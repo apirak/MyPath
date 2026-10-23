@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/index.css"
+        ],
+        "createdAt": "2026-10-23T11:46:02.553Z",
+        "reason": "Design reference: Figma node 4:44296 uses a subject-color stripe at the left edge of My Path plan cards; the prototype preserves that visual subject identifier."
+      }
+    ]
+  }
+}
