@@ -1,0 +1,52 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="1133" height="90" viewBox="0 0 1133 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Center-Land" filter="url(#filter0_n_0_583)">
+<g clip-path="url(#clip0_0_583)">
+<g id="Vector">
+<ellipse cx="567" cy="165" rx="630" ry="165" fill="url(#paint0_radial_0_583)"/>
+<ellipse cx="567" cy="165" rx="630" ry="165" fill="url(#paint1_radial_0_583)" fill-opacity="0.2"/>
+</g>
+<g id="Glass">
+<path id="Vector_2" d="M1095 76.7692L1092.5 80M1090 74L1089 79.0769M1085.5 79.5385L1084 75.8462" stroke-linecap="round" stroke="#143F7D" style="stroke:#143F7D;stroke:color(display-p3 0.0784 0.2471 0.4902);stroke-opacity:1;"/>
+<path id="Vector_3" d="M662 73.7692L659.5 77M657 71L656 76.0769M652.5 76.5385L651 72.8462" stroke-linecap="round" stroke="#143F7D" style="stroke:#143F7D;stroke:color(display-p3 0.0784 0.2471 0.4902);stroke-opacity:1;"/>
+<path id="Vector_4" d="M883 67.7692L880.5 71M878 65L877 70.0769M873.5 70.5385L872 66.8462" stroke-linecap="round" stroke="#143F7D" style="stroke:#143F7D;stroke:color(display-p3 0.0784 0.2471 0.4902);stroke-opacity:1;"/>
+<path id="Vector_5" d="M56 73.7692L58.5 77M61 71L62 76.0769M65.5 76.5385L67 72.8462" stroke-linecap="round" stroke="#143F7D" style="stroke:#143F7D;stroke:color(display-p3 0.0784 0.2471 0.4902);stroke-opacity:1;"/>
+<path id="Vector_6" d="M243 76.7692L245.5 80M248 74L249 79.0769M252.5 79.5385L254 75.8462" stroke-linecap="round" stroke="#143F7D" style="stroke:#143F7D;stroke:color(display-p3 0.0784 0.2471 0.4902);stroke-opacity:1;"/>
+<path id="Vector_7" d="M472 67.7692L474.5 71M477 65L478 70.0769M481.5 70.5385L483 66.8462" stroke-linecap="round" stroke="#143F7D" style="stroke:#143F7D;stroke:color(display-p3 0.0784 0.2471 0.4902);stroke-opacity:1;"/>
+<path id="Vector_8" d="M993 50.7692L990.5 54M988 48L987 53.0769M983.5 53.5385L982 49.8462" stroke-linecap="round" stroke="#143F7D" style="stroke:#143F7D;stroke:color(display-p3 0.0784 0.2471 0.4902);stroke-opacity:1;"/>
+<path id="Vector_9" d="M141 47.7692L143.5 51M146 45L147 50.0769M150.5 50.5385L152 46.8462" stroke-linecap="round" stroke="#143F7D" style="stroke:#143F7D;stroke:color(display-p3 0.0784 0.2471 0.4902);stroke-opacity:1;"/>
+</g>
+</g>
+</g>
+<defs>
+<filter id="filter0_n_0_583" x="0" y="0" width="1133" height="90" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feTurbulence type="fractalNoise" baseFrequency="3.3333332538604736 3.3333332538604736" stitchTiles="stitch" numOctaves="3" result="noise" seed="4446" />
+<feComponentTransfer in="noise" result="coloredNoise1">
+<feFuncR type="linear" slope="2" intercept="-0.5" />
+<feFuncG type="linear" slope="2" intercept="-0.5" />
+<feFuncB type="linear" slope="2" intercept="-0.5" />
+<feFuncA type="discrete" tableValues="0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+</feComponentTransfer>
+<feComposite operator="in" in2="shape" in="coloredNoise1" result="noise1Clipped" />
+<feComponentTransfer in="noise1Clipped" result="color1">
+<feFuncA type="table" tableValues="0 0.15" />
+</feComponentTransfer>
+<feMerge result="effect1_noise_0_583">
+<feMergeNode in="shape" />
+<feMergeNode in="color1" />
+</feMerge>
+</filter>
+<radialGradient id="paint0_radial_0_583" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(579.048 -13.6555) rotate(90) scale(384.18 838.99)">
+<stop stop-color="#266BC8" style="stop-color:#266BC8;stop-color:color(display-p3 0.1490 0.4196 0.7843);stop-opacity:1;"/>
+<stop offset="1" stop-color="#1D58A8" style="stop-color:#1D58A8;stop-color:color(display-p3 0.1137 0.3451 0.6588);stop-opacity:1;"/>
+</radialGradient>
+<radialGradient id="paint1_radial_0_583" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(567.502 -0.407905) rotate(90) scale(129.359 945.012)">
+<stop stop-color="white" stop-opacity="0" style="stop-color:none;stop-opacity:0;"/>
+<stop offset="1" style="stop-color:black;stop-opacity:1;"/>
+</radialGradient>
+<clipPath id="clip0_0_583">
+<rect width="1133" height="90" fill="white" style="fill:white;fill-opacity:1;"/>
+</clipPath>
+</defs>
+</svg>
