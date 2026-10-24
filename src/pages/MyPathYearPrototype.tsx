@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
-import { BookOpen, CalendarDays, ChevronLeft, ChevronRight, CircleUserRound, House } from 'lucide-react'
+import { BookOpen, CalendarDays, CircleUserRound, House } from 'lucide-react'
+import PathHeader from '../components/PathHeader'
 
 // PROTOTYPE — Yearly My Path (throwaway): ดีไซน์ที่เจ้าของเลือกแล้ว (เดิมชื่อ variant A · Timeline grid) บน /mypath/year-prototype
 // ข้อตกลงที่ล็อกไว้ (2026-10-23):
@@ -333,19 +334,7 @@ export default function MyPathYearPrototype() {
   return (
     <main className="yp-page">
       <div className="yp-shell">
-        <header className="monthly-header yp-header">
-          <div className="monthly-tabs">
-            <a href="/mypath">Week</a>
-            <a href="/mypath">Month</a>
-            <a className="active" href="/mypath/year-prototype">Year</a>
-          </div>
-          <div className="month-picker">
-            <button aria-label="ย้อนกลับ"><ChevronLeft /></button>
-            <b>ต.ค. 2569 – ก.พ. 2571</b>
-            <button aria-label="ถัดไป"><ChevronRight /></button>
-          </div>
-          <button className="study-calendar"><CalendarDays size={20} /><span>ปฏิทินการเรียน</span></button>
-        </header>
+        <PathHeader active="year" period="ต.ค. 2569 – ก.พ. 2571" />
         <div className="yp-desktop"><YearTable /><LoadRow /></div>
         <MobileYear />
         <details className="yp-data">

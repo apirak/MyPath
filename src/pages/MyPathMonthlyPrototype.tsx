@@ -1,8 +1,9 @@
 import type { CSSProperties } from 'react'
-import { BookOpen, CalendarDays, ChevronLeft, ChevronRight, CircleUserRound, House } from 'lucide-react'
+import { BookOpen, CalendarDays, CircleUserRound, House } from 'lucide-react'
 import mathCover from '../assets/home/physics-1.png'
 import physicsCover from '../assets/home/physics-3.png'
 import chemistryCover from '../assets/home/physics-2.png'
+import PathHeader from '../components/PathHeader'
 
 // PROTOTYPE: Three Monthly My Path layouts, switchable via ?variant=A|B|C.
 type Course = { subject: string; name: string; type: string; hours: string; start: string; end: string; color: string; cover: string }
@@ -21,7 +22,7 @@ function CourseCard({ course, compact = false }: { course: Course; compact?: boo
 }
 
 function PageHeader() {
-  return <><header className="monthly-header"><h1>แผนการเรียน</h1><div className="monthly-tabs"><button>Week</button><button className="active">Month</button><a href="/mypath/year-prototype">Year</a></div><button className="study-calendar"><CalendarDays size={20} /><span>ปฏิทินการเรียน</span></button></header><div className="month-picker"><button aria-label="Previous month"><ChevronLeft /></button><b>มกราคม 2569</b><button aria-label="Next month"><ChevronRight /></button></div></>
+  return <PathHeader active="month" period="มกราคม 2569" />
 }
 
 function VariantC() {
