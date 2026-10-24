@@ -11,6 +11,7 @@
   position:relative;display:inline-flex;border:0;padding:0;min-height:40px;
   border-radius:10px;background:transparent;color:var(--hb-ink);font-weight:700;cursor:pointer;
   -webkit-tap-highlight-color:transparent;user-select:none;
+  transform:translateY(2px);/* กล่องทั้งก้อนจมลง 2px ตลอด — ค่าล็อกจากเจ้าของ ไม่เกี่ยวกับ motion ที่ front */
 }
 .header-button--primary{
   --hb-face:#0078c4;--hb-ink:#fff;--hb-border:#0078c4;--hb-edge:#03548b;
