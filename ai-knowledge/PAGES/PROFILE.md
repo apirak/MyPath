@@ -24,9 +24,9 @@ The signed-in learner profile hub. It shows the learner identity and account-lin
 | Component | File | Purpose | Behavior / states |
 |---|---|---|---|
 | Avatar preview | `src/pages/Profile.tsx` | Composes supplied Figma avatar layers | Static as-is preview |
-| Profile tools | `src/pages/Profile.tsx` | Share, egg currency, mastery count, outfit entry points | Share/outfit are HeaderButton (pushable 3-layer, secondary); the two counters stay plain badges |
+| Profile tools | `src/pages/Profile.tsx` | Share, egg currency, mastery count, outfit entry points | Share/outfit are HeaderButton on the blue hero — borderless flavour (`header-button--plain`, edge `#d9e8f1`); the two counters stay plain badges |
 | Profile menu | `src/pages/Profile.tsx` | Online Solution, report problem, rate us, contact links | Static rows built on HeaderButton (secondary) with trailing arrows |
-| HeaderButton | `src/components/HeaderButton.tsx` | Shared push button (settings icon here too) | Press animation (solid edge + floating front — no blurred shadow, hover does not change colour); hover lift on pointer devices only, keyboard `:focus-visible` ring, honors `prefers-reduced-motion` |
+| HeaderButton | `src/components/HeaderButton.tsx` | Shared push button (settings icon here too) | Press animation (solid edge + floating front — no blurred shadow, hover does not change colour); on white surfaces the secondary face carries a 3-side border in the edge colour (no bottom border, so visual height matches borderless buttons and primary); keyboard `:focus-visible` ring, honors `prefers-reduced-motion` |
 
 ## States & variants
 

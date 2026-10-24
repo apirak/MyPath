@@ -3,9 +3,11 @@
    edge   = ด้านข้าง 3D สีทึบ อยู่กับที่
    front  = หน้าปุ่มจริง (พื้น/ขอบ/padding) ยกลอย -4px ตอนพัก
    สีทั้งก้อนขับเคลื่อนด้วย --hb-* — variant ใหม่แค่ประกาศชุดตัวแปร
+   secondary มี 2 แบบ: บนพื้นสี = ไร้ขอบ (เติม class header-button--plain)
+   · บนพื้นขาว = ขอบ 3 ด้านสีเดียวกับเงา ไม่มีขอบล่าง (ให้ความสูงสายตาเท่าแบบพื้นสีและ primary)
    (เจ้าของเลือกแบบเงาคมไม่เบลอ + hover ไม่เปลี่ยนสี — ดู verdict บน branch prototype/button-shadow) */
 .header-button{
-  --hb-face:#fff;--hb-ink:#212529;--hb-border:#dee2e6;--hb-edge:#c8cfd6;
+  --hb-face:#fff;--hb-ink:#212529;--hb-border:#d9e8f1;--hb-edge:#d9e8f1;
   position:relative;display:inline-flex;border:0;padding:0;min-height:40px;
   border-radius:10px;background:transparent;color:var(--hb-ink);font-weight:700;cursor:pointer;
   -webkit-tap-highlight-color:transparent;user-select:none;
@@ -19,9 +21,10 @@
 .header-button__front{
   position:relative;align-self:stretch;flex:1;min-width:0;
   display:flex;align-items:center;justify-content:center;gap:6px;
-  border-radius:inherit;background:var(--hb-face);border:2px solid var(--hb-border);padding:8px 12px;
+  border-radius:inherit;background:var(--hb-face);border:2px solid var(--hb-border);border-bottom:0;padding:8px 12px;
   transform:translateY(-4px);
 }
+.header-button--plain .header-button__front{border:0}
 /* จังหวะ 3 แบบ: ปล่อย = จมกลับช้าๆ · hover = เด้งขึ้นด้วย overshoot · กด = เร็วเท่า ~2 เฟรม */
 .header-button__front{transition:transform 600ms cubic-bezier(0.3,0.7,0.4,1);will-change:transform}
 @media(hover:hover){
