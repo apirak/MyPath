@@ -53,6 +53,15 @@
   .cdp-grab{display:none}
 }
 
+/* ---------- รูปปก (แสดงเฉพาะคอร์สที่มี cover ใน mock) ---------- */
+.cdp-cover{display:block;width:100%;height:110px;object-fit:cover;border:2px solid #dee2e6;border-radius:10px;margin:8px 0 2px}
+.cdp-drawer>.cdp-cover{width:calc(100% - 28px);height:96px;margin:10px 14px 0}
+.cdp-cover.hero{flex:none;width:168px;height:96px;margin:0;border:3px solid #fff;box-shadow:0 4px 14px rgba(33,37,41,.3)}
+.cdp-hero-inner{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px}
+.cdp-hero-inner>button{flex-basis:100%}
+.cdp-hero-copy{flex:1;min-width:0}
+@media(max-width:640px){.cdp-cover.hero{width:104px;height:60px;border-width:2px}}
+
 /* ---------- Variant B: หน้าเต็ม ---------- */
 .cdp-page{min-height:100vh;background:#f7f9fc;padding-bottom:76px}
 .cdp-hero{background:var(--subject);color:#fff}

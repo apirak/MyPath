@@ -8,7 +8,7 @@ import { useEffect, type CSSProperties } from 'react'
 import { useNavigate, useSearchParams, useParams, useLocation, Link } from 'react-router-dom'
 import BottomNav from '../components/BottomNav'
 import { subjects, fmtDate, type Course, type Subject } from './plan'
-import { getCourseDetail, prices, ONDEMAND_URL, EGGSPACE_SYSTEMS, EGGSPACE_NOTES, EXAMGYM_SYSTEMS, EXAMGYM_AUDIENCE } from './courseDetail'
+import { getCourseDetail, prices, covers, ONDEMAND_URL, EGGSPACE_SYSTEMS, EGGSPACE_NOTES, EXAMGYM_SYSTEMS, EXAMGYM_AUDIENCE } from './courseDetail'
 import './CourseDetailPrototype.css'
 
 /* ---------- helpers ที่ใช้ร่วม ---------- */
@@ -73,6 +73,7 @@ function BuyBox({ course, big = false }: { course: Course; big?: boolean }) {
 function SheetA({ ref: cr, onClose }: { ref: CourseRef; onClose: () => void }) {
   const { subject, course } = cr
   const d = getCourseDetail(course.id)
+  const cover = covers[course.id]
   return (
     <div className="cdp-a">
       <div className="cdp-backdrop" onClick={onClose} />
@@ -90,6 +91,7 @@ function SheetA({ ref: cr, onClose }: { ref: CourseRef; onClose: () => void }) {
           </div>
         </header>
         <div className="cdp-sheet-body">
+          {cover && <img className="cdp-cover" src={cover} alt="" />}
           {d?.volume && <>
             <h4>หัวข้อในเล่ม{d.volume.title ? ` · ${d.volume.title}` : ''}</h4>
             <div className="cdp-chips">{d.volume.chapters.map(t => <i key={t}>{t}</i>)}</div>
@@ -122,18 +124,22 @@ function PageB({ cr, onBack }: { cr: CourseRef; onBack: () => void }) {
   const { subject, course } = cr
   const d = getCourseDetail(course.id)
   const s = statusOf(course)
+  const cover = covers[course.id]
   return (
     <main className="cdp-page" style={{ '--subject': subject.color } as CSSProperties}>
       <div className="cdp-hero">
         <div className="cdp-hero-inner">
           <button onClick={onBack}>← กลับแผน</button>
-          <p><i className="dot" />{subject.name}{d?.pack ? ` · แพ็ก ${d.pack.name}` : ''}{d?.examgym ? ' · ExamGym' : ''}</p>
-          <h1>{course.name}</h1>
-          <div className="cdp-meta">
-            <StatusPill course={course} />
-            <OwnBadge course={course} />
-            <span>{course.hours} ชม.</span>
+          <div className="cdp-hero-copy">
+            <p><i className="dot" />{subject.name}{d?.pack ? ` · แพ็ก ${d.pack.name}` : ''}{d?.examgym ? ' · ExamGym' : ''}</p>
+            <h1>{course.name}</h1>
+            <div className="cdp-meta">
+              <StatusPill course={course} />
+              <OwnBadge course={course} />
+              <span>{course.hours} ชม.</span>
+            </div>
           </div>
+          {cover && <img className="cdp-cover hero" src={cover} alt="" />}
         </div>
       </div>
       <div className="cdp-page-body">
@@ -199,6 +205,7 @@ function PageB({ cr, onBack }: { cr: CourseRef; onBack: () => void }) {
 function DrawerC({ ref: cr, onClose }: { ref: CourseRef; onClose: () => void }) {
   const { subject, course } = cr
   const d = getCourseDetail(course.id)
+  const cover = covers[course.id]
   return (
     <div className="cdp-c">
       <div className="cdp-backdrop" onClick={onClose} />
@@ -210,6 +217,7 @@ function DrawerC({ ref: cr, onClose }: { ref: CourseRef; onClose: () => void }) 
           </div>
           <button onClick={onClose} aria-label="ปิด">✕</button>
         </header>
+        {cover && <img className="cdp-cover" src={cover} alt="" />}
         <details open>
           <summary>แผนของน้อง</summary>
           <dl className="cdp-dl">

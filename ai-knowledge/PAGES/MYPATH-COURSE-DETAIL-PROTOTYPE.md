@@ -20,6 +20,7 @@
 - คอร์ส **ไม่มีรายละเอียด** (10/25 คอร์ส) → การ์ดย่อจากแผน + ข้อความ "ยังไม่มีรายละเอียดเนื้อหา"
 - คอร์ส **ยังไม่ได้ซื้อ** → ปุ่ม "หาซื้อบน OnDemand ↗" เปิด `ONDEMAND_URL = https://shoponline.ondemand.in.th` (แก้ที่เดียวใน `courseDetail.ts`) + ราคาถ้ามีใน courses.md
 - คลิกได้จาก **ทุกที่ที่คอร์สปรากฏ**: แถบ Year เดสก์ท็อป, เซลล์ Year มือถือ, การ์ด Month · ป้ายสอบ/Mock ไม่รวม
+- **รูปปก**: คอร์สที่มี cover ในแอป (PHY.0–4, MATH.1, CHEM.1 — map ใน `covers` ของ courseDetail.ts) แสดง cover ทุก variant — A: แถบบนเนื้อหาชีท · B: มุมขวา hero (ขอบขาว) · C: แบนเนอร์ใต้หัว drawer · คอร์สไม่มี cover ไม่แสดง
 - Variant A/C = overlay บนหน้าเดิม (`?course=<รหัส>`) · Variant B = ไป route `/mypath/course/:id` · บน route สลับเป็น A/C จะเห็นสไตล์ของ variant นั้นบนหน้า route ทันที
 - สถานะเทียบ `TODAY = 2026-12-05` (mock): กำลังเรียน / ถัดไป / จบแล้ว ตามนิยามใน GLOSSARY
 

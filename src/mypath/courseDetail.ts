@@ -6,6 +6,22 @@
 // ปุ่ม "หาซื้อบน OnDemand" ของคอร์สที่ยังไม่ได้ซื้อ — เปลี่ยนลิงก์ที่ตัวเดียว เปลี่ยนทุกปุ่ม
 export const ONDEMAND_URL = 'https://shoponline.ondemand.in.th'
 
+// รูปปกที่แอปมีอยู่จริง (ชื่อไฟล์ physics-* แต่ถูกใช้หลายวิชา) — ผูกตามที่หน้า Courses/Month ใช้:
+// PHY.1–4 ตามหน้า Courses · MATH.1/PHY.0/CHEM.1 ตามการ์ดหน้า Month · คอร์สอื่นไม่มี cover ไม่ต้องแสดง
+import physics1 from '../assets/home/physics-1.png'
+import physics2 from '../assets/home/physics-2.png'
+import physics3 from '../assets/home/physics-3.png'
+import physics4 from '../assets/home/physics-4.png'
+export const covers: Record<string, string> = {
+  'MATH.1': physics1,
+  'CHEM.1': physics2,
+  'PHY.0': physics3,
+  'PHY.1': physics3,
+  'PHY.2': physics1,
+  'PHY.3': physics2,
+  'PHY.4': physics4,
+}
+
 // ราคาจาก courses.md (มีเฉพาะคอร์สที่มีภาพคอร์ส) — now = ราคาปัจจุบัน, was = ราคาเดิม
 export const prices: Record<string, { now: number; was?: number }> = {
   'MATH.1': { now: 3900, was: 4900 },
