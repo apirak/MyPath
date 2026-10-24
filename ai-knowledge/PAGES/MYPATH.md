@@ -48,3 +48,4 @@ The redesigned My Path defaults to a monthly study agenda. It puts courses avail
 - The Study Calendar destination will configure regular-day/holiday study hours and per-day overrides.
 - Weekly view is still to be designed.
 - The legacy `/mypath/year-prototype` URL remains available during the transition; the Year tab uses `/mypath/year`.
+- **Course-detail prototype** (branch `prototype/course-detail` only): clicking a course opens a detail view in 3 switchable variants — see `MYPATH-COURSE-DETAIL-PROTOTYPE.md`.
