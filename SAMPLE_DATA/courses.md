@@ -66,6 +66,21 @@
 | CHEM.5 | เคมี TCAS เล่ม 5 | เรียน (ติวเข้ม) | 20 ชม. | – | Plan Canvas |
 | CHEM.EX | ตะลุยโจทย์ Upskill เคมี A-Level | Upskill | 24 ชม. | – | Plan Canvas |
 
+## รายละเอียดคอร์ส — รหัส ↔ ไฟล์หน้าคอร์ส
+
+คอร์สที่มีหน้าคอร์สจริง (ใช้ทำหน้ารายละเอียด) — ที่เหลืออยู่ในกลุ่ม "ไม่มีรายละเอียด":
+
+| รหัส | ไฟล์รายละเอียด |
+|---|---|
+| MATH.1–MATH.5 | [TCAS70_Math.md](TCAS70_Math.md) § รายเล่ม 1–5 |
+| PHY.1–PHY.7 | [TCAS70_Physic.md](TCAS70_Physic.md) § รายเล่ม 1–7 |
+| MATH.EX | [Exam_GYM_Math.md](Exam_GYM_Math.md) |
+| PHY.EX | [Exam_GYM_Physic.md](Exam_GYM_Physic.md) |
+| CHEM.EX | [Exam_GYM_Chem.md](Exam_GYM_Chem.md) |
+| อื่น ๆ (10 คอร์ส) | ไม่มี — TPAT3.1/2, MATH.UP, PHY.0, TGAT.1, CHEM.1–5 |
+
+ไฟล์สำรอง (ไม่แม็ปกับแผน): [TCAS70_Bio.md](TCAS70_Bio.md), [TCAS70_Chem.md](TCAS70_Chem.md) (ว่าง), [Exam_GYM_Bio.md](Exam_GYM_Bio.md), [Exam_GYM_English.md](Exam_GYM_English.md)
+
 ## หมายเหตุ
 
 - คอร์สที่มี `ที่มา = ภาพคอร์ส` คือ 5 คอร์สตัวอย่างเดิม — ชื่อ/ชั่วโมง/ราคา อ่านจากหน้าคอร์สจริง; `ข้อมูลเดิม` = มีอยู่แล้วใน mock เดิมของ prototype (`MyPathMonthlyPrototype.tsx`)
