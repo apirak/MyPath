@@ -1,1 +1,48 @@
-.header-button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;border:2px solid #dee2e6;border-radius:10px;background:#fff;box-shadow:0 3px #dee2e6;padding:8px 12px;color:#212529;font-weight:700}.header-button--icon{width:44px;padding:8px}.profile-heading .header-button{flex:none}
+/* ปุ่มดันได้ 3 ชั้น (joshwcomeau.com/animation/3d-button) — แยกหน้าที่ชั้น:
+   button  = กล่อง layout (กว้าง/สูง/รัศมี/สีตัวอักษร) ที่หน้า CSS ของแต่ละหน้าจับง่าย
+   shadow  = เงาเบลออยู่กับที่ เลื่อน "สวนทาง" กับหน้าปุ่มตอน hover/กด
+   edge    = ด้านข้าง 3D (gradient เข้มที่เลี้ยวมุม) อยู่กับที่
+   front   = หน้าปุ่มจริง (พื้น/ขอบ/padding) ยกลอย -4px ตอนพัก
+   สีทั้งก้อนขับเคลื่อนด้วย --hb-* — variant ใหม่แค่ประกาศชุดตัวแปร */
+.header-button{
+  --hb-face:#fff;--hb-ink:#212529;--hb-border:#dee2e6;
+  --hb-edge-deep:#c8cfd6;--hb-edge-mid:#e9ecef;--hb-shadow:rgba(84,98,112,.42);
+  position:relative;display:inline-flex;border:0;padding:0;min-height:40px;
+  border-radius:10px;background:transparent;color:var(--hb-ink);font-weight:700;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;user-select:none;
+  transition:filter 250ms ease;
+}
+.header-button--primary{
+  --hb-face:#0078c4;--hb-ink:#fff;--hb-border:#0078c4;
+  --hb-edge-deep:#03548b;--hb-edge-mid:#0a6db4;--hb-shadow:rgba(3,52,86,.45);
+}
+.header-button:focus:not(:focus-visible){outline:none}
+.header-button:focus-visible{outline-offset:2px}
+.header-button__shadow,.header-button__edge{position:absolute;inset:0;border-radius:inherit}
+.header-button__shadow{background:var(--hb-shadow);filter:blur(4px);transform:translateY(0)}
+.header-button__edge{background:linear-gradient(to left,var(--hb-edge-deep),var(--hb-edge-mid) 50%,var(--hb-edge-deep))}
+.header-button__front{
+  position:relative;align-self:stretch;flex:1;min-width:0;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  border-radius:inherit;background:var(--hb-face);border:2px solid var(--hb-border);padding:8px 12px;
+  transform:translateY(-4px);
+}
+/* จังหวะ 3 แบบ: ปล่อย = จมกลับช้าๆ · hover = เด้งขึ้นด้วย overshoot · กด = เร็วเท่า ~2 เฟรม */
+.header-button__front,.header-button__shadow{transition:transform 600ms cubic-bezier(0.3,0.7,0.4,1);will-change:transform}
+@media(hover:hover){
+  .header-button:hover{filter:brightness(1.1)}
+  .header-button:hover .header-button__front{transform:translateY(-6px);transition:transform 250ms cubic-bezier(0.3,0.7,0.4,1.5)}
+  .header-button:hover .header-button__shadow{transform:translateY(4px);transition:transform 250ms cubic-bezier(0.3,0.7,0.4,1.5)}
+}
+.header-button:active .header-button__front{transform:translateY(-2px);transition:transform 34ms ease}
+.header-button:active .header-button__shadow{transform:translateY(1px);transition:transform 34ms ease}
+.header-button:disabled{cursor:default;filter:none}
+.header-button:disabled .header-button__front{transform:translateY(-2px)}
+@media(prefers-reduced-motion:reduce){
+  .header-button{transition:none}
+  .header-button__front,.header-button__shadow{transform:none;transition:none}
+  .header-button:hover,.header-button:hover .header-button__front,.header-button:hover .header-button__shadow{filter:none;transform:none;transition:none}
+}
+.header-button--icon{width:44px}
+.header-button--icon .header-button__front{padding:8px}
+.profile-heading .header-button{flex:none}

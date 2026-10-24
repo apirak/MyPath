@@ -28,6 +28,7 @@ The signed-in learner's dashboard. It brings recently used courses, course progr
 | Home | `src/pages/Home.tsx` | Composes the Home dashboard | Static logged-in mock data; Home is active |
 | CourseCard | `src/pages/Home.tsx` | Shows one recent course and its progress | Course list is horizontally scrollable on narrow screens |
 | WeeklyHours | `src/pages/Home.tsx` | Shows current-week learning plan | Static empty-progress/planned-hours state |
+| HeaderButton | `src/components/HeaderButton.tsx` | All push buttons here (coin/bag/notification, carousel ‹ ›, extension links) | Pushable 3-layer button (shadow/edge/front, joshwcomeau-style press animation); secondary (white) variant; hover lift on pointer devices only, keyboard `:focus-visible` ring, honors `prefers-reduced-motion` |
 | Bottom navigation | `src/pages/Home.tsx` | Persistent primary navigation | Visual mock only; links do not navigate yet |
 
 ## States & variants

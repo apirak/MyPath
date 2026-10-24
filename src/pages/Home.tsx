@@ -5,6 +5,7 @@ import physicsTwo from '../assets/home/physics-1.png'
 import physicsThree from '../assets/home/physics-2.png'
 import physicsFour from '../assets/home/physics-4.png'
 import BottomNav from '../components/BottomNav'
+import HeaderButton from '../components/HeaderButton'
 
 const courses = [
   ['V-Series Physics TCAS เล่ม 1: กลุ่มกลศาสตร์ 1', physicsOne, '1', '75%'],
@@ -23,5 +24,5 @@ function WeeklyHours() {
 }
 
 export default function Home() {
-  return <main className="home-page"><header className="home-header"><img src={headerIllustration} alt="" className="header-art" /><div className="header-actions"><button><Coins size={18} /> 100</button><button><ShoppingBag size={18} /> 1</button><button aria-label="Notifications"><Bell size={20} /></button></div><p className="greeting"><Hand size={18} /> วันนี้มาอยู่กับให้เต็มที่นะ</p></header><div className="home-body"><section className="latest"><div className="section-heading"><h1>คอร์สเรียนล่าสุด</h1><div className="desktop-only"><button><ChevronLeft size={20} /></button><button><ChevronRight size={20} /></button></div></div><div className="course-strip">{courses.map((course) => <CourseCard key={course[2]} course={course} />)}</div></section><section className="extensions"><h2>ส่วนเสริม</h2><div className="extension-links"><button><MessageCircle size={20} /> <b>Clear คำถามกับทีมวิชาการ</b><span><ArrowRight size={20} /></span></button><button><Repeat2 size={20} /> <b>Guided Practice</b><em>1</em><span><ArrowRight size={20} /></span></button></div><WeeklyHours /></section></div><BottomNav active="home" /></main>
+  return <main className="home-page"><header className="home-header"><img src={headerIllustration} alt="" className="header-art" /><div className="header-actions"><HeaderButton><Coins size={18} /> 100</HeaderButton><HeaderButton><ShoppingBag size={18} /> 1</HeaderButton><HeaderButton aria-label="Notifications"><Bell size={20} /></HeaderButton></div><p className="greeting"><Hand size={18} /> วันนี้มาอยู่กับให้เต็มที่นะ</p></header><div className="home-body"><section className="latest"><div className="section-heading"><h1>คอร์สเรียนล่าสุด</h1><div className="desktop-only"><HeaderButton><ChevronLeft size={20} /></HeaderButton><HeaderButton><ChevronRight size={20} /></HeaderButton></div></div><div className="course-strip">{courses.map((course) => <CourseCard key={course[2]} course={course} />)}</div></section><section className="extensions"><h2>ส่วนเสริม</h2><div className="extension-links"><HeaderButton><MessageCircle size={20} /> <b>Clear คำถามกับทีมวิชาการ</b><span><ArrowRight size={20} /></span></HeaderButton><HeaderButton><Repeat2 size={20} /> <b>Guided Practice</b><em>1</em><span><ArrowRight size={20} /></span></HeaderButton></div><WeeklyHours /></section></div><BottomNav active="home" /></main>
 }

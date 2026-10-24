@@ -33,7 +33,6 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 /* ---------- CTA ใต้ cover (ปุ่มทั้งหมด = HeaderButton ของแอป) ---------- */
 .cdp-cta{padding:12px 14px 16px}
 .cdp-wide{width:100%}
-.cdp-primary{background:#0078c4;border-color:#0078c4;color:#fff;box-shadow:0 3px #03548b}
 .cdp-buy p{margin:6px 0 0;color:#212529;font-weight:700;font-size:15px;text-align:center}
 .cdp-buy s{margin-left:4px;color:#adb5bd}
 .cdp-sheet-top .header-button,.cdp-drawer>header .header-button{flex:none}
@@ -51,7 +50,7 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 .cdp-sheet>header{padding:6px 14px 10px;border-bottom:2px solid #e9ecef}
 .cdp-sheet-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .cdp-sheet-top b{font-size:15px}
-.cdp-sheet-top button{width:34px;height:34px;border:2px solid #dee2e6;border-radius:10px;background:#fff;color:#6d757e;font-size:15px}
+.cdp-sheet-top button{width:34px;height:34px;color:#6d757e;font-size:15px}
 .cdp-sheet-body{flex:1 1 auto;min-height:0;overflow:auto;padding:4px 14px 12px}
 .cdp-sheet-body h4{margin:12px 0 2px;font-size:13px;color:#0078c4}
 .cdp-sheet>footer{display:flex;align-items:center;justify-content:flex-end;border-top:2px solid #e9ecef;background:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
@@ -63,7 +62,7 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 .cdp-drawer>header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;border-left:8px solid var(--subject);padding:14px}
 .cdp-drawer>header b{font-size:13px;color:#6d757e}
 .cdp-drawer>header h3{margin:4px 0 0;font-size:17px;line-height:1.4}
-.cdp-drawer>header button{flex:none;width:34px;height:34px;border:2px solid #dee2e6;border-radius:10px;background:#fff;color:#6d757e;font-size:15px}
+.cdp-drawer>header button{flex:none;width:34px;height:34px;color:#6d757e;font-size:15px}
 .cdp-drawer details{border-top:2px solid #e9ecef;padding:10px 14px}
 .cdp-drawer summary{cursor:pointer;font-weight:700;font-size:14px;color:#0078c4;padding:4px 0}
 .cdp-dl>div{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed #e9ecef;font-size:13px}

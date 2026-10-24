@@ -45,7 +45,7 @@ function OwnBadge({ course }: { course: Course }) {
 function CtaUnderCover({ course }: { course: Course }) {
   const price = prices[course.id]
   const go = () => window.open(ONDEMAND_URL, '_blank', 'noreferrer')
-  if (course.owned) return <HeaderButton className="cdp-wide cdp-primary" onClick={go}>เริ่มเรียน</HeaderButton>
+  if (course.owned) return <HeaderButton variant="primary" className="cdp-wide" onClick={go}>เริ่มเรียน</HeaderButton>
   return (
     <div className="cdp-buy">
       <HeaderButton className="cdp-wide" onClick={go}>หาซื้อบน OnDemand</HeaderButton>
