@@ -43,13 +43,15 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 /* ---------- มือถือ ≤640px: bottom sheet ---------- */
 .cdp-a{position:fixed;inset:0;z-index:61;pointer-events:none}
 .cdp-a .cdp-backdrop{pointer-events:auto}
-.cdp-sheet{pointer-events:auto;position:fixed;right:0;bottom:0;left:0;z-index:2;display:flex;flex-direction:column;max-height:86vh;border-radius:18px 18px 0 0;background:#fff;box-shadow:0 -8px 30px rgba(33,37,41,.25);animation:cdp-up .18s}
+.cdp-sheet{pointer-events:auto;position:fixed;right:0;bottom:0;left:0;z-index:2;display:flex;flex-direction:column;max-height:86vh;border-radius:18px 18px 0 0;background:#fff;box-shadow:0 -8px 30px rgba(33,37,41,.25);animation:cdp-up .18s;overflow:auto}
+/* ส่วนตายห้ามยืดหด — เหลือให้ body เดียวที่ยืด/เลื่อนตามพื้นที่ที่เหลือ (จอสั้นมาก = ชีทเลื่อนทั้งใบแทน) */
+.cdp-sheet>header,.cdp-sheet>.cdp-cover,.cdp-sheet>.cdp-cta,.cdp-sheet>footer{flex:none}
 .cdp-grab{display:block;width:44px;height:5px;border-radius:3px;background:#dee2e6;margin:8px auto 2px}
 .cdp-sheet>header{padding:6px 14px 10px;border-bottom:2px solid #e9ecef}
 .cdp-sheet-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .cdp-sheet-top b{font-size:15px}
 .cdp-sheet-top button{width:34px;height:34px;border:2px solid #dee2e6;border-radius:10px;background:#fff;color:#6d757e;font-size:15px}
-.cdp-sheet-body{flex:1;overflow:auto;padding:4px 14px 12px}
+.cdp-sheet-body{flex:1 1 auto;min-height:0;overflow:auto;padding:4px 14px 12px}
 .cdp-sheet-body h4{margin:12px 0 2px;font-size:13px;color:#0078c4}
 .cdp-sheet>footer{display:flex;align-items:center;justify-content:flex-end;border-top:2px solid #e9ecef;background:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
 
