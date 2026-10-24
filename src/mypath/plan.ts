@@ -1,6 +1,8 @@
 // แผนเรียน mock ของ My Path — ข้อมูล + simulation คิดวันที่ + เรขาคณิตแกนเวลา day-exact
 // ที่มา = SAMPLE_DATA/ (courses.md + study-plan.md สำหรับคอร์ส, exam-dates.md สำหรับสอบ) — mirror ด้วยมือ
-// แก้ hours ใน subjectsSpec ทีเดียว → วันเริ่ม-จบของทั้งแผนขยับเอง (ยกเว้น 3 แถบ fixed)
+import { courseCatalog, type CourseCatalogItem } from './courseCatalog'
+import { studyCalendar, studentCourses } from './studentPlan'
+import { useSyncExternalStore } from 'react'
 
 // --- ปฏิทิน day-exact (ทำงานบน UTC กันเรื่อง DST) ---
 export const MS = 86_400_000
@@ -8,124 +10,116 @@ export const u = (iso: string) => { const [y, m, d] = iso.split('-').map(Number)
 export const isoOf = (ms: number) => new Date(ms).toISOString().slice(0, 10)
 export const addDays = (iso: string, n: number) => isoOf(u(iso) + n * MS)
 export const AXIS_START = '2026-10-01'
-export const AXIS_END = '2028-03-01' // exclusive = จบ ก.พ. 71
-export const TOTAL_DAYS = (u(AXIS_END) - u(AXIS_START)) / MS
+export let AXIS_END = '2028-03-01' // exclusive; recalc ถึงสิ้นเดือนของคอร์สสุดท้าย
+export let TOTAL_DAYS = (u(AXIS_END) - u(AXIS_START)) / MS
 const DAY_START = u('2026-09-28') // วันเริ่ม simulation (จันทร์ที่เริ่มเล่ม 1)
-const DAY_LAST = u('2028-02-28') // วันสุดท้ายของแผน (ก่อนสอบ A-Level จบแผน)
+// เผื่อเวลาหลังแกน Year เดิม เพื่อไม่ตัดคอร์สที่ยังเรียนไม่จบเมื่อปรับปฏิทิน
+const DAY_LAST = u('2028-04-30')
 
 // วันอ้างอิงของ mock (GLOSSARY.md: "วันนี้") — ค่าเดียว ทั้ง Month และ Year ใช้ร่วมกัน
 // แก้ค่านี้ทีเดียว → section ของทั้งสองหน้าขยับตาม (ไม่อ่านนาฬิกาเครื่อง)
 export const TODAY = '2026-12-05'
 
-export const N = 17
+export let N = 17
 const mn = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.']
 const be = (y: number) => String(y + 543).slice(2)
 export const fmtDate = (iso: string) => { const [y, m, d] = iso.split('-').map(Number); return `${d} ${mn[m - 1]} ${be(y)}` }
 export const fmtShort = (iso: string) => { const [, m, d] = iso.split('-').map(Number); return `${d} ${mn[m - 1]}` }
 
-// เดือนบนแกน (ความยาวจริง 31/30/29 วัน) — ใช้ทำหัวตารางและเส้นแบ่งให้ตรงกับตำแหน่งวันจริง
-export const axisMonths = (() => {
-  const out: { label: string; days: number }[] = []
-  let y = 2026, m = 10
-  while (y < 2028 || m <= 2) {
-    out.push({ label: `${mn[m - 1]} ${be(y)}`, days: new Date(Date.UTC(y, m, 0)).getUTCDate() })
-    m += 1; if (m > 12) { m = 1; y += 1 }
-  }
-  return out
-})()
-// เส้นแบ่งเดือน (ตำแหน่ง % สะสมตามวันจริง ตัดเดือนแรกออก)
-export const monthLines = (() => {
-  const lines: number[] = []
-  let acc = 0
-  for (let i = 0; i < axisMonths.length - 1; i++) { acc += axisMonths[i].days; lines.push((acc / TOTAL_DAYS) * 100) }
-  return lines
-})()
+export let axisMonths: { label: string; days: number }[] = []
+export let monthLines: number[] = []
+export let axisLabel = ''
 
 // ตำแหน่งวันบนแกน (หน่วย: เดือน 0..17, day-exact)
 export const pos = (iso: string) => ((u(iso) - u(AXIS_START)) / MS / TOTAL_DAYS) * N
 export const posMs = (ms: number) => ((ms - u(AXIS_START)) / MS / TOTAL_DAYS) * N
 export const pct = (v: number) => (v / N) * 100
 
-type CourseSpec = { id: string; name: string; short: string; abbr: string; hours: number; hpw?: number; owned?: boolean; anchor?: string; fixed?: { start: string; end: string }; cover?: string }
-export type Course = CourseSpec & { start: string; end: string }
+export type Course = CourseCatalogItem & {
+  start: string
+  end: string
+  owned?: boolean
+  startDate?: string
+  weeklyHours: number
+  estimatedWeeks: number
+}
 export type Subject = { name: string; color: string; courses: Course[] }
 export type ExamEvent = { id: string; date: string; label: string; kind: 'exam' | 'mock'; owned?: boolean }
+export const scheduledHoursByDay = new Map<string, number>()
 
-// จาก SAMPLE_DATA/courses.md + study-plan.md (25 คอร์ส, 554.5 ชม.) — start/end ของทุกคอร์ส "คำนวณจากชั่วโมง"
-// ด้วย simulation รายวัน: แต่ละเล่มเดินด้วยจังหวะของตัวเอง hpw = ชม./สปด. วัดจากความยาวแถบบน Plan Canvas
-// (ตาราง study-plan.md — ช้าสุด CHEM.1 2.22 ชม./สปด. ยืด 9 สปด. · เร็วสุด MATH.3 9 ชม./สปด. จบใน 2 สปด.)
-// · คอร์สเริ่มวันถัดจากคอร์สก่อนหน้าในวิชาเดียวกันจบ (ไม่เร็วกว่า anchor ของตัวเอง)
-// ยกเว้น 3 แถบ fixed: TGAT.1 (เรียนเบาทั้งแถบ 17 สปด.) และ MATH.UP + MATH.EX (ผูกฤดูสอบ split 13 สปด. ตามแถบภาพ)
-// → แก้ hours ที่นี่ทีเดียว วันเริ่ม-จบทั้งแผนขยับให้เอง (แถบยืด/หดตามอัตรา hpw เดิม · คอร์สใหม่ไม่ใส่ hpw = 3 ชม./สปด.)
-const subjectsSpec: { name: string; color: string; courses: CourseSpec[] }[] = [
-  { name: 'TPAT3', color: '#a51d1d', courses: [
-    { id: 'TPAT3.1', name: 'ติวเข้มความถนัด วิศวะ (TPAT3)', short: 'ติวเข้ม TPAT3', abbr: 'ติวเข้ม', hours: 30, hpw: 3.33, owned: true, anchor: '2026-10-01' },
-    { id: 'TPAT3.2', name: 'ตะลุยโจทย์ TPAT3 · ทำข้อสอบเก่า', short: 'ทำข้อสอบเก่า', abbr: 'ทำข้อสอบ', hours: 18, hpw: 2, anchor: '2027-12-01' },
-  ]},
-  { name: 'คณิต 1', color: '#0078c4', courses: [
-    { id: 'MATH.1', name: 'Applied Math Admissions TCAS เล่ม 1 (For Dek70)', short: 'เล่ม 1', abbr: 'ล. 1', hours: 24, hpw: 3, owned: true, anchor: '2026-09-28', cover: '/cover/Math_TCAS70_1.png' },
-    { id: 'MATH.2', name: 'Applied Math Admissions TCAS เล่ม 2 (For Dek70)', short: 'เล่ม 2', abbr: 'ล. 2', hours: 24, hpw: 6.86, owned: true, cover: '/cover/Math_TCAS70_2.png' },
-    { id: 'MATH.3', name: 'Applied Math Admissions TCAS เล่ม 3', short: 'เล่ม 3', abbr: 'ล. 3', hours: 18, hpw: 9, owned: true, cover: '/cover/Math_TCAS70_3.png' },
-    { id: 'MATH.4', name: 'Applied Math Admissions TCAS เล่ม 4', short: 'เล่ม 4', abbr: 'ล. 4', hours: 21, hpw: 7, cover: '/cover/Math_TCAS70_4.png' },
-    { id: 'MATH.5', name: 'Applied Math Admissions TCAS เล่ม 5', short: 'เล่ม 5', abbr: 'ล. 5', hours: 24, hpw: 4.36, cover: '/cover/Math_TCAS70_5.png' },
-    { id: 'MATH.UP', name: 'Upskill คณิตศาสตร์ประยุกต์ 1 A-Level', short: 'Upskill คณิต', abbr: 'UP', hours: 64.5, fixed: { start: '2027-12-01', end: '2028-01-15' } },
-    { id: 'MATH.EX', name: 'MATH TCAS ตะลุยโจทย์ข้อสอบ ครบทุกแนว (UPDATE Version 2026 · TCAS70)', short: 'ตะลุยโจทย์ MATH', abbr: 'ตะลุย', hours: 30, fixed: { start: '2028-01-16', end: '2028-02-28' }, cover: '/cover/Exam_Gym_Math.png' },
-  ]},
-  { name: 'ฟิสิกส์', color: '#d72630', courses: [
-    { id: 'PHY.0', name: 'ปรับพื้นฐานฟิสิกส์ TCAS (ปูพื้น ครบทุกทักษะ ครบทุกแนว)', short: 'ปรับพื้นฐาน', abbr: 'ปูพื้น', hours: 18, hpw: 4.5, owned: true, anchor: '2026-10-01' },
-    { id: 'PHY.1', name: 'ฟิสิกส์ TCAS ล. 1', short: 'ล. 1', abbr: 'ล.1', hours: 24, hpw: 3.69, owned: true, cover: '/cover/Physics_TCAS70_1.png' },
-    { id: 'PHY.2', name: 'ฟิสิกส์ TCAS ล. 2 · กลศาสตร์วิเคราะห์ 2', short: 'ล. 2 · กลศาสตร์ 2', abbr: 'ล.2', hours: 21, hpw: 4.2, owned: true, cover: '/cover/Physics_TCAS70_2.png' },
-    { id: 'PHY.3', name: 'ฟิสิกส์ TCAS ล. 3', short: 'ล. 3', abbr: 'ล.3', hours: 15, hpw: 5, owned: true, cover: '/cover/Physics_TCAS70_3.png' },
-    { id: 'PHY.4', name: 'ฟิสิกส์ TCAS ล. 4', short: 'ล. 4', abbr: 'ล.4', hours: 18, hpw: 5.14, owned: true, cover: '/cover/Physics_TCAS70_4.png' },
-    { id: 'PHY.5', name: 'ฟิสิกส์ TCAS ล. 5', short: 'ล. 5', abbr: 'ล.5', hours: 12, hpw: 6, cover: '/cover/Physics_TCAS70_5.png' },
-    { id: 'PHY.6', name: 'ฟิสิกส์ TCAS ล. 6', short: 'ล. 6', abbr: 'ล.6', hours: 15, hpw: 7.5, cover: '/cover/Physics_TCAS70_6.png' },
-    { id: 'PHY.7', name: 'ฟิสิกส์ TCAS ล. 7', short: 'ล. 7', abbr: 'ล.7', hours: 15, hpw: 5, cover: '/cover/Physics_TCAS70_7.png' },
-    { id: 'PHY.EX', name: "PHYSICS TCAS Dek'70 ตะลุยโจทย์ข้อสอบ ครบทุกแนว (TCAS70)", short: 'ตะลุยโจทย์ฟิสิกส์', abbr: 'ตะลุย', hours: 24, hpw: 1.85, anchor: '2027-12-01', cover: '/cover/Exam_Gym_Physic.png' },
-  ]},
-  { name: 'TGAT', color: '#ff6b17', courses: [
-    { id: 'TGAT.1', name: 'ล่าแข่ง TGAT', short: 'ล่าแข่ง TGAT', abbr: 'ล่าแข่ง', hours: 15, fixed: { start: '2027-08-01', end: '2027-11-29' } },
-  ]},
-  { name: 'เคมี', color: '#f5bd3d', courses: [
-    { id: 'CHEM.1', name: 'เคมี TCAS เล่ม 1 · กลุ่มอะตอมและตารางธาตุ', short: 'เล่ม 1', abbr: 'ล. 1', hours: 20, hpw: 2.22, anchor: '2026-12-01' },
-    { id: 'CHEM.2', name: 'เคมี TCAS เล่ม 2 · ปริมาณสัมพันธ์', short: 'เล่ม 2', abbr: 'ล. 2', hours: 20, hpw: 3.33 },
-    { id: 'CHEM.3', name: 'เคมี TCAS เล่ม 3 · พันธะเคมี', short: 'เล่ม 3', abbr: 'ล. 3', hours: 20, hpw: 3.08 },
-    { id: 'CHEM.4', name: 'เคมี TCAS เล่ม 4', short: 'เล่ม 4', abbr: 'ล. 4', hours: 20, hpw: 4.44, anchor: '2027-08-01' },
-    { id: 'CHEM.5', name: 'เคมี TCAS เล่ม 5', short: 'เล่ม 5', abbr: 'ล. 5', hours: 20, hpw: 4.44 },
-    { id: 'CHEM.EX', name: 'ตะลุยโจทย์ Upskill เคมี A-Level', short: 'ตะลุยโจทย์', abbr: 'ตะลุย', hours: 24, hpw: 1.85, anchor: '2027-12-01', cover: '/cover/Exam_Gym_Chemistry.png' },
-  ]},
-]
+export const estimatedWeeksFor = (hours: number, weeklyHours: number) => Math.ceil(hours / weeklyHours)
+const DEFAULT_WEEKLY_HOURS = 5
+const listeners = new Set<() => void>()
+let planVersion = 0
+const subscribe = (listener: () => void) => { listeners.add(listener); return () => listeners.delete(listener) }
+export const usePlanVersion = () => useSyncExternalStore(subscribe, () => planVersion, () => planVersion)
 
-// simulation รายวัน: แต่ละคอร์สสะสมชั่วโมงด้วยอัตราของตัวเอง (hpw ÷ 7 = ชม./วัน) จนครบ — ไม่แชร์งบรวมอีกต่อไป
-const simStart = new Map<string, number>()
-const simEnd = new Map<string, number>()
-{
-  const acc = new Map<string, number>()
-  const done = new Set<string>()
-  const flat: { c: CourseSpec; prev: string | null }[] = []
-  for (const s of subjectsSpec) s.courses.forEach((c, i) => flat.push({ c, prev: i ? s.courses[i - 1].id : null }))
-  for (const { c } of flat) if (c.fixed) { simStart.set(c.id, u(c.fixed.start)); simEnd.set(c.id, u(c.fixed.end)); done.add(c.id) }
-  let day = DAY_START
-  while (day <= DAY_LAST && done.size < flat.length) {
-    // เริ่มคอร์สที่คิวถึงแล้ว: คอร์สก่อนหน้าในวิชาเดียวกันจบแล้ว และถึงวัน anchor (ถ้ามี)
-    for (const { c, prev } of flat) {
-      if (simStart.has(c.id)) continue
-      if ((prev === null || done.has(prev)) && (c.anchor === undefined || day >= u(c.anchor))) simStart.set(c.id, day)
-    }
-    // คอร์สที่เดินอยู่เก็บชั่วโมงตามจังหวะ hpw ของตัวเอง (fixed มีวันเริ่ม-จบของภาพอยู่แล้ว)
-    for (const { c } of flat) {
-      if (c.fixed || !simStart.has(c.id) || done.has(c.id)) continue
-      const a = (acc.get(c.id) ?? 0) + (c.hpw ?? 3) / 7
-      acc.set(c.id, a)
-      if (a >= c.hours - 1e-9) { simEnd.set(c.id, day); done.add(c.id) }
-    }
-    day += MS
+export let subjects: Subject[] = []
+export let totalHours = 0
+
+const rebuildAxis = (lastCourseEnd: number) => {
+  const last = new Date(lastCourseEnd)
+  AXIS_END = isoOf(Date.UTC(last.getUTCFullYear(), last.getUTCMonth() + 1, 1))
+  TOTAL_DAYS = (u(AXIS_END) - u(AXIS_START)) / MS
+  const out: { label: string; days: number }[] = []
+  for (let cursor = AXIS_START; u(cursor) < u(AXIS_END);) {
+    const [y, m] = cursor.slice(0, 7).split('-').map(Number)
+    const days = new Date(Date.UTC(y, m, 0)).getUTCDate()
+    out.push({ label: `${mn[m - 1]} ${be(y)}`, days })
+    cursor = addDays(cursor, days)
   }
+  axisMonths = out
+  N = out.length
+  axisLabel = `${out[0].label} – ${out.at(-1)!.label}`
+  let daysBefore = 0
+  monthLines = out.slice(0, -1).map(month => ((daysBefore += month.days) / TOTAL_DAYS) * 100)
 }
 
-export const subjects: Subject[] = subjectsSpec.map(s => ({
-  name: s.name, color: s.color,
-  courses: s.courses.map(c => ({ ...c, start: isoOf(simStart.get(c.id) ?? DAY_LAST), end: isoOf(simEnd.get(c.id) ?? DAY_LAST) }))
-}))
+// คอร์สในวิชาเดียวกันต่อกันวันถัดไป; หนึ่งสัปดาห์ของคอร์สยาว 7 วันปฏิทินเสมอ
+export const rebuildPlan = () => {
+  const planById = new Map(studentCourses.map(c => [c.courseId, c]))
+  const starts = new Map<string, number>(), ends = new Map<string, number>()
+  scheduledHoursByDay.clear()
+  for (const subject of courseCatalog) {
+    let nextStart = DAY_START
+    for (const course of subject.courses) {
+      const student = planById.get(course.id)
+      const start = Math.max(nextStart, student?.startDate ? u(student.startDate) : DAY_START)
+      const weeks = estimatedWeeksFor(course.hours, student?.weeklyHours ?? DEFAULT_WEEKLY_HOURS)
+      const end = start + weeks * 7 * MS - MS
+      starts.set(course.id, start); ends.set(course.id, end); nextStart = end + MS
+      const dailyHours = course.hours / (weeks * 7)
+      for (let day = start; day <= end; day += MS) {
+        const iso = isoOf(day)
+        scheduledHoursByDay.set(iso, (scheduledHoursByDay.get(iso) ?? 0) + dailyHours)
+      }
+    }
+  }
+  subjects = courseCatalog.map(s => ({ name: s.name, color: s.color, courses: s.courses.map(c => {
+    const student = planById.get(c.id)
+    const weeklyHours = student?.weeklyHours ?? DEFAULT_WEEKLY_HOURS
+    return { ...c, owned: student?.owned, startDate: student?.startDate, weeklyHours, estimatedWeeks: estimatedWeeksFor(c.hours, weeklyHours), start: isoOf(starts.get(c.id) ?? DAY_LAST), end: isoOf(ends.get(c.id) ?? DAY_LAST) }
+  }) }))
+  totalHours = subjects.reduce((t, s) => t + s.courses.reduce((a, c) => a + c.hours, 0), 0)
+  rebuildAxis(Math.max(...ends.values()))
+}
+
+export const setCourseWeeklyHours = (courseId: string, weeklyHours: number) => {
+  const course = studentCourses.find(c => c.courseId === courseId)
+  if (!course) return
+  course.weeklyHours = weeklyHours
+  rebuildPlan(); planVersion += 1; listeners.forEach(listener => listener())
+}
+
+export const setCourseStartDate = (courseId: string, startDate?: string) => {
+  const course = studentCourses.find(c => c.courseId === courseId)
+  if (!course) return
+  course.startDate = startDate
+  rebuildPlan(); planVersion += 1; listeners.forEach(listener => listener())
+}
+
+rebuildPlan()
+if (import.meta.env.DEV && estimatedWeeksFor(30, 5) !== 6) throw new Error('weekly course calculation failed')
 
 // จาก SAMPLE_DATA/exam-dates.md (เจ้าของจัดใหม่ตามภาพ Plan Canvas 20.37.58) — สอบจริง 2 + Mock 6, ทุกรายการ 1 วัน
 // สีตามตำนานภาพ: น้ำเงิน = สอบจริง, แดง = Mock · เข้ม = ซื้อแล้ว, อ่อน = ยังไม่ได้ซื้อ (ซื้อครบยกเว้น Mock CBT)
@@ -140,7 +134,7 @@ export const events: ExamEvent[] = [
   { id: 'X2', date: '2028-02-06', label: 'สอบ A-Level', kind: 'exam', owned: true },
 ]
 
-export const totalHours = subjects.reduce((t, s) => t + s.courses.reduce((a, c) => a + c.hours, 0), 0)
+export { courseCatalog, studyCalendar, studentCourses }
 
 // --- สีชนิดสอบ (encoding เดียวกับรางป้ายของ Year: น้ำเงิน = สอบจริง, แดง = Mock) ---
 export const KIND_COLOR = { exam: '#2b6cd4', mock: '#ef6268' } as const

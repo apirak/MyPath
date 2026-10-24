@@ -23,7 +23,7 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 .cdp-bullets{margin:6px 0;padding-left:18px;color:#495057;font-size:13px;line-height:1.55}
 .cdp-numbered{margin:8px 0;padding-left:22px;color:#212529;font-size:14px;line-height:1.7}
 .cdp-numbered.compact{font-size:13px}
-.cdp-egg{margin:6px 0;padding:6px 10px;border-left:4px solid var(--subject);border-radius:0 8px 8px 0;background:#f8f9fa;color:#495057;font-size:12px}
+.cdp-egg{margin:6px 0;padding:6px 10px;border-radius:8px;background:#f8f9fa;color:#495057;font-size:12px}
 .cdp-pain{margin:6px 0;color:#c0353c;font-size:13px;line-height:1.5}
 .cdp-empty{margin:8px 0;padding:12px;border:2px dashed #dee2e6;border-radius:12px;background:#fff;color:#6d757e;font-size:13px}
 .cdp-systems{display:grid;gap:8px;margin:10px 0}
@@ -36,6 +36,20 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 .cdp-buy p{margin:6px 0 0;color:#212529;font-weight:700;font-size:15px;text-align:center}
 .cdp-buy s{margin-left:4px;color:#adb5bd}
 .cdp-sheet-top .header-button,.cdp-drawer>header .header-button{flex:none}
+
+/* ---------- จังหวะเรียนรายคอร์ส ---------- */
+.cdp-rhythm{border-top:2px solid #e9ecef;padding:12px 14px 10px;background:#f8fbff}
+.cdp-rhythm h4{margin:0;color:#0078c4;font-size:14px}
+.cdp-rhythm>p{margin:2px 0 10px;color:#6d757e;font-size:12px}
+.cdp-rhythm label{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 10px;margin-top:9px;color:#495057;font-size:13px;font-weight:600}
+.cdp-rhythm label b{color:#0078c4;font-size:12px}
+.cdp-rhythm input[type=range]{grid-column:1/-1;width:100%;accent-color:#0078c4}
+.cdp-marks{grid-column:1/-1;display:flex;justify-content:space-between;padding:0 4px;color:#6d757e;font-size:10px;font-weight:700}
+.cdp-marks i{display:grid;place-items:center;width:14px;font-style:normal}
+.cdp-marks i::before{content:'';width:5px;height:5px;margin-bottom:1px;border-radius:50%;background:#93bfe1}
+.cdp-rhythm .cdp-start{grid-template-columns:1fr auto;margin-top:12px;padding-top:10px;border-top:1px dashed #cdd8e3}
+.cdp-start small{color:#6d757e;font-size:11px;font-weight:400}
+.cdp-start input{grid-column:1/-1;width:100%;min-height:34px;border:1px solid #cdd8e3;border-radius:7px;background:#fff;padding:5px 8px;color:#212529;font:inherit;font-size:13px}
 
 /* ---------- cover + CTA ใต้ cover ---------- */
 .cdp-cover{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
@@ -59,7 +73,7 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 .cdp-c{position:fixed;inset:0;z-index:61;pointer-events:none}
 .cdp-c .cdp-backdrop{pointer-events:auto}
 .cdp-drawer{pointer-events:auto;position:fixed;top:0;right:0;bottom:0;z-index:2;width:min(460px,94vw);overflow:auto;background:#fff;box-shadow:-8px 0 30px rgba(33,37,41,.2);animation:cdp-in .18s}
-.cdp-drawer>header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;border-left:8px solid var(--subject);padding:14px}
+.cdp-drawer>header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:14px}
 .cdp-drawer>header b{font-size:13px;color:#6d757e}
 .cdp-drawer>header h3{margin:4px 0 0;font-size:17px;line-height:1.4}
 .cdp-drawer>header button{flex:none;width:34px;height:34px;color:#6d757e;font-size:15px}

@@ -29,6 +29,15 @@
         ],
         "createdAt": "2026-10-24T02:46:38.294Z",
         "reason": "Project design: the left subject-colour strip is the established course-card identity and uses the rounded card edge intentionally."
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/pages/MyPathYear.css"
+        ],
+        "createdAt": "2026-10-24T12:10:58.100Z",
+        "reason": "sanctioned exception: subject-colored course head is the intentional ownership encoding documented in MYPATH.md"
       }
     ]
   }

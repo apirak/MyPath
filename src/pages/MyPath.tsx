@@ -6,7 +6,8 @@ import BottomNav from '../components/BottomNav'
 import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailPrototype'
 import {
   TODAY, AXIS_START, AXIS_END, u, addMonths, monthStartOf, dayOf, monthShortOf,
-  fmtDate, fmtMonth, fmtShort, agendaFor, subjects, events, totalHours, KIND_COLOR,
+  fmtDate, fmtMonth, fmtShort, agendaFor, subjects, events, totalHours, KIND_COLOR, studyCalendar,
+  usePlanVersion,
   type Agenda, type AgendaCourse, type ExamEvent,
 } from '../mypath/plan'
 
@@ -96,6 +97,7 @@ function Agenda({ agenda }: { agenda: Agenda }) {
 }
 
 export default function MyPath() {
+  usePlanVersion()
   const [month, setMonth] = useState(monthStartOf(TODAY))
   const agenda = agendaFor(month)
   const canPrev = u(month) > u(AXIS_START)
@@ -109,7 +111,7 @@ export default function MyPath() {
       <CourseDetailOverlay />
       <details className="prototype-data">
         <summary>ข้อมูล mock (plan.ts · วันนี้ = {fmtDate(TODAY)})</summary>
-        <pre>{JSON.stringify({ TODAY, totalHours, subjects, events, agenda }, null, 2)}</pre>
+        <pre>{JSON.stringify({ TODAY, totalHours, studyCalendar, subjects, events, agenda }, null, 2)}</pre>
       </details>
     </div>
     <BottomNav active="mypath" />

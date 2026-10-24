@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
 import PathHeader from '../components/PathHeader'
 import BottomNav from '../components/BottomNav'
-import { MS, N, TOTAL_DAYS, AXIS_START, AXIS_END, TODAY, u, isoOf, addDays, fmtDate, fmtShort, axisMonths, monthLines, pos, posMs, pct, subjects, events, totalHours, type Course } from '../mypath/plan'
+import { MS, N, TOTAL_DAYS, AXIS_START, AXIS_END, TODAY, u, isoOf, addDays, fmtDate, fmtShort, axisLabel, axisMonths, monthLines, pos, posMs, pct, subjects, events, totalHours, studyCalendar, scheduledHoursByDay, usePlanVersion, type Course } from '../mypath/plan'
 // PROTOTYPE — คลิกแถบคอร์สเปิดรายละเอียด (desktop แผงขวา / มือถือ bottom sheet)
 import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailPrototype'
 import './MyPathYear.css'
@@ -10,8 +10,7 @@ import './MyPathYear.css'
 // ข้อตกลงที่ล็อกไว้ (2026-10-23):
 //   1. Desktop: X = เดือน, Y = วิชา / Mobile (≤640px): พลิกแกน — Y = เดือน, X = วิชา
 //   2. แถบคอร์สแยกทุกเล่ม ตาม "วันเริ่ม–วันจบ" ระดับวัน · เรียงต่อเนื่องในวิชา ไม่ซ้อนเวลา
-//   3. start/end ทุกคอร์ส = คำนวณจากชั่วโมง (simulation รายวัน): แต่ละเล่มเดินด้วยจังหวะ hpw (ชม./สปด.)
-//      ที่วัดจากความยาวแถบภาพต้นฉบับ — แก้ hours ใน src/mypath/plan.ts แล้ววันที่ทั้งแผนขยับเอง (ยกเว้น 3 แถบ fixed)
+//   3. start/end ทุกคอร์ส = คำนวณจากชั่วโมงและชั่วโมงต่อสัปดาห์ของคอร์สนั้น (หนึ่งสัปดาห์ = 7 วันปฏิทิน)
 //   4. ชื่อในแถบ 3 ระดับตามพื้นที่: เต็ม → "เล่ม 1" → "ล. 1"
 //   5. สอบ/Mock = เหตุการณ์ 1 วัน · รางป้าย 2 แถว ป้ายเรียงยาวได้ เลื่อนหนีกัน + เส้นจางชี้ลงหมุดวันจริง
 //   6. สี = การซื้อ: แถบ/ป้ายสีเข้ม = ซื้อแล้ว, สีอ่อน = ยังไม่ได้ซื้อ (หัวแถบสีวิชาเสมอ)
@@ -130,23 +129,17 @@ function YearTable() {
   )
 }
 
-// แถบภาระเรียนต่อสัปดาห์ — หน่วยเป็น "ชั่วโมงที่ต้องใช้" ไม่ใช่จำนวนคอร์ส:
-// แต่ละคอร์สกระจายชั่วโมงลงทุกสัปดาห์ที่มันเปิดอยู่ (ชม. ÷ ความยาวคอร์ส) แล้วรวมกันเทียบงบ 15 ชม./สัปดาห์
-// (วันธรรมดา 1 ชม./วัน + เสาร์อาทิตย์ 5 ชม./วัน) — เขียว = ไม่เกินงบ · ส้ม = เกิน · แดง = เกินกว่า 1.5 เท่า
+// แถบภาระเรียนต่อสัปดาห์ — รวมชั่วโมงจริงที่กระจายตามช่วง 7 วันของแต่ละคอร์ส
 function LoadRow() {
-  const WEEK_BUDGET = 15
+  const WEEK_BUDGET = studyCalendar.weekdayHours * 5 + studyCalendar.weekendHours * 2
   const axisStartMs = u(AXIS_START)
   const firstMonday = axisStartMs - ((new Date(axisStartMs).getUTCDay() + 6) % 7) * MS
-  const allCourses = subjects.flatMap(s => s.courses)
   const weeks: { s: number; e: number; n: number; demand: number }[] = []
   for (let s = firstMonday; s < u(AXIS_END); s += 7 * MS) {
     const e = Math.min(s + 7 * MS, u(AXIS_END))
     let demand = 0, n = 0
-    for (const c of allCourses) {
-      const cs = u(c.start), ce = u(addDays(c.end, 1))
-      const ov = Math.max(0, Math.min(ce, e) - Math.max(cs, s))
-      if (ov > 0) { n++; demand += c.hours * (ov / (ce - cs)) }
-    }
+    for (let day = s; day < e; day += MS) demand += scheduledHoursByDay.get(isoOf(day)) ?? 0
+    n = subjects.flatMap(subject => subject.courses).filter(c => u(c.start) < e && u(addDays(c.end, 1)) > s).length
     weeks.push({ s, e, n, demand })
   }
   const max = Math.max(...weeks.map(w => w.demand), 1)
@@ -158,7 +151,7 @@ function LoadRow() {
           {monthLines.map(p => <em key={p} style={{ left: `${p}%` }} />)}
           {weeks.map(w => {
             const cls = w.n === 0 ? 'off' : w.demand > WEEK_BUDGET * 1.5 ? 'hot' : w.demand > WEEK_BUDGET ? 'warm' : ''
-            const title = `${fmtDate(isoOf(w.s))} – ${fmtDate(isoOf(w.e - MS))} · ${w.demand.toFixed(1)} ชม./สัปดาห์ (งบ 15 ชม.) · ${w.n} คอร์ส`
+            const title = `${fmtDate(isoOf(w.s))} – ${fmtDate(isoOf(w.e - MS))} · ${w.demand.toFixed(1)} ชม./สัปดาห์ (งบ ${WEEK_BUDGET} ชม.) · ${w.n} คอร์ส`
             const left = Math.max(0, posMs(w.s))
             return <i key={w.s} className={cls} title={title}
               style={{ left: `${pct(left)}%`, width: `${pct(Math.max(0.02, posMs(w.e) - left))}%`, height: `${w.n === 0 ? 8 : Math.max(20, (w.demand / max) * 100)}%` }} />
@@ -169,7 +162,7 @@ function LoadRow() {
   )
 }
 
-const mobileMonthRanges = (() => {
+const mobileMonthRanges = () => {
   let daysBefore = 0
   return axisMonths.map(month => {
     const start = (daysBefore / TOTAL_DAYS) * N
@@ -177,18 +170,19 @@ const mobileMonthRanges = (() => {
     daysBefore += month.days
     return { ...month, start, end: (daysBefore / TOTAL_DAYS) * N, startDate, endDate: addDays(AXIS_START, daysBefore) }
   })
-})()
+}
 
 /* Mobile พลิกแกน: หนึ่งแถวต่อเดือน — แถบสอบอยู่หัวเดือน, คอร์สอยู่ด้านล่าง */
 function MobileYear() {
   const open = useOpenCourse()
+  const ranges = mobileMonthRanges()
   return (
     <section className="yp-mobile">
       <div className="yp-mobile-head">
         <i />
         {subjects.map(s => <b key={s.name}><i style={{ background: s.color }} />{s.name}</b>)}
       </div>
-      <div className="yp-mobile-months">{mobileMonthRanges.map(month => {
+      <div className="yp-mobile-months">{ranges.map(month => {
         const monthEvents = events.filter(event => pos(event.date) >= month.start && pos(event.date) < month.end)
         return <section className={'yp-mobile-month' + (month.label === nowMonthLabel ? ' now' : '')} key={month.label}>
           <b>{month.label}</b>
@@ -209,15 +203,16 @@ function MobileYear() {
 /* ---------- shell ---------- */
 
 export default function MyPathYear() {
+  usePlanVersion()
   return (
     <main className="yp-page">
       <div className="yp-shell">
-        <PathHeader active="year" period="ต.ค. 2569 – ก.พ. 2571" />
+        <PathHeader active="year" period={axisLabel} />
         <div className="yp-desktop"><YearTable /><LoadRow /></div>
         <MobileYear />
         <details className="yp-data">
           <summary>ข้อมูล mock (SAMPLE_DATA) + ข้อตกลงที่ล็อกไว้</summary>
-          <pre>{JSON.stringify({ axis: 'ต.ค. 69 – ก.พ. 71 (17 เดือน)', totalHours, subjects, events }, null, 2)}</pre>
+          <pre>{JSON.stringify({ axis: axisLabel, months: axisMonths.length, totalHours, studyCalendar, subjects, events }, null, 2)}</pre>
         </details>
         <CourseDetailOverlay />
       </div>

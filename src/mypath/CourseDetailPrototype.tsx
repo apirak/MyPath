@@ -7,7 +7,7 @@ import { useEffect, useState, type CSSProperties } from 'react'
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { X } from 'lucide-react'
 import HeaderButton from '../components/HeaderButton'
-import { subjects, fmtDate, type Course, type Subject } from './plan'
+import { subjects, fmtDate, setCourseStartDate, setCourseWeeklyHours, usePlanVersion, type Course, type Subject } from './plan'
 import { getCourseDetail, prices, covers, ONDEMAND_URL, EXAMGYM_SYSTEMS } from './courseDetail'
 import './CourseDetailPrototype.css'
 
@@ -54,6 +54,21 @@ function CtaUnderCover({ course }: { course: Course }) {
   )
 }
 
+function StudyRhythmControls({ course }: { course: Course }) {
+  const marks = <span className="cdp-marks" aria-hidden="true">{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <i key={n}>{n}</i>)}</span>
+  return <section className="cdp-rhythm" aria-label="กำหนดเวลาเรียน">
+    <h4>เวลาเรียนของน้อง</h4>
+    <p>{course.weeklyHours} ชม./สัปดาห์ · ประมาณ {course.estimatedWeeks} สัปดาห์</p>
+    <label>ชั่วโมงต่อสัปดาห์ <b>{course.weeklyHours} ชม.</b>
+      <input aria-label="ชั่วโมงต่อสัปดาห์" type="range" min="1" max="10" step="1" value={course.weeklyHours} onChange={e => setCourseWeeklyHours(course.id, Number(e.target.value))} />
+      {marks}
+    </label>
+    <label className="cdp-start">วันเริ่มต้น <small>ไม่บังคับ</small>
+      <input aria-label="วันเริ่มต้น" type="date" value={course.startDate ?? ''} onChange={e => setCourseStartDate(course.id, e.target.value || undefined)} />
+    </label>
+  </section>
+}
+
 const CloseButton = ({ onClose }: { onClose: () => void }) =>
   <HeaderButton className="header-button--icon" aria-label="ปิด" onClick={onClose}><X size={20} /></HeaderButton>
 
@@ -81,6 +96,7 @@ function SheetMobile({ ref: cr, onClose }: { ref: CourseRef; onClose: () => void
         </header>
         {cover && <img className="cdp-cover" src={cover} alt="" />}
         <div className="cdp-cta"><CtaUnderCover course={course} /></div>
+        <StudyRhythmControls course={course} />
         <div className="cdp-sheet-body">
           {d?.volume && <>
             <h4>หัวข้อในเล่ม{d.volume.title ? ` · ${d.volume.title}` : ''}</h4>
@@ -127,6 +143,7 @@ function DrawerDesktop({ ref: cr, onClose }: { ref: CourseRef; onClose: () => vo
         </header>
         {cover && <img className="cdp-cover" src={cover} alt="" />}
         <div className="cdp-cta"><CtaUnderCover course={course} /></div>
+        <StudyRhythmControls course={course} />
         <details open>
           <summary>แผนของน้อง</summary>
           <dl className="cdp-dl">
@@ -182,6 +199,7 @@ export function useOpenCourse() {
 }
 
 export function CourseDetailOverlay() {
+  usePlanVersion()
   const [sp, setSp] = useSearchParams()
   const id = sp.get('course')
   const cr = id ? findCourse(id) : undefined
