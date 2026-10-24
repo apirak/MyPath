@@ -1,0 +1,71 @@
+/* PROTOTYPE — หน้ารายละเอียดคอร์ส แบบ D ตัวเดียว (desktop = แผงขวา, มือถือ = bottom sheet)
+   ใช้โทนเดียวกับแอป · --subject = สีวิชาจาก plan.ts
+   ปรับ 24 ต.ค. 69: cover เต็ม 16/9 ไม่มี padding · แผงไม่มี border · ปุ่มเริ่มเรียนใต้ cover */
+
+/* คอร์สบนแผนกดได้ */
+.yp-bar,.yp-mobile-course,.monthly-course{cursor:pointer}
+
+/* ---------- ส่วนแชร์ ---------- */
+.cdp-backdrop{position:fixed;inset:0;z-index:1;background:rgba(33,37,41,.45);animation:cdp-fade .15s}
+@keyframes cdp-fade{from{opacity:0}}
+@keyframes cdp-up{from{transform:translateY(24px);opacity:.4}}
+@keyframes cdp-in{from{transform:translateX(40px);opacity:.4}}
+header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--subject);margin-right:6px;vertical-align:1px}
+.cdp-status{font-style:normal;font-weight:700;font-size:11px;border-radius:999px;padding:3px 9px}
+.cdp-status.now{background:#e6f4ff;color:#0797f5}
+.cdp-status.next{background:#fff4dd;color:#b66b00}
+.cdp-status.done{background:#eaf7e6;color:#2f8f1f}
+.cdp-own{font-style:normal;font-weight:700;font-size:11px;border-radius:999px;padding:3px 9px;background:#eaf7e6;color:#2f8f1f}
+.cdp-own.no{background:#fdf0f0;color:#c0353c;border:1.5px dashed #ef6268}
+.cdp-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:#6d757e;font-size:12px}
+.cdp-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.cdp-chips i{font-style:normal;font-size:12px;border-radius:999px;background:#f1f3f5;padding:5px 10px;color:#212529}
+.cdp-bullets{margin:6px 0;padding-left:18px;color:#495057;font-size:13px;line-height:1.55}
+.cdp-numbered{margin:8px 0;padding-left:22px;color:#212529;font-size:14px;line-height:1.7}
+.cdp-numbered.compact{font-size:13px}
+.cdp-egg{margin:6px 0;padding:6px 10px;border-left:4px solid var(--subject);border-radius:0 8px 8px 0;background:#f8f9fa;color:#495057;font-size:12px}
+.cdp-pain{margin:6px 0;color:#c0353c;font-size:13px;line-height:1.5}
+.cdp-empty{margin:8px 0;padding:12px;border:2px dashed #dee2e6;border-radius:12px;background:#fff;color:#6d757e;font-size:13px}
+.cdp-systems{display:grid;gap:8px;margin:10px 0}
+.cdp-systems>div{border:2px solid #e9ecef;border-radius:10px;background:#fff;padding:8px 10px}
+.cdp-systems b{font-size:13px}
+
+/* ---------- CTA ใต้ cover (ปุ่มทั้งหมด = HeaderButton ของแอป) ---------- */
+.cdp-cta{padding:12px 14px 16px}
+.cdp-wide{width:100%}
+.cdp-primary{background:#0078c4;border-color:#0078c4;color:#fff;box-shadow:0 3px #03548b}
+.cdp-buy p{margin:6px 0 0;color:#212529;font-weight:700;font-size:15px;text-align:center}
+.cdp-buy s{margin-left:4px;color:#adb5bd}
+.cdp-sheet-top .header-button,.cdp-drawer>header .header-button{flex:none}
+
+/* ---------- cover + CTA ใต้ cover ---------- */
+.cdp-cover{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+
+/* ---------- มือถือ ≤640px: bottom sheet ---------- */
+.cdp-a{position:fixed;inset:0;z-index:61;pointer-events:none}
+.cdp-a .cdp-backdrop{pointer-events:auto}
+.cdp-sheet{pointer-events:auto;position:fixed;right:0;bottom:0;left:0;z-index:2;display:flex;flex-direction:column;max-height:86vh;border-radius:18px 18px 0 0;background:#fff;box-shadow:0 -8px 30px rgba(33,37,41,.25);animation:cdp-up .18s;overflow:auto}
+/* ส่วนตายห้ามยืดหด — เหลือให้ body เดียวที่ยืด/เลื่อนตามพื้นที่ที่เหลือ (จอสั้นมาก = ชีทเลื่อนทั้งใบแทน) */
+.cdp-sheet>header,.cdp-sheet>.cdp-cover,.cdp-sheet>.cdp-cta,.cdp-sheet>footer{flex:none}
+.cdp-grab{display:block;width:44px;height:5px;border-radius:3px;background:#dee2e6;margin:8px auto 2px}
+.cdp-sheet>header{padding:6px 14px 10px;border-bottom:2px solid #e9ecef}
+.cdp-sheet-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cdp-sheet-top b{font-size:15px}
+.cdp-sheet-top button{width:34px;height:34px;border:2px solid #dee2e6;border-radius:10px;background:#fff;color:#6d757e;font-size:15px}
+.cdp-sheet-body{flex:1 1 auto;min-height:0;overflow:auto;padding:4px 14px 12px}
+.cdp-sheet-body h4{margin:12px 0 2px;font-size:13px;color:#0078c4}
+.cdp-sheet>footer{display:flex;align-items:center;justify-content:flex-end;border-top:2px solid #e9ecef;background:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
+
+/* ---------- เดสก์ท็อป ≥641px: แผงข้างขวา (ไม่มี border) ---------- */
+.cdp-c{position:fixed;inset:0;z-index:61;pointer-events:none}
+.cdp-c .cdp-backdrop{pointer-events:auto}
+.cdp-drawer{pointer-events:auto;position:fixed;top:0;right:0;bottom:0;z-index:2;width:min(460px,94vw);overflow:auto;background:#fff;box-shadow:-8px 0 30px rgba(33,37,41,.2);animation:cdp-in .18s}
+.cdp-drawer>header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;border-left:8px solid var(--subject);padding:14px}
+.cdp-drawer>header b{font-size:13px;color:#6d757e}
+.cdp-drawer>header h3{margin:4px 0 0;font-size:17px;line-height:1.4}
+.cdp-drawer>header button{flex:none;width:34px;height:34px;border:2px solid #dee2e6;border-radius:10px;background:#fff;color:#6d757e;font-size:15px}
+.cdp-drawer details{border-top:2px solid #e9ecef;padding:10px 14px}
+.cdp-drawer summary{cursor:pointer;font-weight:700;font-size:14px;color:#0078c4;padding:4px 0}
+.cdp-dl>div{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed #e9ecef;font-size:13px}
+.cdp-dl dt{color:#6d757e}
+.cdp-dl dd{margin:0;font-weight:600}

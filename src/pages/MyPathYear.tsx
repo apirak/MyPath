@@ -2,6 +2,8 @@ import type { CSSProperties } from 'react'
 import PathHeader from '../components/PathHeader'
 import BottomNav from '../components/BottomNav'
 import { MS, N, TOTAL_DAYS, AXIS_START, AXIS_END, u, isoOf, addDays, fmtDate, fmtShort, axisMonths, monthLines, pos, posMs, pct, subjects, events, totalHours, type Course } from '../mypath/plan'
+// PROTOTYPE — คลิกแถบคอร์สเปิดรายละเอียด (desktop แผงขวา / มือถือ bottom sheet)
+import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailPrototype'
 import './MyPathYear.css'
 
 // Yearly My Path: ดีไซน์ที่เจ้าของเลือกแล้ว (เดิมชื่อ variant A · Timeline grid) บน /mypath/year
@@ -89,6 +91,7 @@ function EventRail({ big = false }: { big?: boolean }) {
 }
 
 function YearTable() {
+  const open = useOpenCourse()
   return (
     <div className="yp-table">
       <div className="yp-table-inner">
@@ -107,7 +110,8 @@ function YearTable() {
               <MonthBands />
               <MonthLines />
               {s.courses.map(c => (
-                <span key={c.id} className={'yp-bar' + (c.owned ? ' own' : ' own-no')} title={barTitle(c)}
+                <span key={c.id} className={'yp-bar' + (c.owned ? ' own' : ' own-no')} title={barTitle(c)} role="button" tabIndex={0}
+                  onClick={() => open(c.id)} onKeyDown={e => { if (e.key === 'Enter') open(c.id) }}
                   style={{ color: c.owned ? barText(s.color) : undefined, left: `calc(${pct(x0(c))}% + 2px)`, width: `calc(${pct(x1(c) - x0(c))}% - 4px)` }}>
                   {labelFor(c)}
                 </span>
@@ -171,6 +175,7 @@ const mobileMonthRanges = (() => {
 
 /* Mobile พลิกแกน: หนึ่งแถวต่อเดือน — แถบสอบอยู่หัวเดือน, คอร์สอยู่ด้านล่าง */
 function MobileYear() {
+  const open = useOpenCourse()
   return (
     <section className="yp-mobile">
       <div className="yp-mobile-head">
@@ -186,7 +191,7 @@ function MobileYear() {
             <div className="yp-mobile-subjects">{subjects.map(subject => {
               const courses = subject.courses.filter(course => x0(course) < month.end && x1(course) > month.start)
               const fillsMonth = courses.some(course => u(course.start) <= u(month.startDate) && u(addDays(course.end, 1)) >= u(month.endDate))
-              return <div className={`yp-mobile-cell${fillsMonth ? ' full-month' : ''}`} key={subject.name} style={{ '--subject': subject.color } as CSSProperties}>{courses.map(course => <span key={course.id} className={'yp-mobile-course' + (course.owned ? ' own' : ' own-no')} style={{ color: course.owned ? barText(subject.color) : undefined }}>{labelFor(course, true)}</span>)}</div>
+              return <div className={`yp-mobile-cell${fillsMonth ? ' full-month' : ''}`} key={subject.name} style={{ '--subject': subject.color } as CSSProperties}>{courses.map(course => <span key={course.id} className={'yp-mobile-course' + (course.owned ? ' own' : ' own-no')} role="button" tabIndex={0} onClick={() => open(course.id)} style={{ color: course.owned ? barText(subject.color) : undefined }}>{labelFor(course, true)}</span>)}</div>
             })}</div>
           </div>
         </section>
@@ -208,6 +213,7 @@ export default function MyPathYear() {
           <summary>ข้อมูล mock (SAMPLE_DATA) + ข้อตกลงที่ล็อกไว้</summary>
           <pre>{JSON.stringify({ axis: 'ต.ค. 69 – ก.พ. 71 (17 เดือน)', totalHours, subjects, events }, null, 2)}</pre>
         </details>
+        <CourseDetailOverlay />
       </div>
       <BottomNav active="mypath" />
     </main>
