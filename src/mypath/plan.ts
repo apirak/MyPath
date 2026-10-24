@@ -46,55 +46,56 @@ export const pos = (iso: string) => ((u(iso) - u(AXIS_START)) / MS / TOTAL_DAYS)
 export const posMs = (ms: number) => ((ms - u(AXIS_START)) / MS / TOTAL_DAYS) * N
 export const pct = (v: number) => (v / N) * 100
 
-type CourseSpec = { id: string; name: string; short: string; abbr: string; hours: number; owned?: boolean; anchor?: string; fixed?: { start: string; end: string }; cover?: string }
+type CourseSpec = { id: string; name: string; short: string; abbr: string; hours: number; hpw?: number; owned?: boolean; anchor?: string; fixed?: { start: string; end: string }; cover?: string }
 export type Course = CourseSpec & { start: string; end: string }
 export type Subject = { name: string; color: string; courses: Course[] }
 export type ExamEvent = { id: string; date: string; label: string; kind: 'exam' | 'mock'; owned?: boolean }
 
 // จาก SAMPLE_DATA/courses.md + study-plan.md (25 คอร์ส, 554.5 ชม.) — start/end ของทุกคอร์ส "คำนวณจากชั่วโมง"
-// ด้วย simulation รายวัน: อัตราเรียน 15 ชม./สปด. (1 ชม./วันธรรมดา + 5 ชม./เสาร์-อาทิตย์) แบ่งเท่า ๆ กัน
-// ทุกวิชาที่เดินพร้อมกันในแต่ละวัน · คอร์สเริ่มวันถัดจากคอร์สก่อนหน้าในวิชาเดียวกันจบ (ไม่เร็วกว่า anchor ของตัวเอง)
+// ด้วย simulation รายวัน: แต่ละเล่มเดินด้วยจังหวะของตัวเอง hpw = ชม./สปด. วัดจากความยาวแถบบน Plan Canvas
+// (ตาราง study-plan.md — ช้าสุด CHEM.1 2.22 ชม./สปด. ยืด 9 สปด. · เร็วสุด MATH.3 9 ชม./สปด. จบใน 2 สปด.)
+// · คอร์สเริ่มวันถัดจากคอร์สก่อนหน้าในวิชาเดียวกันจบ (ไม่เร็วกว่า anchor ของตัวเอง)
 // ยกเว้น 3 แถบ fixed: TGAT.1 (เรียนเบาทั้งแถบ 17 สปด.) และ MATH.UP + MATH.EX (ผูกฤดูสอบ split 13 สปด. ตามแถบภาพ)
-// → แก้ hours ที่นี่ทีเดียว วันเริ่ม-จบทั้งแผนขยับให้เอง
+// → แก้ hours ที่นี่ทีเดียว วันเริ่ม-จบทั้งแผนขยับให้เอง (แถบยืด/หดตามอัตรา hpw เดิม · คอร์สใหม่ไม่ใส่ hpw = 3 ชม./สปด.)
 const subjectsSpec: { name: string; color: string; courses: CourseSpec[] }[] = [
   { name: 'TPAT3', color: '#a51d1d', courses: [
-    { id: 'TPAT3.1', name: 'ติวเข้มความถนัด วิศวะ (TPAT3)', short: 'ติวเข้ม TPAT3', abbr: 'ติวเข้ม', hours: 30, owned: true, anchor: '2026-10-01' },
-    { id: 'TPAT3.2', name: 'ตะลุยโจทย์ TPAT3 · ทำข้อสอบเก่า', short: 'ทำข้อสอบเก่า', abbr: 'ทำข้อสอบ', hours: 18, anchor: '2027-12-01' },
+    { id: 'TPAT3.1', name: 'ติวเข้มความถนัด วิศวะ (TPAT3)', short: 'ติวเข้ม TPAT3', abbr: 'ติวเข้ม', hours: 30, hpw: 3.33, owned: true, anchor: '2026-10-01' },
+    { id: 'TPAT3.2', name: 'ตะลุยโจทย์ TPAT3 · ทำข้อสอบเก่า', short: 'ทำข้อสอบเก่า', abbr: 'ทำข้อสอบ', hours: 18, hpw: 2, anchor: '2027-12-01' },
   ]},
   { name: 'คณิต 1', color: '#0078c4', courses: [
-    { id: 'MATH.1', name: 'Applied Math Admissions TCAS เล่ม 1 (For Dek70)', short: 'เล่ม 1', abbr: 'ล. 1', hours: 24, owned: true, anchor: '2026-09-28', cover: '/cover/Math_TCAS70_1.png' },
-    { id: 'MATH.2', name: 'Applied Math Admissions TCAS เล่ม 2 (For Dek70)', short: 'เล่ม 2', abbr: 'ล. 2', hours: 24, owned: true, cover: '/cover/Math_TCAS70_2.png' },
-    { id: 'MATH.3', name: 'Applied Math Admissions TCAS เล่ม 3', short: 'เล่ม 3', abbr: 'ล. 3', hours: 18, owned: true, cover: '/cover/Math_TCAS70_3.png' },
-    { id: 'MATH.4', name: 'Applied Math Admissions TCAS เล่ม 4', short: 'เล่ม 4', abbr: 'ล. 4', hours: 21, cover: '/cover/Math_TCAS70_4.png' },
-    { id: 'MATH.5', name: 'Applied Math Admissions TCAS เล่ม 5', short: 'เล่ม 5', abbr: 'ล. 5', hours: 24, cover: '/cover/Math_TCAS70_5.png' },
+    { id: 'MATH.1', name: 'Applied Math Admissions TCAS เล่ม 1 (For Dek70)', short: 'เล่ม 1', abbr: 'ล. 1', hours: 24, hpw: 3, owned: true, anchor: '2026-09-28', cover: '/cover/Math_TCAS70_1.png' },
+    { id: 'MATH.2', name: 'Applied Math Admissions TCAS เล่ม 2 (For Dek70)', short: 'เล่ม 2', abbr: 'ล. 2', hours: 24, hpw: 6.86, owned: true, cover: '/cover/Math_TCAS70_2.png' },
+    { id: 'MATH.3', name: 'Applied Math Admissions TCAS เล่ม 3', short: 'เล่ม 3', abbr: 'ล. 3', hours: 18, hpw: 9, owned: true, cover: '/cover/Math_TCAS70_3.png' },
+    { id: 'MATH.4', name: 'Applied Math Admissions TCAS เล่ม 4', short: 'เล่ม 4', abbr: 'ล. 4', hours: 21, hpw: 7, cover: '/cover/Math_TCAS70_4.png' },
+    { id: 'MATH.5', name: 'Applied Math Admissions TCAS เล่ม 5', short: 'เล่ม 5', abbr: 'ล. 5', hours: 24, hpw: 4.36, cover: '/cover/Math_TCAS70_5.png' },
     { id: 'MATH.UP', name: 'Upskill คณิตศาสตร์ประยุกต์ 1 A-Level', short: 'Upskill คณิต', abbr: 'UP', hours: 64.5, fixed: { start: '2027-12-01', end: '2028-01-15' } },
     { id: 'MATH.EX', name: 'MATH TCAS ตะลุยโจทย์ข้อสอบ ครบทุกแนว (UPDATE Version 2026 · TCAS70)', short: 'ตะลุยโจทย์ MATH', abbr: 'ตะลุย', hours: 30, fixed: { start: '2028-01-16', end: '2028-02-28' }, cover: '/cover/Exam_Gym_Math.png' },
   ]},
   { name: 'ฟิสิกส์', color: '#d72630', courses: [
-    { id: 'PHY.0', name: 'ปรับพื้นฐานฟิสิกส์ TCAS (ปูพื้น ครบทุกทักษะ ครบทุกแนว)', short: 'ปรับพื้นฐาน', abbr: 'ปูพื้น', hours: 18, owned: true, anchor: '2026-10-01' },
-    { id: 'PHY.1', name: 'ฟิสิกส์ TCAS ล. 1', short: 'ล. 1', abbr: 'ล.1', hours: 24, owned: true, cover: '/cover/Physics_TCAS70_1.png' },
-    { id: 'PHY.2', name: 'ฟิสิกส์ TCAS ล. 2 · กลศาสตร์วิเคราะห์ 2', short: 'ล. 2 · กลศาสตร์ 2', abbr: 'ล.2', hours: 21, owned: true, cover: '/cover/Physics_TCAS70_2.png' },
-    { id: 'PHY.3', name: 'ฟิสิกส์ TCAS ล. 3', short: 'ล. 3', abbr: 'ล.3', hours: 15, owned: true, cover: '/cover/Physics_TCAS70_3.png' },
-    { id: 'PHY.4', name: 'ฟิสิกส์ TCAS ล. 4', short: 'ล. 4', abbr: 'ล.4', hours: 18, owned: true, cover: '/cover/Physics_TCAS70_4.png' },
-    { id: 'PHY.5', name: 'ฟิสิกส์ TCAS ล. 5', short: 'ล. 5', abbr: 'ล.5', hours: 12, cover: '/cover/Physics_TCAS70_5.png' },
-    { id: 'PHY.6', name: 'ฟิสิกส์ TCAS ล. 6', short: 'ล. 6', abbr: 'ล.6', hours: 15, cover: '/cover/Physics_TCAS70_6.png' },
-    { id: 'PHY.7', name: 'ฟิสิกส์ TCAS ล. 7', short: 'ล. 7', abbr: 'ล.7', hours: 15, cover: '/cover/Physics_TCAS70_7.png' },
-    { id: 'PHY.EX', name: "PHYSICS TCAS Dek'70 ตะลุยโจทย์ข้อสอบ ครบทุกแนว (TCAS70)", short: 'ตะลุยโจทย์ฟิสิกส์', abbr: 'ตะลุย', hours: 24, anchor: '2027-12-01', cover: '/cover/Exam_Gym_Physic.png' },
+    { id: 'PHY.0', name: 'ปรับพื้นฐานฟิสิกส์ TCAS (ปูพื้น ครบทุกทักษะ ครบทุกแนว)', short: 'ปรับพื้นฐาน', abbr: 'ปูพื้น', hours: 18, hpw: 4.5, owned: true, anchor: '2026-10-01' },
+    { id: 'PHY.1', name: 'ฟิสิกส์ TCAS ล. 1', short: 'ล. 1', abbr: 'ล.1', hours: 24, hpw: 3.69, owned: true, cover: '/cover/Physics_TCAS70_1.png' },
+    { id: 'PHY.2', name: 'ฟิสิกส์ TCAS ล. 2 · กลศาสตร์วิเคราะห์ 2', short: 'ล. 2 · กลศาสตร์ 2', abbr: 'ล.2', hours: 21, hpw: 4.2, owned: true, cover: '/cover/Physics_TCAS70_2.png' },
+    { id: 'PHY.3', name: 'ฟิสิกส์ TCAS ล. 3', short: 'ล. 3', abbr: 'ล.3', hours: 15, hpw: 5, owned: true, cover: '/cover/Physics_TCAS70_3.png' },
+    { id: 'PHY.4', name: 'ฟิสิกส์ TCAS ล. 4', short: 'ล. 4', abbr: 'ล.4', hours: 18, hpw: 5.14, owned: true, cover: '/cover/Physics_TCAS70_4.png' },
+    { id: 'PHY.5', name: 'ฟิสิกส์ TCAS ล. 5', short: 'ล. 5', abbr: 'ล.5', hours: 12, hpw: 6, cover: '/cover/Physics_TCAS70_5.png' },
+    { id: 'PHY.6', name: 'ฟิสิกส์ TCAS ล. 6', short: 'ล. 6', abbr: 'ล.6', hours: 15, hpw: 7.5, cover: '/cover/Physics_TCAS70_6.png' },
+    { id: 'PHY.7', name: 'ฟิสิกส์ TCAS ล. 7', short: 'ล. 7', abbr: 'ล.7', hours: 15, hpw: 5, cover: '/cover/Physics_TCAS70_7.png' },
+    { id: 'PHY.EX', name: "PHYSICS TCAS Dek'70 ตะลุยโจทย์ข้อสอบ ครบทุกแนว (TCAS70)", short: 'ตะลุยโจทย์ฟิสิกส์', abbr: 'ตะลุย', hours: 24, hpw: 1.85, anchor: '2027-12-01', cover: '/cover/Exam_Gym_Physic.png' },
   ]},
   { name: 'TGAT', color: '#ff6b17', courses: [
     { id: 'TGAT.1', name: 'ล่าแข่ง TGAT', short: 'ล่าแข่ง TGAT', abbr: 'ล่าแข่ง', hours: 15, fixed: { start: '2027-08-01', end: '2027-11-29' } },
   ]},
   { name: 'เคมี', color: '#f5bd3d', courses: [
-    { id: 'CHEM.1', name: 'เคมี TCAS เล่ม 1 · กลุ่มอะตอมและตารางธาตุ', short: 'เล่ม 1', abbr: 'ล. 1', hours: 20, anchor: '2026-12-01' },
-    { id: 'CHEM.2', name: 'เคมี TCAS เล่ม 2 · ปริมาณสัมพันธ์', short: 'เล่ม 2', abbr: 'ล. 2', hours: 20 },
-    { id: 'CHEM.3', name: 'เคมี TCAS เล่ม 3 · พันธะเคมี', short: 'เล่ม 3', abbr: 'ล. 3', hours: 20 },
-    { id: 'CHEM.4', name: 'เคมี TCAS เล่ม 4', short: 'เล่ม 4', abbr: 'ล. 4', hours: 20, anchor: '2027-08-01' },
-    { id: 'CHEM.5', name: 'เคมี TCAS เล่ม 5', short: 'เล่ม 5', abbr: 'ล. 5', hours: 20 },
-    { id: 'CHEM.EX', name: 'ตะลุยโจทย์ Upskill เคมี A-Level', short: 'ตะลุยโจทย์', abbr: 'ตะลุย', hours: 24, anchor: '2027-12-01', cover: '/cover/Exam_Gym_Chemistry.png' },
+    { id: 'CHEM.1', name: 'เคมี TCAS เล่ม 1 · กลุ่มอะตอมและตารางธาตุ', short: 'เล่ม 1', abbr: 'ล. 1', hours: 20, hpw: 2.22, anchor: '2026-12-01' },
+    { id: 'CHEM.2', name: 'เคมี TCAS เล่ม 2 · ปริมาณสัมพันธ์', short: 'เล่ม 2', abbr: 'ล. 2', hours: 20, hpw: 3.33 },
+    { id: 'CHEM.3', name: 'เคมี TCAS เล่ม 3 · พันธะเคมี', short: 'เล่ม 3', abbr: 'ล. 3', hours: 20, hpw: 3.08 },
+    { id: 'CHEM.4', name: 'เคมี TCAS เล่ม 4', short: 'เล่ม 4', abbr: 'ล. 4', hours: 20, hpw: 4.44, anchor: '2027-08-01' },
+    { id: 'CHEM.5', name: 'เคมี TCAS เล่ม 5', short: 'เล่ม 5', abbr: 'ล. 5', hours: 20, hpw: 4.44 },
+    { id: 'CHEM.EX', name: 'ตะลุยโจทย์ Upskill เคมี A-Level', short: 'ตะลุยโจทย์', abbr: 'ตะลุย', hours: 24, hpw: 1.85, anchor: '2027-12-01', cover: '/cover/Exam_Gym_Chemistry.png' },
   ]},
 ]
 
-// simulation รายวัน: เดินวันทีละวัน แบ่ง 15 ชม. ให้วิชาที่เดินอยู่เท่า ๆ กัน จนครบชั่วโมงของแต่ละคอร์ส
+// simulation รายวัน: แต่ละคอร์สสะสมชั่วโมงด้วยอัตราของตัวเอง (hpw ÷ 7 = ชม./วัน) จนครบ — ไม่แชร์งบรวมอีกต่อไป
 const simStart = new Map<string, number>()
 const simEnd = new Map<string, number>()
 {
@@ -110,13 +111,10 @@ const simEnd = new Map<string, number>()
       if (simStart.has(c.id)) continue
       if ((prev === null || done.has(prev)) && (c.anchor === undefined || day >= u(c.anchor))) simStart.set(c.id, day)
     }
-    // วิชาที่เดินอยู่วันนี้ (รวม fixed) แบ่งชั่วโมงเท่า ๆ กัน — อัตราต่อวัน = (15 ชม./สปด. ÷ 7) ÷ จำนวนวิชา
-    const active = flat.filter(({ c }) =>
-      c.fixed ? (day >= u(c.fixed.start) && day <= u(c.fixed.end)) : (simStart.has(c.id) && !done.has(c.id)))
-    const rate = active.length ? 15 / (7 * active.length) : 0
-    for (const { c } of active) {
-      if (c.fixed) continue
-      const a = (acc.get(c.id) ?? 0) + rate
+    // คอร์สที่เดินอยู่เก็บชั่วโมงตามจังหวะ hpw ของตัวเอง (fixed มีวันเริ่ม-จบของภาพอยู่แล้ว)
+    for (const { c } of flat) {
+      if (c.fixed || !simStart.has(c.id) || done.has(c.id)) continue
+      const a = (acc.get(c.id) ?? 0) + (c.hpw ?? 3) / 7
       acc.set(c.id, a)
       if (a >= c.hours - 1e-9) { simEnd.set(c.id, day); done.add(c.id) }
     }

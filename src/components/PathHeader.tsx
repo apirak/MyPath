@@ -15,7 +15,6 @@ type PathHeaderProps = {
 export default function PathHeader({ active, period, now = false, canPrev = false, canNext = false, onPrev, onNext }: PathHeaderProps) {
   return <header className="monthly-header path-header">
     <div className="monthly-tabs">
-      <a href="/mypath">Week</a>
       {active === 'month' ? <button className="active">Month</button> : <a href="/mypath">Month</a>}
       {active === 'year' ? <a className="active" href="/mypath/year">Year</a> : <a href="/mypath/year">Year</a>}
     </div>
