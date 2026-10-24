@@ -5,7 +5,7 @@
 .yp-bar,.yp-mobile-course,.monthly-course{cursor:pointer}
 
 /* ---------- ส่วนแชร์ ---------- */
-.cdp-backdrop{position:fixed;inset:0;z-index:60;background:rgba(33,37,41,.45);animation:cdp-fade .15s}
+.cdp-backdrop{position:fixed;inset:0;z-index:1;background:rgba(33,37,41,.45);animation:cdp-fade .15s}
 @keyframes cdp-fade{from{opacity:0}}
 @keyframes cdp-up{from{transform:translateY(24px);opacity:.4}}
 @keyframes cdp-in{from{transform:translateX(40px);opacity:.4}}
@@ -39,7 +39,7 @@
 /* ---------- Variant A: sheet (มือถือ=ล่างจอ / เดสก์ท็อป=modal กลาง) ---------- */
 .cdp-a{position:fixed;inset:0;z-index:61;pointer-events:none}
 .cdp-a .cdp-backdrop{pointer-events:auto}
-.cdp-sheet{pointer-events:auto;position:fixed;right:0;bottom:0;left:0;display:flex;flex-direction:column;max-height:86vh;border:2px solid #dee2e6;border-bottom:0;border-radius:18px 18px 0 0;background:#fff;box-shadow:0 -8px 30px rgba(33,37,41,.25);animation:cdp-up .18s}
+.cdp-sheet{pointer-events:auto;position:fixed;right:0;bottom:0;left:0;z-index:2;display:flex;flex-direction:column;max-height:86vh;border:2px solid #dee2e6;border-bottom:0;border-radius:18px 18px 0 0;background:#fff;box-shadow:0 -8px 30px rgba(33,37,41,.25);animation:cdp-up .18s}
 .cdp-grab{display:block;width:44px;height:5px;border-radius:3px;background:#dee2e6;margin:8px auto 2px}
 .cdp-sheet>header{padding:6px 14px 10px;border-bottom:2px solid #e9ecef}
 .cdp-sheet-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -80,7 +80,7 @@
 /* ---------- Variant C: drawer (เดสก์ท็อป=ขวาจอ / มือถือ=เต็มจอ) ---------- */
 .cdp-c{position:fixed;inset:0;z-index:61;pointer-events:none}
 .cdp-c .cdp-backdrop{pointer-events:auto}
-.cdp-drawer{pointer-events:auto;position:fixed;top:0;right:0;bottom:0;width:min(460px,94vw);overflow:auto;border-left:2px solid #dee2e6;background:#fff;box-shadow:-8px 0 30px rgba(33,37,41,.2);animation:cdp-in .18s}
+.cdp-drawer{pointer-events:auto;position:fixed;top:0;right:0;bottom:0;z-index:2;width:min(460px,94vw);overflow:auto;border-left:2px solid #dee2e6;background:#fff;box-shadow:-8px 0 30px rgba(33,37,41,.2);animation:cdp-in .18s}
 .cdp-drawer>header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;border-left:8px solid var(--subject);padding:14px}
 .cdp-drawer>header b{font-size:13px;color:#6d757e}
 .cdp-drawer>header h3{margin:4px 0 0;font-size:17px;line-height:1.4}
