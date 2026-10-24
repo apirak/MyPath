@@ -307,7 +307,7 @@ function MobileYear() {
         <div className="yp-mobile-tracks">
           {bands.map(({ ev, y, slot }) => (
             <i key={ev.id} className={`yp-band ${ev.kind}${ev.owned ? '' : ' no'}`}
-              style={{ top: `${(y / (N * rowH)) * 100}%`, marginTop: slot * 13 }}>
+              style={{ top: `${(y / (N * rowH)) * 100}%`, marginTop: slot * 20 }}>
               {ev.label} · {fmtShort(ev.date)}
             </i>
           ))}
@@ -315,7 +315,7 @@ function MobileYear() {
             <div className="yp-col" key={s.name} style={{ '--subject': s.color } as CSSProperties}>
               {s.courses.map(c => (
                 <span key={c.id} className={'yp-bar' + (c.owned ? ' own' : ' own-no')}
-                  style={{ color: c.owned ? barText(s.color) : undefined, top: `${(x0(c) / N) * 100}%`, height: `${((x1(c) - x0(c)) / N) * 100}%` }}>
+                  style={{ color: c.owned ? barText(s.color) : undefined, top: `calc(${(x0(c) / N) * 100}% + 3px)`, height: `calc(${((x1(c) - x0(c)) / N) * 100}% - 5px)` }}>
                   {labelFor(c, true)}
                 </span>
               ))}
@@ -333,20 +333,19 @@ export default function MyPathYearPrototype() {
   return (
     <main className="yp-page">
       <div className="yp-shell">
-        <header className="monthly-header">
-          <h1>แผนการเรียน</h1>
+        <header className="monthly-header yp-header">
           <div className="monthly-tabs">
             <a href="/mypath">Week</a>
             <a href="/mypath">Month</a>
             <a className="active" href="/mypath/year-prototype">Year</a>
           </div>
+          <div className="month-picker">
+            <button aria-label="ย้อนกลับ"><ChevronLeft /></button>
+            <b>ต.ค. 2569 – ก.พ. 2571</b>
+            <button aria-label="ถัดไป"><ChevronRight /></button>
+          </div>
           <button className="study-calendar"><CalendarDays size={20} /><span>ปฏิทินการเรียน</span></button>
         </header>
-        <div className="month-picker">
-          <button aria-label="ย้อนกลับ"><ChevronLeft /></button>
-          <b>ต.ค. 2569 – ก.พ. 2571</b>
-          <button aria-label="ถัดไป"><ChevronRight /></button>
-        </div>
         <div className="yp-desktop"><YearTable /><LoadRow /></div>
         <MobileYear />
         <details className="yp-data">
