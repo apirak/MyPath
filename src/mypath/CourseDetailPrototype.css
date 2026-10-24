@@ -31,8 +31,9 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 .cdp-systems b{font-size:13px}
 
 /* ---------- CTA ใต้ cover (ปุ่มทั้งหมด = HeaderButton ของแอป) ---------- */
-.cdp-cta{padding:12px 14px 0}
+.cdp-cta{padding:12px 14px 16px}
 .cdp-wide{width:100%}
+.cdp-primary{background:#0078c4;border-color:#0078c4;color:#fff;box-shadow:0 3px #03548b}
 .cdp-buy p{margin:6px 0 0;color:#212529;font-weight:700;font-size:15px;text-align:center}
 .cdp-buy s{margin-left:4px;color:#adb5bd}
 .cdp-sheet-top .header-button,.cdp-drawer>header .header-button{flex:none}

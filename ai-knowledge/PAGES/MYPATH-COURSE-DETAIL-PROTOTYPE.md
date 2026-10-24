@@ -8,7 +8,7 @@
 
 แบบที่ล็อก (24 ต.ค. 69 + ปรับเพิ่มวันเดียวกัน):
 
-- **Desktop ≥641px** = แผงข้างขวา (slide-in) · **มือถือ ≤640px** = bottom sheet — สลับสดตาม viewport (`useIsMobile`, breakpoint เดียวกับแอป 640px)
+- **Desktop ≥641px** = แผงข้างขวา (slide-in) · **มือถือ ≤640px** = bottom sheet — สลับสดตาม viewport (`useIsMobile`, breakpoint เดียวกับแอป 640px) · **กฎ layout:** ส่วนตายของชีท (header/cover/CTA/footer) เป็น `flex:none` ห้ามยืดหด — มีแค่ body ที่ยืด/เลื่อนตามพื้นที่ที่เหลือ และชีท `overflow:auto` เป็น fallback ให้จอสั้นมาก (เลื่อนทั้งใบแทนการล้นทับ) — สแกน 6 ขนาดจอแล้วไม่มี overlap/spill
 - **Cover เต็ม 16:9** (`aspect-ratio`) เต็มความกว้าง ไม่มี padding รอบ — แสดงเฉพาะคอร์สที่มีรูป (map `covers` ใน courseDetail.ts: PHY.0–4, MATH.1, CHEM.1 ตามที่หน้า Courses/Month ใช้จริง)
 - **แผง/sheet ไม่มี border** — เฉพาะเงา
 - **ปุ่มเริ่มเรียน ใต้ cover** (คอร์สที่ซื้อแล้ว) · คอร์สที่ยังไม่ซื้อเป็นปุ่ม "หาซื้อบน OnDemand" + ราคา — **ทุกปุ่มใช้ `HeaderButton` component ตัวเดียวกับหน้า Profile** (✕ ปิด = `header-button--icon` + ไอคอน X จาก lucide) — mock: ทั้งเริ่มเรียนและหาซื้อเปิด `ONDEMAND_URL`
