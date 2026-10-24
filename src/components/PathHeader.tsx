@@ -9,7 +9,7 @@ export default function PathHeader({ active, period }: PathHeaderProps) {
     <div className="monthly-tabs">
       <a href="/mypath">Week</a>
       {active === 'month' ? <button className="active">Month</button> : <a href="/mypath">Month</a>}
-      {active === 'year' ? <a className="active" href="/mypath/year-prototype">Year</a> : <a href="/mypath/year-prototype">Year</a>}
+      {active === 'year' ? <a className="active" href="/mypath/year">Year</a> : <a href="/mypath/year">Year</a>}
     </div>
     <div className="month-picker">
       <button aria-label="Previous period"><ChevronLeft /></button>

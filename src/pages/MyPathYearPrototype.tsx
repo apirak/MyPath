@@ -1,8 +1,9 @@
 import type { CSSProperties } from 'react'
 import { BookOpen, CalendarDays, CircleUserRound, House } from 'lucide-react'
 import PathHeader from '../components/PathHeader'
+import './MyPathYearPrototype.css'
 
-// PROTOTYPE — Yearly My Path (throwaway): ดีไซน์ที่เจ้าของเลือกแล้ว (เดิมชื่อ variant A · Timeline grid) บน /mypath/year-prototype
+// Yearly My Path: ดีไซน์ที่เจ้าของเลือกแล้ว (เดิมชื่อ variant A · Timeline grid) บน /mypath/year
 // ข้อตกลงที่ล็อกไว้ (2026-10-23):
 //   1. Desktop: X = เดือน, Y = วิชา / Mobile (≤640px): พลิกแกน — Y = เดือน, X = วิชา
 //   2. แถบคอร์สแยกทุกเล่ม ตาม "วันเริ่ม–วันจบ" ระดับวัน · เรียงต่อเนื่องในวิชา ไม่ซ้อนเวลา
@@ -179,6 +180,16 @@ function MonthLines() {
   return <>{monthLines.map(p => <i key={p} style={{ left: `${p}%` }} />)}</>
 }
 
+function MonthBands() {
+  let left = 0
+  return <>{axisMonths.map((month, index) => {
+    const width = (month.days / TOTAL_DAYS) * 100
+    const band = <span aria-hidden="true" className={`yp-month-band${index % 2 ? ' alternate' : ''}`} key={month.label} style={{ left: `${left}%`, width: `${width}%` }} />
+    left += width
+    return band
+  })}</>
+}
+
 // ราง event: ป้าย 2 บรรทัด (ชื่อชั้นบน วันที่ชั้นล่าง) center ตรงกับวันจริงเสมอ — ป้ายที่จะทับกันไต่ลงแถวล่าง
 // (จำนวนแถวโตตามจำเนียน) และมีเส้นจางๆ จากใต้ป้ายลงไปหาหมุดวงกลมที่ตำแหน่งวันจริงบนเส้นราง
 function EventRail({ big = false }: { big?: boolean }) {
@@ -198,6 +209,7 @@ function EventRail({ big = false }: { big?: boolean }) {
   const dotY = railH - 6
   return (
     <div className={big ? 'yp-rail big' : 'yp-rail'} style={{ height: railH }}>
+      <MonthBands />
       <svg viewBox={`0 0 100 ${railH}`} preserveAspectRatio="none" aria-hidden="true">
         {items.map(({ ev, lane, x }) => {
           const top = lane * step + pillH
@@ -231,6 +243,7 @@ function YearTable() {
           <div className="yp-row" key={s.name} style={{ ...gridCols(true), '--subject': s.color } as CSSProperties}>
             <b><i style={{ background: s.color }} />{s.name}</b>
             <div className="yp-track">
+              <MonthBands />
               <MonthLines />
               {s.courses.map(c => (
                 <span key={c.id} className={'yp-bar' + (c.owned ? ' own' : ' own-no')} title={barTitle(c)}
@@ -285,45 +298,38 @@ function LoadRow() {
   )
 }
 
-/* Mobile พลิกแกนตามข้อตกลง: Y = เดือน (17 แถว), X = วิชา, event 1 วัน = แถบคาดเต็มความกว้างคั่นทุกวิชา */
-function MobileYear() {
-  const rowH = 26
-  // แถบสอบกว้างเต็มหน้าจอ สองแถบที่ห่างกัน <13px ต้องคนละชั้น (กองซ้อนทีละ 13px)
-  const placed: { y: number; slot: number }[] = []
-  const bands = events.map(ev => {
-    const y = (pos(ev.date) / N) * (N * rowH)
-    let slot = 0
-    for (const p of placed) if (y - p.y < 13) slot = Math.max(slot, p.slot + 1)
-    placed.push({ y, slot })
-    return { ev, y, slot }
+const mobileMonthRanges = (() => {
+  let daysBefore = 0
+  return axisMonths.map(month => {
+    const start = (daysBefore / TOTAL_DAYS) * N
+    const startDate = addDays(AXIS_START, daysBefore)
+    daysBefore += month.days
+    return { ...month, start, end: (daysBefore / TOTAL_DAYS) * N, startDate, endDate: addDays(AXIS_START, daysBefore) }
   })
+})()
+
+/* Mobile พลิกแกน: หนึ่งแถวต่อเดือน — แถบสอบอยู่หัวเดือน, คอร์สอยู่ด้านล่าง */
+function MobileYear() {
   return (
     <section className="yp-mobile">
       <div className="yp-mobile-head">
         <i />
         {subjects.map(s => <b key={s.name}><i style={{ background: s.color }} />{s.name}</b>)}
       </div>
-      <div className="yp-mobile-body">
-        <div className="yp-months-col">{axisMonths.map(m => <span key={m.label}>{m.label}</span>)}</div>
-        <div className="yp-mobile-tracks">
-          {bands.map(({ ev, y, slot }) => (
-            <i key={ev.id} className={`yp-band ${ev.kind}${ev.owned ? '' : ' no'}`}
-              style={{ top: `${(y / (N * rowH)) * 100}%`, marginTop: slot * 20 }}>
-              {ev.label} · {fmtShort(ev.date)}
-            </i>
-          ))}
-          {subjects.map(s => (
-            <div className="yp-col" key={s.name} style={{ '--subject': s.color } as CSSProperties}>
-              {s.courses.map(c => (
-                <span key={c.id} className={'yp-bar' + (c.owned ? ' own' : ' own-no')}
-                  style={{ color: c.owned ? barText(s.color) : undefined, top: `calc(${(x0(c) / N) * 100}% + 3px)`, height: `calc(${((x1(c) - x0(c)) / N) * 100}% - 5px)` }}>
-                  {labelFor(c, true)}
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
+      <div className="yp-mobile-months">{mobileMonthRanges.map(month => {
+        const monthEvents = events.filter(event => pos(event.date) >= month.start && pos(event.date) < month.end)
+        return <section className="yp-mobile-month" key={month.label}>
+          <b>{month.label}</b>
+          <div className="yp-mobile-month-content">
+            {monthEvents.length > 0 && <div className="yp-mobile-events">{monthEvents.map(event => <span key={event.id} className={`yp-mobile-event ${event.kind}${event.owned ? '' : ' no'}`}>{event.label} · {fmtShort(event.date)}</span>)}</div>}
+            <div className="yp-mobile-subjects">{subjects.map(subject => {
+              const courses = subject.courses.filter(course => x0(course) < month.end && x1(course) > month.start)
+              const fillsMonth = courses.some(course => u(course.start) <= u(month.startDate) && u(addDays(course.end, 1)) >= u(month.endDate))
+              return <div className={`yp-mobile-cell${fillsMonth ? ' full-month' : ''}`} key={subject.name} style={{ '--subject': subject.color } as CSSProperties}>{courses.map(course => <span key={course.id} className={'yp-mobile-course' + (course.owned ? ' own' : ' own-no')} style={{ color: course.owned ? barText(subject.color) : undefined }}>{labelFor(course, true)}</span>)}</div>
+            })}</div>
+          </div>
+        </section>
+      })}</div>
     </section>
   )
 }

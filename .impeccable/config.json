@@ -11,6 +11,24 @@
         ],
         "createdAt": "2026-10-23T11:46:02.553Z",
         "reason": "Design reference: Figma node 4:44296 uses a subject-color stripe at the left edge of My Path plan cards; the prototype preserves that visual subject identifier."
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/pages/MyPathYearPrototype.css"
+        ],
+        "createdAt": "2026-10-24T02:15:33.955Z",
+        "reason": "Owner-locked mobile Year course-bar subject encoding; documented in the project handoff."
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/index.css"
+        ],
+        "createdAt": "2026-10-24T02:46:38.294Z",
+        "reason": "Project design: the left subject-colour strip is the established course-card identity and uses the rounded card edge intentionally."
       }
     ]
   }
