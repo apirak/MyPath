@@ -1,36 +1,117 @@
-import type { CSSProperties } from 'react'
-import mathCover from '../assets/home/physics-1.png'
-import physicsCover from '../assets/home/physics-3.png'
-import chemistryCover from '../assets/home/physics-2.png'
+import { useState } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import PathHeader from '../components/PathHeader'
 import BottomNav from '../components/BottomNav'
 // PROTOTYPE — คลิกการ์ดคอร์สเปิดรายละเอียด (desktop แผงขวา / มือถือ bottom sheet)
 import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailPrototype'
+import {
+  TODAY, AXIS_START, AXIS_END, u, addMonths, monthStartOf, dayOf, monthShortOf,
+  fmtDate, fmtMonth, fmtShort, agendaFor, subjects, events, totalHours, KIND_COLOR,
+  type Agenda, type AgendaCourse, type ExamEvent,
+} from '../mypath/plan'
 
-// Monthly My Path: agenda ดีไซน์ที่เจ้าของเลือกแล้ว (เดิมคือ variant C ในบรดา A/B/C)
-type Course = { id: string; subject: string; name: string; type: string; hours: string; start: string; end: string; color: string; cover: string }
+// Monthly My Path: agenda generate จาก plan.ts ทั้งหมด (ไม่มี hardcode) — กติกา section ล็อกไว้ใน GLOSSARY.md
+// ปุ่ม ‹ › เลื่อนหน้าต่างเดือนภายในแกน ต.ค. 69 – ก.พ. 71 · เดือนเริ่มต้น = เดือนของ TODAY
 
-const courses: Course[] = [
-  { id: 'MATH.1', subject: 'คณิต 1', name: 'Applied Math Admissions TCAS เล่ม 1 (For Dek70)', type: 'เรียน (ติวเข้ม)', hours: '24 ชม.', start: '01 ม.ค. 69', end: '14 ก.พ. 69', color: '#0078c4', cover: mathCover },
-  { id: 'PHY.0', subject: 'ฟิสิกส์', name: 'ปรับพื้นฐานฟิสิกส์ TCAS', type: 'เรียน (ติวเข้ม)', hours: '18 ชม.', start: '01 ม.ค. 69', end: '31 ม.ค. 69', color: '#d72630', cover: physicsCover },
-  { id: 'CHEM.1', subject: 'เคมี', name: 'เคมี TCAS: กลุ่มอะตอมและตารางธาตุ', type: 'เรียน (ติวเข้ม)', hours: '20 ชม.', start: '15 ม.ค. 69', end: '28 ก.พ. 69', color: '#f5bd3d', cover: chemistryCover },
-]
+function Plate({ text, color, owned }: { text: string; color: string; owned: boolean }) {
+  // ปกสำรอง: ทึบสีวิชา = ซื้อแล้ว · แผ่นอ่อนขอบประ = ยังไม่ได้ซื้อ (encoding เดียวกับ Year)
+  return <span className="monthly-plate" style={owned ? { background: color, color: '#fff' } : { background: `${color}1c`, color, boxShadow: `inset 0 0 0 2px ${color}` }}>{text}</span>
+}
 
-function CourseCard({ course, compact = false, onOpen }: { course: Course; compact?: boolean; onOpen: (id: string) => void }) {
-  return <article className={`monthly-course${compact ? ' compact' : ''}`} style={{ '--subject': course.color } as CSSProperties} role="button" tabIndex={0} onClick={() => onOpen(course.id)} onKeyDown={e => { if (e.key === 'Enter') onOpen(course.id) }}>
-    <div className="monthly-course-body"><img src={course.cover} alt="" /><div><div className="monthly-course-top"><b>{course.subject}</b><span>{course.type}</span></div><strong>{course.name}</strong><small>{course.hours} · {course.start} – {course.end}</small></div></div>
+function CourseCard({ course, done = false }: { course: AgendaCourse; done?: boolean }) {
+  const open = useOpenCourse()
+  return <article className={`monthly-course${done ? ' done' : ''}`} style={{ '--subject': course.color } as CSSProperties} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={e => { if (e.key === 'Enter') open(course.id) }}>
+    <div className="monthly-course-body">
+      {course.cover ? <img src={course.cover} alt="" /> : <Plate text={course.short} color={course.color} owned={!!course.owned} />}
+      <div>
+        <div className="monthly-course-top"><b>{course.subject}</b><span>เรียน (ติวเข้ม)</span></div>
+        <strong>{course.name}</strong>
+        <small>{course.hours} ชม. · {fmtDate(course.start)} – {fmtDate(course.end)}{course.owned ? '' : ' · ยังไม่ได้ซื้อ'}</small>
+      </div>
+    </div>
   </article>
 }
 
-function PageHeader() {
-  return <PathHeader active="month" period="มกราคม 2569" />
+function EventCard({ event, done = false }: { event: ExamEvent; done?: boolean }) {
+  const color = KIND_COLOR[event.kind]
+  const kindLabel = event.kind === 'exam' ? 'สอบจริง' : 'Mock'
+  return <article className={`monthly-course${done ? ' done' : ''}`} style={{ '--subject': color } as CSSProperties}>
+    <div className="monthly-course-body">
+      <Plate text={kindLabel} color={color} owned={!!event.owned} />
+      <div>
+        <div className="monthly-course-top"><b>{kindLabel}</b><span>{fmtShort(event.date)}</span></div>
+        <strong>{event.label}</strong>
+        <small>สอบ 1 วัน{event.owned ? '' : ' · ยังไม่ได้ซื้อ'}</small>
+      </div>
+    </div>
+  </article>
 }
 
-function Agenda() {
-  const open = useOpenCourse()
-  return <section className="monthly-agenda"><div className="today-callout"><span>วันนี้</span><h2>เริ่ม 2 คอร์สได้เลย</h2><p>เลือกวิชาที่สำคัญที่สุดก่อน แล้วค่อยเดินตามแผน</p></div><div className="agenda-now">{courses.slice(0, 2).map(course => <CourseCard course={course} key={course.name} compact onOpen={open} />)}</div><div className="next-course"><div><span>ถัดไป</span><h2>15 มกราคม</h2></div><CourseCard course={courses[2]} onOpen={open} /></div></section>
+function SectionTitle({ title }: { title: string }) {
+  return <div className="now-heading"><span>{title}</span></div>
+}
+
+function DateHeading({ iso }: { iso: string }) {
+  return <div className="date-heading"><b>{dayOf(iso)}</b><span>{monthShortOf(iso)}</span><i /></div>
+}
+
+function Stack({ children }: { children: ReactNode }) {
+  return <div className="course-stack">{children}</div>
+}
+
+function Agenda({ agenda }: { agenda: Agenda }) {
+  const ongoing = agenda.isCurrent ? agenda.inProgress : agenda.active
+  const empty = ongoing.length === 0 && agenda.upcoming.length === 0 && agenda.finished.length === 0 && agenda.pastEvents.length === 0
+  return <section className="monthly-agenda">
+    {agenda.isCurrent && <div className="today-callout">
+      <span>วันนี้ · {fmtDate(TODAY)}</span>
+      <h2>{agenda.inProgress.length ? `เริ่มเรียนได้เลย ${agenda.inProgress.length} คอร์ส` : 'วันนี้ไม่มีคอร์ส — วันพัก'}</h2>
+      <p>{agenda.inProgress.length ? 'เลือกวิชาที่สำคัญที่สุดก่อน แล้วค่อยเดินตามแผน' : 'ใช้วันนี้ทบทวน หรืออ่านล่วงหน้าได้ตามสบาย'}</p>
+    </div>}
+    {empty ? <div className="agenda-empty">ไม่มีคอร์สหรือสอบในเดือนนี้ — ลองเลื่อนดูเดือนอื่น</div> : <>
+      {ongoing.length > 0 && <>
+        <SectionTitle title={agenda.isCurrent ? 'วันนี้ · กำลังเรียน' : 'กำลังเรียนช่วงเดือนนี้'} />
+        <Stack>{ongoing.map(course => <CourseCard key={course.id} course={course} />)}</Stack>
+      </>}
+      {agenda.upcoming.length > 0 && <>
+        <SectionTitle title="ถัดไป" />
+        {agenda.upcoming.map(group => <div key={group.date}>
+          <DateHeading iso={group.date} />
+          <Stack>
+            {group.courses.map(course => <CourseCard key={course.id} course={course} />)}
+            {group.events.map(event => <EventCard key={event.id} event={event} />)}
+          </Stack>
+        </div>)}
+      </>}
+      {agenda.finished.length > 0 && <>
+        <SectionTitle title="จบแล้วในเดือนนี้" />
+        <Stack>{agenda.finished.map(course => <CourseCard key={course.id} course={course} done />)}</Stack>
+      </>}
+      {agenda.pastEvents.length > 0 && <>
+        <SectionTitle title="ผ่านมาแล้ว" />
+        <Stack>{agenda.pastEvents.map(event => <EventCard key={event.id} event={event} done />)}</Stack>
+      </>}
+    </>}
+  </section>
 }
 
 export default function MyPath() {
-  return <main className="monthly-prototype"><div className="monthly-shell"><PageHeader /><Agenda /><CourseDetailOverlay /></div><BottomNav active="mypath" /></main>
+  const [month, setMonth] = useState(monthStartOf(TODAY))
+  const agenda = agendaFor(month)
+  const canPrev = u(month) > u(AXIS_START)
+  const canNext = u(addMonths(month, 1)) < u(AXIS_END)
+  return <main className="monthly-prototype">
+    <div className="monthly-shell">
+      <PathHeader active="month" period={fmtMonth(month)} now={agenda.isCurrent}
+        canPrev={canPrev} canNext={canNext}
+        onPrev={() => setMonth(addMonths(month, -1))} onNext={() => setMonth(addMonths(month, 1))} />
+      <Agenda agenda={agenda} />
+      <CourseDetailOverlay />
+      <details className="prototype-data">
+        <summary>ข้อมูล mock (plan.ts · วันนี้ = {fmtDate(TODAY)})</summary>
+        <pre>{JSON.stringify({ TODAY, totalHours, subjects, events, agenda }, null, 2)}</pre>
+      </details>
+    </div>
+    <BottomNav active="mypath" />
+  </main>
 }

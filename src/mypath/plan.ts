@@ -13,6 +13,10 @@ export const TOTAL_DAYS = (u(AXIS_END) - u(AXIS_START)) / MS
 const DAY_START = u('2026-09-28') // วันเริ่ม simulation (จันทร์ที่เริ่มเล่ม 1)
 const DAY_LAST = u('2028-02-28') // วันสุดท้ายของแผน (ก่อนสอบ A-Level จบแผน)
 
+// วันอ้างอิงของ mock (GLOSSARY.md: "วันนี้") — ค่าเดียว ทั้ง Month และ Year ใช้ร่วมกัน
+// แก้ค่านี้ทีเดียว → section ของทั้งสองหน้าขยับตาม (ไม่อ่านนาฬิกาเครื่อง)
+export const TODAY = '2026-12-05'
+
 export const N = 17
 const mn = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.']
 const be = (y: number) => String(y + 543).slice(2)
@@ -42,7 +46,7 @@ export const pos = (iso: string) => ((u(iso) - u(AXIS_START)) / MS / TOTAL_DAYS)
 export const posMs = (ms: number) => ((ms - u(AXIS_START)) / MS / TOTAL_DAYS) * N
 export const pct = (v: number) => (v / N) * 100
 
-type CourseSpec = { id: string; name: string; short: string; abbr: string; hours: number; owned?: boolean; anchor?: string; fixed?: { start: string; end: string } }
+type CourseSpec = { id: string; name: string; short: string; abbr: string; hours: number; owned?: boolean; anchor?: string; fixed?: { start: string; end: string }; cover?: string }
 export type Course = CourseSpec & { start: string; end: string }
 export type Subject = { name: string; color: string; courses: Course[] }
 export type ExamEvent = { id: string; date: string; label: string; kind: 'exam' | 'mock'; owned?: boolean }
@@ -58,24 +62,24 @@ const subjectsSpec: { name: string; color: string; courses: CourseSpec[] }[] = [
     { id: 'TPAT3.2', name: 'ตะลุยโจทย์ TPAT3 · ทำข้อสอบเก่า', short: 'ทำข้อสอบเก่า', abbr: 'ทำข้อสอบ', hours: 18, anchor: '2027-12-01' },
   ]},
   { name: 'คณิต 1', color: '#0078c4', courses: [
-    { id: 'MATH.1', name: 'Applied Math Admissions TCAS เล่ม 1 (For Dek70)', short: 'เล่ม 1', abbr: 'ล. 1', hours: 24, owned: true, anchor: '2026-09-28' },
-    { id: 'MATH.2', name: 'Applied Math Admissions TCAS เล่ม 2 (For Dek70)', short: 'เล่ม 2', abbr: 'ล. 2', hours: 24, owned: true },
-    { id: 'MATH.3', name: 'Applied Math Admissions TCAS เล่ม 3', short: 'เล่ม 3', abbr: 'ล. 3', hours: 18, owned: true },
-    { id: 'MATH.4', name: 'Applied Math Admissions TCAS เล่ม 4', short: 'เล่ม 4', abbr: 'ล. 4', hours: 21 },
-    { id: 'MATH.5', name: 'Applied Math Admissions TCAS เล่ม 5', short: 'เล่ม 5', abbr: 'ล. 5', hours: 24 },
+    { id: 'MATH.1', name: 'Applied Math Admissions TCAS เล่ม 1 (For Dek70)', short: 'เล่ม 1', abbr: 'ล. 1', hours: 24, owned: true, anchor: '2026-09-28', cover: '/cover/Math_TCAS70_1.png' },
+    { id: 'MATH.2', name: 'Applied Math Admissions TCAS เล่ม 2 (For Dek70)', short: 'เล่ม 2', abbr: 'ล. 2', hours: 24, owned: true, cover: '/cover/Math_TCAS70_2.png' },
+    { id: 'MATH.3', name: 'Applied Math Admissions TCAS เล่ม 3', short: 'เล่ม 3', abbr: 'ล. 3', hours: 18, owned: true, cover: '/cover/Math_TCAS70_3.png' },
+    { id: 'MATH.4', name: 'Applied Math Admissions TCAS เล่ม 4', short: 'เล่ม 4', abbr: 'ล. 4', hours: 21, cover: '/cover/Math_TCAS70_4.png' },
+    { id: 'MATH.5', name: 'Applied Math Admissions TCAS เล่ม 5', short: 'เล่ม 5', abbr: 'ล. 5', hours: 24, cover: '/cover/Math_TCAS70_5.png' },
     { id: 'MATH.UP', name: 'Upskill คณิตศาสตร์ประยุกต์ 1 A-Level', short: 'Upskill คณิต', abbr: 'UP', hours: 64.5, fixed: { start: '2027-12-01', end: '2028-01-15' } },
-    { id: 'MATH.EX', name: 'MATH TCAS ตะลุยโจทย์ข้อสอบ ครบทุกแนว (UPDATE Version 2026 · TCAS70)', short: 'ตะลุยโจทย์ MATH', abbr: 'ตะลุย', hours: 30, fixed: { start: '2028-01-16', end: '2028-02-28' } },
+    { id: 'MATH.EX', name: 'MATH TCAS ตะลุยโจทย์ข้อสอบ ครบทุกแนว (UPDATE Version 2026 · TCAS70)', short: 'ตะลุยโจทย์ MATH', abbr: 'ตะลุย', hours: 30, fixed: { start: '2028-01-16', end: '2028-02-28' }, cover: '/cover/Exam_Gym_Math.png' },
   ]},
   { name: 'ฟิสิกส์', color: '#d72630', courses: [
     { id: 'PHY.0', name: 'ปรับพื้นฐานฟิสิกส์ TCAS (ปูพื้น ครบทุกทักษะ ครบทุกแนว)', short: 'ปรับพื้นฐาน', abbr: 'ปูพื้น', hours: 18, owned: true, anchor: '2026-10-01' },
-    { id: 'PHY.1', name: 'ฟิสิกส์ TCAS ล. 1', short: 'ล. 1', abbr: 'ล.1', hours: 24, owned: true },
-    { id: 'PHY.2', name: 'ฟิสิกส์ TCAS ล. 2 · กลศาสตร์วิเคราะห์ 2', short: 'ล. 2 · กลศาสตร์ 2', abbr: 'ล.2', hours: 21, owned: true },
-    { id: 'PHY.3', name: 'ฟิสิกส์ TCAS ล. 3', short: 'ล. 3', abbr: 'ล.3', hours: 15, owned: true },
-    { id: 'PHY.4', name: 'ฟิสิกส์ TCAS ล. 4', short: 'ล. 4', abbr: 'ล.4', hours: 18, owned: true },
-    { id: 'PHY.5', name: 'ฟิสิกส์ TCAS ล. 5', short: 'ล. 5', abbr: 'ล.5', hours: 12 },
-    { id: 'PHY.6', name: 'ฟิสิกส์ TCAS ล. 6', short: 'ล. 6', abbr: 'ล.6', hours: 15 },
-    { id: 'PHY.7', name: 'ฟิสิกส์ TCAS ล. 7', short: 'ล. 7', abbr: 'ล.7', hours: 15 },
-    { id: 'PHY.EX', name: "PHYSICS TCAS Dek'70 ตะลุยโจทย์ข้อสอบ ครบทุกแนว (TCAS70)", short: 'ตะลุยโจทย์ฟิสิกส์', abbr: 'ตะลุย', hours: 24, anchor: '2027-12-01' },
+    { id: 'PHY.1', name: 'ฟิสิกส์ TCAS ล. 1', short: 'ล. 1', abbr: 'ล.1', hours: 24, owned: true, cover: '/cover/Physics_TCAS70_1.png' },
+    { id: 'PHY.2', name: 'ฟิสิกส์ TCAS ล. 2 · กลศาสตร์วิเคราะห์ 2', short: 'ล. 2 · กลศาสตร์ 2', abbr: 'ล.2', hours: 21, owned: true, cover: '/cover/Physics_TCAS70_2.png' },
+    { id: 'PHY.3', name: 'ฟิสิกส์ TCAS ล. 3', short: 'ล. 3', abbr: 'ล.3', hours: 15, owned: true, cover: '/cover/Physics_TCAS70_3.png' },
+    { id: 'PHY.4', name: 'ฟิสิกส์ TCAS ล. 4', short: 'ล. 4', abbr: 'ล.4', hours: 18, owned: true, cover: '/cover/Physics_TCAS70_4.png' },
+    { id: 'PHY.5', name: 'ฟิสิกส์ TCAS ล. 5', short: 'ล. 5', abbr: 'ล.5', hours: 12, cover: '/cover/Physics_TCAS70_5.png' },
+    { id: 'PHY.6', name: 'ฟิสิกส์ TCAS ล. 6', short: 'ล. 6', abbr: 'ล.6', hours: 15, cover: '/cover/Physics_TCAS70_6.png' },
+    { id: 'PHY.7', name: 'ฟิสิกส์ TCAS ล. 7', short: 'ล. 7', abbr: 'ล.7', hours: 15, cover: '/cover/Physics_TCAS70_7.png' },
+    { id: 'PHY.EX', name: "PHYSICS TCAS Dek'70 ตะลุยโจทย์ข้อสอบ ครบทุกแนว (TCAS70)", short: 'ตะลุยโจทย์ฟิสิกส์', abbr: 'ตะลุย', hours: 24, anchor: '2027-12-01', cover: '/cover/Exam_Gym_Physic.png' },
   ]},
   { name: 'TGAT', color: '#ff6b17', courses: [
     { id: 'TGAT.1', name: 'ล่าแข่ง TGAT', short: 'ล่าแข่ง TGAT', abbr: 'ล่าแข่ง', hours: 15, fixed: { start: '2027-08-01', end: '2027-11-29' } },
@@ -86,7 +90,7 @@ const subjectsSpec: { name: string; color: string; courses: CourseSpec[] }[] = [
     { id: 'CHEM.3', name: 'เคมี TCAS เล่ม 3 · พันธะเคมี', short: 'เล่ม 3', abbr: 'ล. 3', hours: 20 },
     { id: 'CHEM.4', name: 'เคมี TCAS เล่ม 4', short: 'เล่ม 4', abbr: 'ล. 4', hours: 20, anchor: '2027-08-01' },
     { id: 'CHEM.5', name: 'เคมี TCAS เล่ม 5', short: 'เล่ม 5', abbr: 'ล. 5', hours: 20 },
-    { id: 'CHEM.EX', name: 'ตะลุยโจทย์ Upskill เคมี A-Level', short: 'ตะลุยโจทย์', abbr: 'ตะลุย', hours: 24, anchor: '2027-12-01' },
+    { id: 'CHEM.EX', name: 'ตะลุยโจทย์ Upskill เคมี A-Level', short: 'ตะลุยโจทย์', abbr: 'ตะลุย', hours: 24, anchor: '2027-12-01', cover: '/cover/Exam_Gym_Chemistry.png' },
   ]},
 ]
 
@@ -139,3 +143,61 @@ export const events: ExamEvent[] = [
 ]
 
 export const totalHours = subjects.reduce((t, s) => t + s.courses.reduce((a, c) => a + c.hours, 0), 0)
+
+// --- สีชนิดสอบ (encoding เดียวกับรางป้ายของ Year: น้ำเงิน = สอบจริง, แดง = Mock) ---
+export const KIND_COLOR = { exam: '#2b6cd4', mock: '#ef6268' } as const
+
+// --- หน้า Month: หน้าต่างเดือน + agenda (กติกา section ล็อกไว้ใน GLOSSARY.md) ---
+// เส้นตัด R ของแต่ละเดือน: เดือนของ TODAY → TODAY · เดือนอดีต → สิ้นเดือน · เดือนอนาคต → ก่อนต้นเดือน
+// ทุก section คำนวณจากข้อมูลล้วน ๆ — แก้ plan.ts แล้ว agenda ของทุกเดือนคำนวณใหม่เอง
+const MONTHS_FULL = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม']
+export const dayOf = (iso: string) => Number(iso.slice(8, 10))
+export const monthShortOf = (iso: string) => mn[Number(iso.slice(5, 7)) - 1]
+export const fmtMonth = (iso: string) => `${MONTHS_FULL[Number(iso.slice(5, 7)) - 1]} ${Number(iso.slice(0, 4)) + 543}`
+export const monthStartOf = (iso: string) => `${iso.slice(0, 7)}-01`
+export const addMonths = (iso: string, n: number) => {
+  const [y, m] = iso.split('-').map(Number)
+  const t = y * 12 + (m - 1) + n
+  return `${String(Math.floor(t / 12)).padStart(4, '0')}-${String((t % 12) + 1).padStart(2, '0')}-01`
+}
+
+export type AgendaCourse = Course & { subject: string; color: string }
+export type AgendaGroup = { date: string; courses: AgendaCourse[]; events: ExamEvent[] }
+export type Agenda = {
+  monthStart: string
+  monthEnd: string // exclusive
+  isCurrent: boolean // หน้าต่างนี้ครอบ TODAY
+  isPast: boolean
+  inProgress: AgendaCourse[] // เดือนของ TODAY: คอร์สที่ครอบวันนี้
+  active: AgendaCourse[] // เดือนอื่น: คอร์สที่ทับหน้าต่างเดือน
+  upcoming: AgendaGroup[] // กลุ่มตามวันเริ่ม/วันสอบ หลัง R ภายในเดือน (สอบของวัน TODAY รวมกลุ่มวันนี้)
+  finished: AgendaCourse[] // จบภายในเดือนก่อนถึง R
+  pastEvents: ExamEvent[] // สอบ/Mock ในเดือนที่ผ่าน R ไปแล้ว
+}
+
+export function agendaFor(monthStartIso: string, today: string = TODAY): Agenda {
+  const monthStart = monthStartOf(monthStartIso)
+  const monthEnd = addMonths(monthStart, 1)
+  const isCurrent = u(today) >= u(monthStart) && u(today) < u(monthEnd)
+  const isPast = u(today) >= u(monthEnd)
+  const R = isCurrent ? today : isPast ? monthEnd : addDays(monthStart, -1)
+  const withSubject: AgendaCourse[] = subjects.flatMap(s => s.courses.map(c => ({ ...c, subject: s.name, color: s.color })))
+  const inWin = (d: string) => d >= monthStart && d < monthEnd
+  const inProgress = isCurrent ? withSubject.filter(c => u(c.start) <= u(today) && u(today) <= u(c.end)) : []
+  // กำลังเรียนช่วงเดือน (เดือนอื่น): ทับหน้าต่างเดือนและยังไม่จบก่อน R — คอร์สที่จบในเดือนนั้นไปอยู่ finished อย่างเดียว
+  const active = isCurrent ? [] : withSubject.filter(c => u(c.start) < u(monthEnd) && u(c.end) >= u(R))
+  const finished = withSubject.filter(c => inWin(c.end) && u(c.end) < u(R))
+  // กลุ่มถัดไป: รวมคอร์สที่เริ่มและสอบที่จัดหลัง R ภายในเดือน ตามวันที่ (สอบวัน TODAY อยู่กลุ่มวันนี้)
+  const byDate = new Map<string, AgendaGroup>()
+  for (const c of withSubject) {
+    const ok = isCurrent ? (c.start > today && inWin(c.start)) : (!isPast && inWin(c.start))
+    if (ok) (byDate.get(c.start) ?? byDate.set(c.start, { date: c.start, courses: [], events: [] }).get(c.start)!).courses.push(c)
+  }
+  for (const ev of events) {
+    const ok = isCurrent ? (u(ev.date) >= u(today) && inWin(ev.date)) : (!isPast && inWin(ev.date))
+    if (ok) (byDate.get(ev.date) ?? byDate.set(ev.date, { date: ev.date, courses: [], events: [] }).get(ev.date)!).events.push(ev)
+  }
+  const upcoming = [...byDate.values()].sort((a, b) => u(a.date) - u(b.date))
+  const pastEvents = events.filter(ev => inWin(ev.date) && u(ev.date) < u(R))
+  return { monthStart, monthEnd, isCurrent, isPast, inProgress, active, upcoming, finished, pastEvents }
+}

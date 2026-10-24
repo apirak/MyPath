@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
 import PathHeader from '../components/PathHeader'
 import BottomNav from '../components/BottomNav'
-import { MS, N, TOTAL_DAYS, AXIS_START, AXIS_END, u, isoOf, addDays, fmtDate, fmtShort, axisMonths, monthLines, pos, posMs, pct, subjects, events, totalHours, type Course } from '../mypath/plan'
+import { MS, N, TOTAL_DAYS, AXIS_START, AXIS_END, TODAY, u, isoOf, addDays, fmtDate, fmtShort, axisMonths, monthLines, pos, posMs, pct, subjects, events, totalHours, type Course } from '../mypath/plan'
 // PROTOTYPE — คลิกแถบคอร์สเปิดรายละเอียด (desktop แผงขวา / มือถือ bottom sheet)
 import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailPrototype'
 import './MyPathYear.css'
@@ -39,6 +39,12 @@ const gridCols = (withLabel: boolean) => ({ gridTemplateColumns: withLabel ? `14
 
 /* ---------- shared pieces ---------- */
 
+// เดือนที่มี "วันนี้" (TODAY ตัวเดียวกับหน้า Month) — ไฮไลต์แถบเดือน + หัวเดือนสีฟ้า
+const nowMonthLabel = axisMonths.find((_, i) => {
+  const start = addDays(AXIS_START, axisMonths.slice(0, i).reduce((t, m) => t + m.days, 0))
+  return u(start) <= u(TODAY) && u(TODAY) < u(addDays(start, axisMonths[i].days))
+})?.label
+
 function MonthLines() {
   return <>{monthLines.map(p => <i key={p} style={{ left: `${p}%` }} />)}</>
 }
@@ -47,7 +53,7 @@ function MonthBands() {
   let left = 0
   return <>{axisMonths.map((month, index) => {
     const width = (month.days / TOTAL_DAYS) * 100
-    const band = <span aria-hidden="true" className={`yp-month-band${index % 2 ? ' alternate' : ''}`} key={month.label} style={{ left: `${left}%`, width: `${width}%` }} />
+    const band = <span aria-hidden="true" className={`yp-month-band${index % 2 ? ' alternate' : ''}${month.label === nowMonthLabel ? ' now' : ''}`} key={month.label} style={{ left: `${left}%`, width: `${width}%` }} />
     left += width
     return band
   })}</>
@@ -97,7 +103,7 @@ function YearTable() {
       <div className="yp-table-inner">
         <div className="yp-months" style={gridCols(true)}>
           <i />
-          {axisMonths.map(m => <span key={m.label}>{m.label}</span>)}
+          {axisMonths.map(m => <span key={m.label} className={m.label === nowMonthLabel ? 'now' : ''}>{m.label}</span>)}
         </div>
         <div className="yp-eventrow" style={gridCols(true)}>
           <i />
@@ -184,7 +190,7 @@ function MobileYear() {
       </div>
       <div className="yp-mobile-months">{mobileMonthRanges.map(month => {
         const monthEvents = events.filter(event => pos(event.date) >= month.start && pos(event.date) < month.end)
-        return <section className="yp-mobile-month" key={month.label}>
+        return <section className={'yp-mobile-month' + (month.label === nowMonthLabel ? ' now' : '')} key={month.label}>
           <b>{month.label}</b>
           <div className="yp-mobile-month-content">
             {monthEvents.length > 0 && <div className="yp-mobile-events">{monthEvents.map(event => <span key={event.id} className={`yp-mobile-event ${event.kind}${event.owned ? '' : ' no'}`}>{event.label} · {fmtShort(event.date)}</span>)}</div>}
