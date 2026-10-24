@@ -3,7 +3,7 @@ import Home from './pages/Home'
 import Courses from './pages/Courses'
 import MyPath from './pages/MyPath'
 import Profile from './pages/Profile'
-import MyPathYearPrototype from './pages/MyPathYearPrototype'
+import MyPathYear from './pages/MyPathYear'
 
 export default function App() {
   return (
@@ -11,8 +11,8 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/courses" element={<Courses />} />
       <Route path="/mypath" element={<MyPath />} />
-      <Route path="/mypath/year" element={<MyPathYearPrototype />} />
-      <Route path="/mypath/year-prototype" element={<MyPathYearPrototype />} />
+      <Route path="/mypath/year" element={<MyPathYear />} />
+      <Route path="/mypath/year-prototype" element={<MyPathYear />} />
       <Route path="/profile" element={<Profile />} />
     </Routes>
   )
