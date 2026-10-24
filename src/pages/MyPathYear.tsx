@@ -2,8 +2,8 @@ import type { CSSProperties } from 'react'
 import PathHeader from '../components/PathHeader'
 import BottomNav from '../components/BottomNav'
 import { MS, N, TOTAL_DAYS, AXIS_START, AXIS_END, u, isoOf, addDays, fmtDate, fmtShort, axisMonths, monthLines, pos, posMs, pct, subjects, events, totalHours, type Course } from '../mypath/plan'
-// PROTOTYPE (throwaway) — คลิกแถบคอร์สเปิดรายละเอียด (สลับ A/B/C ด้วย ?variant=)
-import { useOpenCourse, CourseDetailOverlay, PrototypeSwitcher } from '../mypath/CourseDetailPrototype'
+// PROTOTYPE — คลิกแถบคอร์สเปิดรายละเอียด (desktop แผงขวา / มือถือ bottom sheet)
+import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailPrototype'
 import './MyPathYear.css'
 
 // Yearly My Path: ดีไซน์ที่เจ้าของเลือกแล้ว (เดิมชื่อ variant A · Timeline grid) บน /mypath/year
@@ -214,7 +214,6 @@ export default function MyPathYear() {
           <pre>{JSON.stringify({ axis: 'ต.ค. 69 – ก.พ. 71 (17 เดือน)', totalHours, subjects, events }, null, 2)}</pre>
         </details>
         <CourseDetailOverlay />
-        <PrototypeSwitcher />
       </div>
       <BottomNav active="mypath" />
     </main>

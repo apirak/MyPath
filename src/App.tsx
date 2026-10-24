@@ -4,8 +4,6 @@ import Courses from './pages/Courses'
 import MyPath from './pages/MyPath'
 import Profile from './pages/Profile'
 import MyPathYear from './pages/MyPathYear'
-// PROTOTYPE (throwaway) — หน้ารายละเอียดคอร์ส สลับ variants ด้วย ?variant=A|B|C
-import { CourseDetailPage } from './mypath/CourseDetailPrototype'
 
 export default function App() {
   return (
@@ -15,7 +13,6 @@ export default function App() {
       <Route path="/mypath" element={<MyPath />} />
       <Route path="/mypath/year" element={<MyPathYear />} />
       <Route path="/mypath/year-prototype" element={<MyPathYear />} />
-      <Route path="/mypath/course/:id" element={<CourseDetailPage />} />
       <Route path="/profile" element={<Profile />} />
     </Routes>
   )

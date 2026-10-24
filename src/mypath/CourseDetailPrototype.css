@@ -1,5 +1,6 @@
-/* PROTOTYPE — สไตล์หน้ารายละเอียดคอร์ส (variants A/B/C) + switcher
-   ใช้โทนเดียวกับแอป: ขอบ 2px #dee2e6 · radius 12 · เงาแบบทึบ · --subject = สีวิชาจาก plan.ts */
+/* PROTOTYPE — หน้ารายละเอียดคอร์ส แบบ D ตัวเดียว (desktop = แผงขวา, มือถือ = bottom sheet)
+   ใช้โทนเดียวกับแอป · --subject = สีวิชาจาก plan.ts
+   ปรับ 24 ต.ค. 69: cover เต็ม 16/9 ไม่มี padding · แผงไม่มี border · ปุ่มเริ่มเรียนใต้ cover */
 
 /* คอร์สบนแผนกดได้ */
 .yp-bar,.yp-mobile-course,.monthly-course{cursor:pointer}
@@ -9,7 +10,7 @@
 @keyframes cdp-fade{from{opacity:0}}
 @keyframes cdp-up{from{transform:translateY(24px);opacity:.4}}
 @keyframes cdp-in{from{transform:translateX(40px);opacity:.4}}
-.cdp-dot,.cdp-sheet-top .dot,.cdp-hero .dot,header b .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--subject);margin-right:6px;vertical-align:1px}
+header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--subject);margin-right:6px;vertical-align:1px}
 .cdp-status{font-style:normal;font-weight:700;font-size:11px;border-radius:999px;padding:3px 9px}
 .cdp-status.now{background:#e6f4ff;color:#0797f5}
 .cdp-status.next{background:#fff4dd;color:#b66b00}
@@ -25,21 +26,24 @@
 .cdp-egg{margin:6px 0;padding:6px 10px;border-left:4px solid var(--subject);border-radius:0 8px 8px 0;background:#f8f9fa;color:#495057;font-size:12px}
 .cdp-pain{margin:6px 0;color:#c0353c;font-size:13px;line-height:1.5}
 .cdp-empty{margin:8px 0;padding:12px;border:2px dashed #dee2e6;border-radius:12px;background:#fff;color:#6d757e;font-size:13px}
-.cdp-price{margin:4px 0;color:#6d757e;font-size:13px}
-.cdp-price s{margin-left:4px;color:#adb5bd}
-.cdp-buy a{display:inline-block;border-radius:12px;background:#0078c4;box-shadow:0 4px #03548b;color:#fff;font-weight:700;font-size:14px;padding:10px 16px;text-decoration:none}
-.cdp-buy p{margin:6px 0 0;color:#212529;font-weight:700;font-size:15px}
-.cdp-buy.big a{display:block;text-align:center;padding:12px}
-.cdp-hint{margin:8px 0 0;color:#6d757e;font-size:12px}
 .cdp-systems{display:grid;gap:8px;margin:10px 0}
 .cdp-systems>div{border:2px solid #e9ecef;border-radius:10px;background:#fff;padding:8px 10px}
 .cdp-systems b{font-size:13px}
-.cdp-systems p{margin:3px 0 0;color:#6d757e;font-size:12px;line-height:1.45}
 
-/* ---------- Variant A: sheet (มือถือ=ล่างจอ / เดสก์ท็อป=modal กลาง) ---------- */
+/* ---------- CTA ใต้ cover (ปุ่มทั้งหมด = HeaderButton ของแอป) ---------- */
+.cdp-cta{padding:12px 14px 0}
+.cdp-wide{width:100%}
+.cdp-buy p{margin:6px 0 0;color:#212529;font-weight:700;font-size:15px;text-align:center}
+.cdp-buy s{margin-left:4px;color:#adb5bd}
+.cdp-sheet-top .header-button,.cdp-drawer>header .header-button{flex:none}
+
+/* ---------- cover + CTA ใต้ cover ---------- */
+.cdp-cover{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+
+/* ---------- มือถือ ≤640px: bottom sheet ---------- */
 .cdp-a{position:fixed;inset:0;z-index:61;pointer-events:none}
 .cdp-a .cdp-backdrop{pointer-events:auto}
-.cdp-sheet{pointer-events:auto;position:fixed;right:0;bottom:0;left:0;z-index:2;display:flex;flex-direction:column;max-height:86vh;border:2px solid #dee2e6;border-bottom:0;border-radius:18px 18px 0 0;background:#fff;box-shadow:0 -8px 30px rgba(33,37,41,.25);animation:cdp-up .18s}
+.cdp-sheet{pointer-events:auto;position:fixed;right:0;bottom:0;left:0;z-index:2;display:flex;flex-direction:column;max-height:86vh;border-radius:18px 18px 0 0;background:#fff;box-shadow:0 -8px 30px rgba(33,37,41,.25);animation:cdp-up .18s}
 .cdp-grab{display:block;width:44px;height:5px;border-radius:3px;background:#dee2e6;margin:8px auto 2px}
 .cdp-sheet>header{padding:6px 14px 10px;border-bottom:2px solid #e9ecef}
 .cdp-sheet-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -47,49 +51,12 @@
 .cdp-sheet-top button{width:34px;height:34px;border:2px solid #dee2e6;border-radius:10px;background:#fff;color:#6d757e;font-size:15px}
 .cdp-sheet-body{flex:1;overflow:auto;padding:4px 14px 12px}
 .cdp-sheet-body h4{margin:12px 0 2px;font-size:13px;color:#0078c4}
-.cdp-sheet>footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;border-top:2px solid #e9ecef;background:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
-@media(min-width:641px){
-  .cdp-sheet{right:auto;left:50%;bottom:auto;top:50%;transform:translate(-50%,-50%);width:min(500px,92vw);max-height:min(78vh,640px);border-radius:16px;border-bottom:2px solid #dee2e6;animation:cdp-up .18s}
-  .cdp-grab{display:none}
-}
+.cdp-sheet>footer{display:flex;align-items:center;justify-content:flex-end;border-top:2px solid #e9ecef;background:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
 
-/* ---------- รูปปก (แสดงเฉพาะคอร์สที่มี cover ใน mock) ---------- */
-.cdp-cover{display:block;width:100%;height:110px;object-fit:cover;border:2px solid #dee2e6;border-radius:10px;margin:8px 0 2px}
-.cdp-drawer>.cdp-cover{width:calc(100% - 28px);height:96px;margin:10px 14px 0}
-.cdp-cover.hero{flex:none;width:168px;height:96px;margin:0;border:3px solid #fff;box-shadow:0 4px 14px rgba(33,37,41,.3)}
-.cdp-hero-inner{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px}
-.cdp-hero-inner>button{flex-basis:100%}
-.cdp-hero-copy{flex:1;min-width:0}
-@media(max-width:640px){.cdp-cover.hero{width:104px;height:60px;border-width:2px}}
-
-/* ---------- Variant B: หน้าเต็ม ---------- */
-.cdp-page{min-height:100vh;background:#f7f9fc;padding-bottom:76px}
-.cdp-hero{background:var(--subject);color:#fff}
-.cdp-hero-inner{width:min(1024px,calc(100% - 32px));margin:auto;padding:16px 0 18px}
-.cdp-hero-inner>button{margin-bottom:10px;border:0;border-radius:10px;background:rgba(255,255,255,.92);box-shadow:0 3px rgba(33,37,41,.25);padding:7px 12px;font-weight:700;cursor:pointer}
-.cdp-hero-inner p{margin:0;font-size:13px;opacity:.92}
-.cdp-hero-inner h1{margin:4px 0 10px;font-size:22px;line-height:1.35}
-.cdp-hero .cdp-meta{color:#f1f3f5}
-.cdp-page-body{display:grid;grid-template-columns:1fr 320px;align-items:start;gap:16px;width:min(1024px,calc(100% - 32px));margin:16px auto}
-.cdp-page-body article{border:2px solid #dee2e6;border-radius:12px;background:#fff;padding:14px 16px}
-.cdp-page-body article h3{margin:14px 0 4px;font-size:15px;color:#0078c4}
-.cdp-page-body article h3:first-child{margin-top:0}
-.cdp-page-body aside{display:grid;gap:12px;position:sticky;top:12px}
-.cdp-card{border:2px solid #dee2e6;border-radius:12px;background:#fff;padding:12px 14px}
-.cdp-card h4{margin:0 0 8px;font-size:14px}
-.cdp-card h5{margin:10px 0 4px;font-size:12px;color:#6d757e}
-.cdp-card.plan{border-left:8px solid var(--subject)}
-.cdp-card dl{margin:0}
-.cdp-card dl>div{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed #e9ecef;font-size:13px}
-.cdp-card dl>div:last-child{border-bottom:0}
-.cdp-card dt{color:#6d757e}
-.cdp-card dd{margin:0;text-align:right;font-weight:600}
-.cdp-card.buy{border-left:8px solid #0078c4}
-
-/* ---------- Variant C: drawer (เดสก์ท็อป=ขวาจอ / มือถือ=เต็มจอ) ---------- */
+/* ---------- เดสก์ท็อป ≥641px: แผงข้างขวา (ไม่มี border) ---------- */
 .cdp-c{position:fixed;inset:0;z-index:61;pointer-events:none}
 .cdp-c .cdp-backdrop{pointer-events:auto}
-.cdp-drawer{pointer-events:auto;position:fixed;top:0;right:0;bottom:0;z-index:2;width:min(460px,94vw);overflow:auto;border-left:2px solid #dee2e6;background:#fff;box-shadow:-8px 0 30px rgba(33,37,41,.2);animation:cdp-in .18s}
+.cdp-drawer{pointer-events:auto;position:fixed;top:0;right:0;bottom:0;z-index:2;width:min(460px,94vw);overflow:auto;background:#fff;box-shadow:-8px 0 30px rgba(33,37,41,.2);animation:cdp-in .18s}
 .cdp-drawer>header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;border-left:8px solid var(--subject);padding:14px}
 .cdp-drawer>header b{font-size:13px;color:#6d757e}
 .cdp-drawer>header h3{margin:4px 0 0;font-size:17px;line-height:1.4}
@@ -99,27 +66,3 @@
 .cdp-dl>div{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed #e9ecef;font-size:13px}
 .cdp-dl dt{color:#6d757e}
 .cdp-dl dd{margin:0;font-weight:600}
-.cdp-drawer .cdp-buy{margin-top:10px}
-@media(max-width:640px){
-  .cdp-drawer{left:0;width:auto;border-left:0;border-top:10px solid var(--subject);animation:cdp-up .18s}
-}
-
-/* ---------- Variant A/C บนหน้า route (สลับดูจากหน้าเต็ม) ---------- */
-.cdp-route-host{min-height:100vh;background:#f7f9fc;padding:20px 16px}
-.cdp-route-host .cdp-a,.cdp-route-host .cdp-c{position:static;pointer-events:auto}
-.cdp-route-host .cdp-backdrop{display:none}
-.cdp-route-host .cdp-sheet{position:relative;right:auto;left:auto;top:auto;bottom:auto;transform:none;width:min(500px,100%);margin:0 auto;animation:cdp-up .18s}
-.cdp-route-host .cdp-grab{display:none}
-.cdp-route-host .cdp-drawer{position:relative;top:auto;right:auto;bottom:auto;width:min(460px,100%);margin:0 auto;border:2px solid #dee2e6;border-top:10px solid var(--subject);animation:cdp-up .18s}
-
-/* ---------- switcher ---------- */
-.cdp-switcher{position:fixed;bottom:64px;left:50%;transform:translateX(-50%);z-index:90;display:flex;align-items:center;gap:4px;border-radius:999px;background:#212529;box-shadow:0 4px #000;padding:4px;color:#fff;font-size:12px}
-.cdp-switcher b{padding:0 10px;white-space:nowrap}
-.cdp-switcher button{width:30px;height:30px;border:0;border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font-size:10px;cursor:pointer}
-.cdp-switcher button:hover{background:rgba(255,255,255,.3)}
-
-/* ---------- มือถือ: หน้าเต็ม B เป็นคอลัมน์เดียว ---------- */
-@media(max-width:820px){
-  .cdp-page-body{grid-template-columns:1fr}
-  .cdp-page-body aside{position:static}
-}

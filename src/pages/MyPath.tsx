@@ -4,8 +4,8 @@ import physicsCover from '../assets/home/physics-3.png'
 import chemistryCover from '../assets/home/physics-2.png'
 import PathHeader from '../components/PathHeader'
 import BottomNav from '../components/BottomNav'
-// PROTOTYPE (throwaway) — คลิกการ์ดคอร์สเปิดรายละเอียด (สลับ A/B/C ด้วย ?variant=)
-import { useOpenCourse, CourseDetailOverlay, PrototypeSwitcher } from '../mypath/CourseDetailPrototype'
+// PROTOTYPE — คลิกการ์ดคอร์สเปิดรายละเอียด (desktop แผงขวา / มือถือ bottom sheet)
+import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailPrototype'
 
 // Monthly My Path: agenda ดีไซน์ที่เจ้าของเลือกแล้ว (เดิมคือ variant C ในบรดา A/B/C)
 type Course = { id: string; subject: string; name: string; type: string; hours: string; start: string; end: string; color: string; cover: string }
@@ -32,5 +32,5 @@ function Agenda() {
 }
 
 export default function MyPath() {
-  return <main className="monthly-prototype"><div className="monthly-shell"><PageHeader /><Agenda /><CourseDetailOverlay /><PrototypeSwitcher /></div><BottomNav active="mypath" /></main>
+  return <main className="monthly-prototype"><div className="monthly-shell"><PageHeader /><Agenda /><CourseDetailOverlay /></div><BottomNav active="mypath" /></main>
 }
