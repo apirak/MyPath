@@ -4,7 +4,7 @@
 //   C = แผงข้าง (drawer ขวาเดสก์ท็อป / เต็มจอเลื่อนขึ้นมือถือ, แท็บ แผนของน้อง/เนื้อหา)
 // ข้อมูล: plan.ts (แผน/ชั่วโมง/วันที่/การซื้อ) + courseDetail.ts (แพ็ก/เล่ม/ExamGym — mirror SAMPLE_DATA)
 // คลิกคอร์สบน /mypath และ /mypath/year → variant A/C เปิดเป็น overlay (?course=), variant B ไป route
-import { useEffect, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { useNavigate, useSearchParams, useParams, useLocation, Link } from 'react-router-dom'
 import BottomNav from '../components/BottomNav'
 import { subjects, fmtDate, type Course, type Subject } from './plan'
@@ -15,6 +15,8 @@ import './CourseDetailPrototype.css'
 
 export type CourseRef = { subject: Subject; course: Course }
 export const TODAY = '2026-12-05' // วันอ้างอิง mock — สอดคล้อง GLOSSARY "วันนี้"
+// variant เริ่มต้น = D แบบที่เจ้าของเลือก (24 ต.ค. 69): desktop ออกด้านข้างแบบ C · มือถือขึ้นจากล่างแบบ A
+export const DEFAULT_VARIANT = 'D'
 
 export const findCourse = (id: string): CourseRef | undefined => {
   for (const subject of subjects) {
@@ -43,7 +45,7 @@ export function useOpenCourse() {
   const navigate = useNavigate()
   const loc = useLocation()
   const [sp] = useSearchParams()
-  const variant = sp.get('variant') ?? 'A'
+  const variant = sp.get('variant') ?? DEFAULT_VARIANT
   return (id: string) => openCourse(navigate, loc.pathname, loc.search, id, variant)
 }
 
@@ -248,10 +250,25 @@ function DrawerC({ ref: cr, onClose }: { ref: CourseRef; onClose: () => void }) 
 
 /* ---------- เจ้าภาพกลาง: overlay บนหน้าแผน + หน้า route + switcher ---------- */
 
+const useIsMobile = () => {
+  const [mobile, setMobile] = useState(() => window.matchMedia('(max-width: 640px)').matches)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)')
+    const fn = () => setMobile(mq.matches)
+    mq.addEventListener('change', fn)
+    return () => mq.removeEventListener('change', fn)
+  }, [])
+  return mobile
+}
+
+function ResponsiveDetail({ ref: cr, onClose }: { ref: CourseRef; onClose: () => void }) {
+  return useIsMobile() ? <SheetA ref={cr} onClose={onClose} /> : <DrawerC ref={cr} onClose={onClose} />
+}
+
 export function CourseDetailOverlay() {
   const [sp, setSp] = useSearchParams()
   const id = sp.get('course')
-  const variant = sp.get('variant') ?? 'A'
+  const variant = sp.get('variant') ?? DEFAULT_VARIANT
   const cr = id ? findCourse(id) : undefined
   const close = () => { sp.delete('course'); setSp(sp) }
   useEffect(() => {
@@ -260,24 +277,26 @@ export function CourseDetailOverlay() {
     return () => window.removeEventListener('keydown', esc)
   })
   if (!cr || variant === 'B') return null
-  return variant === 'A' ? <SheetA ref={cr} onClose={close} /> : <DrawerC ref={cr} onClose={close} />
+  if (variant === 'A') return <SheetA ref={cr} onClose={close} />
+  if (variant === 'C') return <DrawerC ref={cr} onClose={close} />
+  return <ResponsiveDetail ref={cr} onClose={close} />
 }
 
 export function CourseDetailPage() {
   const { id = '' } = useParams()
   const [sp] = useSearchParams()
-  const variant = sp.get('variant') ?? 'B'
+  const variant = sp.get('variant') ?? DEFAULT_VARIANT
   const navigate = useNavigate()
   const cr = findCourse(id)
   if (!cr) return <main className="cdp-page"><div className="cdp-page-body"><p className="cdp-empty">ไม่พบคอร์ส “{id}” — <Link to="/mypath/year">กลับแผนรายปี</Link></p></div><PrototypeSwitcher /></main>
   const back = () => navigate(-1)
-  // บนหน้า route: B = หน้าเต็มตามดีไซน์ · A/C ยังคงสไตล์ของตัวเอง เพื่อให้สลับ variant แล้วเห็นผลทันที
-  if (variant === 'A') return <main className="cdp-route-host"><SheetA ref={cr} onClose={back} /><PrototypeSwitcher /></main>
-  if (variant === 'C') return <main className="cdp-route-host"><DrawerC ref={cr} onClose={back} /><PrototypeSwitcher /></main>
-  return <><PageB cr={cr} onBack={back} /><PrototypeSwitcher /></>
+  // บนหน้า route: B = หน้าเต็มตามดีไซน์ · variant อื่นคงสไตล์ของตัวเอง เพื่อให้สลับ variant แล้วเห็นผลทันที
+  if (variant === 'B') return <><PageB cr={cr} onBack={back} /><PrototypeSwitcher /></>
+  return <main className="cdp-route-host"><ResponsiveDetail ref={cr} onClose={back} /><PrototypeSwitcher /></main>
 }
 
 const VARIANTS: { key: string; label: string }[] = [
+  { key: 'D', label: 'D · ผสม (เลือกแล้ว)' },
   { key: 'A', label: 'A · ชีทรวดเร็ว' },
   { key: 'B', label: 'B · หน้าเต็ม' },
   { key: 'C', label: 'C · แผงข้าง' },
