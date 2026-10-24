@@ -26,7 +26,7 @@ The signed-in learner profile hub. It shows the learner identity and account-lin
 | Avatar preview | `src/pages/Profile.tsx` | Composes supplied Figma avatar layers | Static as-is preview |
 | Profile tools | `src/pages/Profile.tsx` | Share, egg currency, mastery count, outfit entry points | Share/outfit are HeaderButton (pushable 3-layer, secondary); the two counters stay plain badges |
 | Profile menu | `src/pages/Profile.tsx` | Online Solution, report problem, rate us, contact links | Static rows built on HeaderButton (secondary) with trailing arrows |
-| HeaderButton | `src/components/HeaderButton.tsx` | Shared push button (settings icon here too) | 3-layer press animation (shadow/edge/front); hover lift on pointer devices only, keyboard `:focus-visible` ring, honors `prefers-reduced-motion` |
+| HeaderButton | `src/components/HeaderButton.tsx` | Shared push button (settings icon here too) | Press animation (solid edge + floating front — no blurred shadow, hover does not change colour); hover lift on pointer devices only, keyboard `:focus-visible` ring, honors `prefers-reduced-motion` |
 
 ## States & variants
 

@@ -24,7 +24,7 @@
 | `src/mypath/CourseDetailPrototype.tsx` | SheetMobile (มือถือ) + DrawerDesktop (desktop) + ResponsiveDetail + overlay |
 | `src/mypath/CourseDetailPrototype.css` | สไตล์ (`cdp-*`) — ปุ่มไม่มีสไตล์เอง ใช้ HeaderButton ของแอป |
 | `src/pages/MyPathYear.tsx` / `MyPath.tsx` | onClick แถบ/เซลล์/การ์ด + mount `<CourseDetailOverlay />` |
-| `src/components/HeaderButton.tsx` | ปุ่มกลางของแอป — pushable 3 ชั้น (เงา/ขอบ/หน้า) + variant primary/secondary |
+| `src/components/HeaderButton.tsx` | ปุ่มกลางของแอป — pushable (ขอบทึบ + หน้าปุ่มลอย) + variant primary/secondary |
 
 แม็ปข้อมูล: MATH.1–5 ← TCAS70_Math · PHY.1–7 ← TCAS70_Physic · EX ×3 ← Exam_GYM_* · ที่เหลือไม่มีรายละเอียด (ดู `SAMPLE_DATA/courses.md` § รายละเอียดคอร์ส)
 
