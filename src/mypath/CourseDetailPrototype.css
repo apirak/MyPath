@@ -8,7 +8,9 @@
 /* ---------- ส่วนแชร์ ---------- */
 .cdp-backdrop{position:fixed;inset:0;z-index:1;background:rgba(33,37,41,.45);animation:cdp-fade .15s}
 @keyframes cdp-fade{from{opacity:0}}
-@keyframes cdp-up{from{transform:translateY(24px);opacity:.4}}
+@keyframes cdp-up{from{translate:0 100%;opacity:.7}to{translate:0 0;opacity:1}}
+@keyframes cdp-down{from{translate:0 0;opacity:1}to{translate:0 105%;opacity:.8}}
+@keyframes cdp-fade-out{to{opacity:0}}
 @keyframes cdp-in{from{transform:translateX(40px);opacity:.4}}
 header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--subject);margin-right:6px;vertical-align:1px}
 .cdp-status{font-style:normal;font-weight:700;font-size:11px;border-radius:999px;padding:3px 9px}
@@ -41,13 +43,13 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 .cdp-rhythm{border-top:2px solid #e9ecef;padding:12px 14px 10px;background:#f8fbff}
 .cdp-rhythm h4{margin:0;color:#0078c4;font-size:14px}
 .cdp-rhythm>p{margin:2px 0 10px;color:#6d757e;font-size:12px}
-.cdp-rhythm label{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 10px;margin-top:9px;color:#495057;font-size:13px;font-weight:600}
+.cdp-rhythm label{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 10px;margin-top:9px;color:#495057;font-size:14px;font-weight:600}
 .cdp-rhythm label b{color:#0078c4;font-size:12px}
-.cdp-rhythm input[type=range]{grid-column:1/-1;width:100%;accent-color:#0078c4}
-.cdp-marks{grid-column:1/-1;display:flex;justify-content:space-between;padding:0 4px;color:#6d757e;font-size:10px;font-weight:700}
-.cdp-marks i{display:grid;place-items:center;width:14px;font-style:normal}
-.cdp-marks i::before{content:'';width:5px;height:5px;margin-bottom:1px;border-radius:50%;background:#93bfe1}
-.cdp-rhythm .cdp-start{grid-template-columns:1fr auto;margin-top:12px;padding-top:10px;border-top:1px dashed #cdd8e3}
+.cdp-step-slider{grid-column:1/-1;position:relative;height:42px;width:100%}
+.cdp-step-track{position:absolute;top:9px;right:4px;left:4px;height:8px;overflow:hidden;border-radius:999px;background:#e9ecef}.cdp-step-track>i{display:block;width:var(--progress);height:100%;border-radius:inherit;background:#0078c4}
+.cdp-step-input{position:absolute;z-index:2;top:0;right:0;left:0;width:100%;height:26px;margin:0;appearance:none;background:transparent;cursor:pointer}.cdp-step-input::-webkit-slider-thumb{width:26px;height:26px;appearance:none;border:0;border-radius:50%;background:transparent}.cdp-step-input::-moz-range-thumb{width:26px;height:26px;border:0;border-radius:50%;background:transparent}
+.cdp-step-marks{position:absolute;top:10px;right:4px;left:4px;display:flex;justify-content:space-between;color:#6d757e;font-size:10px;font-weight:700}.cdp-step-marks i{position:relative;width:0;height:15px;font-style:normal}.cdp-step-marks i::before{content:'';position:absolute;top:1px;left:0;width:5px;height:5px;border-radius:50%;background:#fff;transform:translateX(-50%)}.cdp-step-marks i.active::after{content:'';position:absolute;z-index:1;top:-10px;left:0;width:26px;height:26px;border:3px solid #fff;border-radius:50%;background:#0078c4;box-shadow:0 1px 3px #0078c455;transform:translateX(-50%)}.cdp-step-marks b{position:absolute;top:19px;left:0;font:inherit;transform:translateX(-50%)}
+.cdp-rhythm .cdp-start{grid-template-columns:1fr auto;margin-top:20px;padding-top:0;border-top:0}
 .cdp-start small{color:#6d757e;font-size:11px;font-weight:400}
 .cdp-start input{grid-column:1/-1;width:100%;min-height:34px;border:1px solid #cdd8e3;border-radius:7px;background:#fff;padding:5px 8px;color:#212529;font:inherit;font-size:13px}
 
@@ -57,14 +59,15 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 /* ---------- มือถือ ≤640px: bottom sheet ---------- */
 .cdp-a{position:fixed;inset:0;z-index:61;pointer-events:none}
 .cdp-a .cdp-backdrop{pointer-events:auto}
-.cdp-sheet{pointer-events:auto;position:fixed;right:0;bottom:0;left:0;z-index:2;display:flex;flex-direction:column;max-height:86vh;border-radius:18px 18px 0 0;background:#fff;box-shadow:0 -8px 30px rgba(33,37,41,.25);animation:cdp-up .18s;overflow:auto}
+.cdp-sheet{pointer-events:auto;position:fixed;right:0;bottom:0;left:0;z-index:2;display:flex;flex-direction:column;max-height:86vh;border-radius:18px 18px 0 0;background:#fff;box-shadow:0 -8px 30px rgba(33,37,41,.25);animation:cdp-up .48s cubic-bezier(.22,1,.36,1);overflow:auto;will-change:translate}
+.cdp-a.closing .cdp-sheet{animation:cdp-down .28s cubic-bezier(.16,1,.3,1) forwards}.cdp-a.closing .cdp-backdrop{animation:cdp-fade-out .28s ease-out forwards}
 /* ส่วนตายห้ามยืดหด — เหลือให้ body เดียวที่ยืด/เลื่อนตามพื้นที่ที่เหลือ (จอสั้นมาก = ชีทเลื่อนทั้งใบแทน) */
 .cdp-sheet>header,.cdp-sheet>.cdp-cover,.cdp-sheet>.cdp-cta,.cdp-sheet>footer{flex:none}
 .cdp-grab{display:block;width:44px;height:5px;border-radius:3px;background:#dee2e6;margin:8px auto 2px}
 .cdp-sheet>header{padding:6px 14px 10px;border-bottom:2px solid #e9ecef}
 .cdp-sheet-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .cdp-sheet-top b{font-size:15px}
-.cdp-sheet-top button{width:34px;height:34px;color:#6d757e;font-size:15px}
+.cdp-sheet-top button{color:#6d757e}
 .cdp-sheet-body{flex:1 1 auto;min-height:0;overflow:auto;padding:4px 14px 12px}
 .cdp-sheet-body h4{margin:12px 0 2px;font-size:13px;color:#0078c4}
 .cdp-sheet>footer{display:flex;align-items:center;justify-content:flex-end;border-top:2px solid #e9ecef;background:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
@@ -82,3 +85,29 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 .cdp-dl>div{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed #e9ecef;font-size:13px}
 .cdp-dl dt{color:#6d757e}
 .cdp-dl dd{margin:0;font-weight:600}
+
+/* Course detail: one bottom sheet, horizontal above the mobile breakpoint. */
+.cdp-sheet{max-height:calc(100vh - 32px);overflow:auto}
+.cdp-sheet>header{padding:16px 16px 4px;border:0}
+.cdp-layout{display:flex;flex-direction:column;gap:16px;padding:4px 16px 16px}
+.cdp-course{display:flex;flex-direction:column;justify-content:space-between;gap:16px;min-height:112px;width:286px;max-width:100%}
+.cdp-course-title{display:flex;gap:12px;align-items:flex-start;width:100%}
+.cdp-course-title img{width:77px;height:43px;object-fit:cover;flex:none}
+.cdp-course-title strong{font-size:14px;font-weight:400;line-height:1.7}
+.cdp-course .header-button{width:100%}
+.cdp-divider{display:block;height:2px;width:100%;background:#dee2e6}
+.cdp-rhythm{width:305px;max-width:100%;padding:0;border:0;background:transparent}
+.cdp-rhythm label{margin:0}
+.cdp-start{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px 10px;margin-top:20px;color:#495057;font-size:14px;font-weight:600}
+.cdp-follow{display:flex!important;align-items:center;gap:7px;color:#0078c4;font-size:12px!important;font-weight:600!important;white-space:nowrap}
+.cdp-follow input{position:absolute;opacity:0;pointer-events:none}
+.cdp-follow i{display:grid;place-items:center;width:16px;height:16px;border:1.5px solid #0078c4;border-radius:4px;background:#fff}
+.cdp-follow i::after{content:'';width:7px;height:4px;border:solid #fff;border-width:0 0 2px 2px;transform:rotate(-45deg) scale(0);transition:transform .15s ease}
+.cdp-follow input:checked+i{background:#0078c4}.cdp-follow input:checked+i::after{transform:rotate(-45deg) scale(1)}.cdp-follow input:focus-visible+i{outline:2px solid #7ec2ed;outline-offset:2px}
+.cdp-start>input{grid-column:1/-1;width:100%;min-height:34px;border:1px solid #cdd8e3;border-radius:7px;background:#fff;padding:5px 8px;color:#212529;font:inherit;font-size:13px}
+.cdp-start>input:disabled{background:#f1f3f5;color:#adb5bd;cursor:not-allowed}
+.cdp-summary{flex:1;min-width:0;color:#6d757e;font-size:12px;line-height:1.5}
+.cdp-summary p{margin:0 0 4px}.cdp-summary b{color:#3478c4}.cdp-topics{display:flex;flex-wrap:wrap;gap:4px;color:#212529;font-size:13px}.cdp-topics span+span::before{content:'·';margin-right:4px;color:#6d757e}
+.cdp-close{width:34px!important;min-height:34px!important;transform:none}.cdp-close .header-button__front{padding:7px}.cdp-close svg{display:block}
+@media(min-width:641px){.cdp-sheet{left:50%;right:auto;width:min(960px,calc(100vw - 32px));transform:translateX(-50%);border-radius:18px 18px 0 0}.cdp-layout{flex-direction:row;align-items:stretch;gap:16px}.cdp-divider{width:2px;height:auto;flex:none}.cdp-summary{padding-top:2px}}
+@media(max-width:640px){.cdp-course,.cdp-rhythm{width:100%}}

@@ -7,6 +7,7 @@ export type StudentCourse = {
   courseId: string
   owned?: boolean
   startDate?: string
+  followPrevious?: boolean
   weeklyHours?: number
 }
 

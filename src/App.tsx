@@ -12,7 +12,8 @@ export default function App() {
       <Route path="/courses" element={<Courses />} />
       <Route path="/mypath" element={<MyPath />} />
       <Route path="/mypath/year" element={<MyPathYear />} />
-      <Route path="/mypath/year-prototype" element={<MyPathYear />} />
+      <Route path="/mypath/all" element={<MyPathYear mode="all" />} />
+      <Route path="/mypath/year-prototype" element={<MyPathYear mode="all" />} />
       <Route path="/profile" element={<Profile />} />
     </Routes>
   )

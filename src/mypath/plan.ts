@@ -40,6 +40,7 @@ export type Course = CourseCatalogItem & {
   end: string
   owned?: boolean
   startDate?: string
+  followPrevious?: boolean
   weeklyHours: number
   estimatedWeeks: number
 }
@@ -84,7 +85,7 @@ export const rebuildPlan = () => {
     let nextStart = DAY_START
     for (const course of subject.courses) {
       const student = planById.get(course.id)
-      const start = Math.max(nextStart, student?.startDate ? u(student.startDate) : DAY_START)
+      const start = Math.max(nextStart, !student?.followPrevious && student?.startDate ? u(student.startDate) : DAY_START)
       const weeks = estimatedWeeksFor(course.hours, student?.weeklyHours ?? DEFAULT_WEEKLY_HOURS)
       const end = start + weeks * 7 * MS - MS
       starts.set(course.id, start); ends.set(course.id, end); nextStart = end + MS
@@ -98,7 +99,7 @@ export const rebuildPlan = () => {
   subjects = courseCatalog.map(s => ({ name: s.name, color: s.color, courses: s.courses.map(c => {
     const student = planById.get(c.id)
     const weeklyHours = student?.weeklyHours ?? DEFAULT_WEEKLY_HOURS
-    return { ...c, owned: student?.owned, startDate: student?.startDate, weeklyHours, estimatedWeeks: estimatedWeeksFor(c.hours, weeklyHours), start: isoOf(starts.get(c.id) ?? DAY_LAST), end: isoOf(ends.get(c.id) ?? DAY_LAST) }
+    return { ...c, owned: student?.owned, startDate: student?.startDate, followPrevious: student?.followPrevious, weeklyHours, estimatedWeeks: estimatedWeeksFor(c.hours, weeklyHours), start: isoOf(starts.get(c.id) ?? DAY_LAST), end: isoOf(ends.get(c.id) ?? DAY_LAST) }
   }) }))
   totalHours = subjects.reduce((t, s) => t + s.courses.reduce((a, c) => a + c.hours, 0), 0)
   rebuildAxis(Math.max(...ends.values()))
@@ -118,8 +119,15 @@ export const setCourseStartDate = (courseId: string, startDate?: string) => {
   rebuildPlan(); planVersion += 1; listeners.forEach(listener => listener())
 }
 
+export const setCourseFollowPrevious = (courseId: string, followPrevious: boolean) => {
+  const course = studentCourses.find(c => c.courseId === courseId)
+  if (!course) return
+  course.followPrevious = followPrevious
+  rebuildPlan(); planVersion += 1; listeners.forEach(listener => listener())
+}
+
 rebuildPlan()
-if (import.meta.env.DEV && estimatedWeeksFor(30, 5) !== 6) throw new Error('weekly course calculation failed')
+if (import.meta.env.DEV && (estimatedWeeksFor(30, 5) !== 6 || !studentCourses.some(c => c.courseId === 'MATH.2'))) throw new Error('weekly course calculation failed')
 
 // จาก SAMPLE_DATA/exam-dates.md (เจ้าของจัดใหม่ตามภาพ Plan Canvas 20.37.58) — สอบจริง 2 + Mock 6, ทุกรายการ 1 วัน
 // สีตามตำนานภาพ: น้ำเงิน = สอบจริง, แดง = Mock · เข้ม = ซื้อแล้ว, อ่อน = ยังไม่ได้ซื้อ (ซื้อครบยกเว้น Mock CBT)
