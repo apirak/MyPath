@@ -18,7 +18,7 @@ export const studyCalendar: StudyCalendar = {
   weekdayHours: 1,
   weekendHours: 3,
   specialDays: [{ date: '2026-12-12', hours: 5 }],
-  breaks: [{ id: 1, start: '2026-12-21', end: '2027-01-03', hours: 0 }],
+  breaks: [{ id: 1, start: '2026-12-21', end: '2027-01-03', hours: 2 }],
 }
 
 export const studentCourses: StudentCourse[] = [
