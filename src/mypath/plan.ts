@@ -126,6 +126,11 @@ export const setCourseFollowPrevious = (courseId: string, followPrevious: boolea
   rebuildPlan(); planVersion += 1; listeners.forEach(listener => listener())
 }
 
+export const setStudyCalendar = (next: typeof studyCalendar) => {
+  Object.assign(studyCalendar, next)
+  planVersion += 1; listeners.forEach(listener => listener())
+}
+
 rebuildPlan()
 if (import.meta.env.DEV && (estimatedWeeksFor(30, 5) !== 6 || !studentCourses.some(c => c.courseId === 'MATH.2'))) throw new Error('weekly course calculation failed')
 

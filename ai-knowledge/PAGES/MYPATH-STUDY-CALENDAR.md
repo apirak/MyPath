@@ -2,38 +2,42 @@
 
 ## Identity
 
-- **Route:** _ยังไม่สร้าง route_
-- **Mockup:** `src/mypath/studentPlan.ts` (ข้อมูลตั้งต้นของหน้าที่จะสร้าง)
+- **Route:** Panel overlay from the Study Calendar button on `/mypath`, `/mypath/year`, and `/mypath/all`
+- **Figma:** _No as-is frame; promoted from the approved My Path prototype_
+- **Mockup:** `src/mypath/StudyCalendarPanel.tsx`
 
 ## Purpose
 
-ให้ผู้เรียนกำหนดงบเวลาที่เรียนได้จริง แล้วให้ Month/Year คำนวณวันเริ่ม–จบของทุกคอร์สใหม่จากชั่วโมงคอร์สและชั่วโมงต่อสัปดาห์รายคอร์สโดยอัตโนมัติ
+Lets a learner set their usual available study time, personal school-break periods, and one-off special days without leaving My Path. The controls update the shared in-memory calendar used by the plan views.
 
-## Planned controls
+## Layout
 
-| กลุ่ม | ข้อมูล | ค่าเริ่มต้น |
-|---|---|---|
-| วันเรียนปกติ | ชั่วโมงต่อวันจันทร์–ศุกร์ | 1 ชม. |
-| วันหยุดประจำสัปดาห์ | ชั่วโมงต่อวันเสาร์–อาทิตย์ | 3 ชม. |
+| # | Section | What it contains | Desktop | Mobile |
+|---|---|---|---|---|
+| 1 | Full-screen panel | Sheet rises from the bottom over the current My Path view; a dim backdrop remains behind it | Full viewport | Full viewport, scrollable |
+| 2 | Header | Calendar title and close button | Sticky | Sticky |
+| 3 | Weekly budget | `weekday × 5 + weekend/holiday × 2` | Full-width blue summary | Full-width blue summary |
+| 4 | Regular study time | Separate 0–10 hour sliders for Mon–Fri and Sat/Sun/holidays | Two cards | Stacked cards |
+| 5 | School break | Addable date ranges and a 0–10 hours-per-day slider | One panel | One panel |
+| 6 | Special day | Initially collapsed; opening it shows the calendar beside the chosen-day slider | Two columns | Stacked |
 
-## Course-detail controls
+## Components
 
-ผู้เรียนตั้งค่าจากหน้ารายละเอียดของแต่ละคอร์ส ค่าจะอัปเดตแผนและกราฟทันที
+| Component | File | Purpose | Behavior / states |
+|---|---|---|---|
+| StudyCalendarPanel | `src/mypath/StudyCalendarPanel.tsx` | The overlay and calendar controls | Opens from `PathHeader`; closes with × or backdrop and animates down before unmounting |
+| PathHeader | `src/components/PathHeader.tsx` | My Path shared header | Owns open/closed panel state for Month, Year, and All |
+| studyCalendar | `src/mypath/studentPlan.ts` | Learner calendar source data | Regular hours, special-day overrides, and break periods |
+| setStudyCalendar | `src/mypath/plan.ts` | In-memory update entry point | Notifies Month / Year / All to refresh their view state |
 
-| ข้อมูล | การควบคุม | ค่าเริ่มต้น |
-|---|---|---|
-| ชั่วโมงต่อสัปดาห์ | Slider 1–10 | 5 ชม. |
-| วันเริ่มต้น | วันที่เลือกได้หรือเว้นว่าง | ว่าง |
+## States & rules
 
-- ระยะเวลาคอร์ส = ปัดขึ้น `(ชั่วโมงคอร์ส ÷ ชั่วโมงต่อสัปดาห์)`; timeline แปลงทุกสัปดาห์เป็น 7 วันปฏิทินจากวันเริ่ม
-- งบรายสัปดาห์ของ Study Calendar = `(ชั่วโมงวันธรรมดา × 5) + (ชั่วโมงวันหยุด × 2)`
-- กราฟภาระรายสัปดาห์รวมคอร์สที่กำลังเรียน แล้วเทียบกับงบ Study Calendar: ปกติ ≤ งบ, ส้ม > งบถึง 150%, แดง > 150%; คอร์สที่ทับสัปดาห์ไม่เต็มช่วงกระจายชั่วโมงตามส่วนของวันที่ทับ เพื่อให้ผลรวมไม่เกินชั่วโมงคอร์ส
+- Daily capacity priority: special day → school-break range → normal weekly setting.
+- A one-digit special-day hour marker is circular; `10` is a same-height pill.
+- Sliders are visually cloned from the course weekly-hours control; this panel allows 0 (“พัก”).
+- The summary deliberately reflects only the recurring weekly budget; exceptional dates stay in the lower controls.
+- This is a frontend mock: changes persist only while the app runs.
 
-## Data contract
+## Open questions
 
-- `courseCatalog.ts` เป็นข้อมูลกลางของคอร์สทุกคน: รหัส ชื่อ วิชา ชั่วโมง และปก
-- `studentPlan.ts` เป็นข้อมูลของนักเรียนคนนี้: สถานะซื้อ และค่าปฏิทิน
-- `studentPlan.ts` รองรับชั่วโมงต่อสัปดาห์รายคอร์สและ `startDate`: ระบบจะรอถึงวันนั้น ส่วนคอร์สถัดไปที่ไม่มี `startDate` จะต่อจากคอร์สก่อนหน้าทันที
-- `plan.ts` เป็นผลคำนวณ ไม่ใช่ source data: สร้าง `start/end` ใหม่จากชั่วโมงคอร์สและชั่วโมงต่อสัปดาห์
-- Month และ Year ต้อง import ผลจาก `plan.ts` ชุดเดียวกันเสมอ
-
+- Holidays and special-day capacity do not yet reschedule course end dates; they are recorded as learner availability for the next scheduling-engine iteration.
