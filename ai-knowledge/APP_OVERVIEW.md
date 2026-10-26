@@ -23,7 +23,7 @@ A **frontend-only as-is mockup** of the current Learn Anywhere website:
 | Phase | Goal | Status |
 |---|---|---|
 | 1. As-is mockup | Rebuild every existing page 1:1 from Figma (desktop + mobile), document each page & component in `ai-knowledge/PAGES/` | In progress |
-| 2. My Path redesign | Redesign the My Path page on top of the as-is understanding | Not started |
+| 2. My Path redesign | Redesign the My Path page on top of the as-is understanding | In progress |
 
 ## How we work
 
@@ -38,6 +38,6 @@ A **frontend-only as-is mockup** of the current Learn Anywhere website:
 |---|---|---|---|
 | Home | `/` | Complete | `PAGES/HOME.md` |
 | Courses | `/courses` | Complete | `PAGES/COURSES.md` |
-| My Path | `/mypath` | Complete as-is mockup; redesign target of phase 2 | `PAGES/MYPATH.md` |
+| My Path | `/mypath` | Phase 2 redesign in progress | `PAGES/MYPATH.md` |
 | Profile | `/profile` | Complete | `PAGES/PROFILE.md` |
 | _more pages added as Figma links arrive_ | | | |

@@ -13,10 +13,10 @@ export const AXIS_START = '2026-10-01'
 export let AXIS_END = '2028-03-01' // exclusive; recalc ถึงสิ้นเดือนของคอร์สสุดท้าย
 export let TOTAL_DAYS = (u(AXIS_END) - u(AXIS_START)) / MS
 const DAY_START = u('2026-09-28') // วันเริ่ม simulation (จันทร์ที่เริ่มเล่ม 1)
-// เผื่อเวลาหลังแกน Year เดิม เพื่อไม่ตัดคอร์สที่ยังเรียนไม่จบเมื่อปรับปฏิทิน
+// เผื่อเวลาหลังแกน All เพื่อไม่ตัดคอร์สที่ยังเรียนไม่จบเมื่อปรับปฏิทิน
 const DAY_LAST = u('2028-04-30')
 
-// วันอ้างอิงของ mock (GLOSSARY.md: "วันนี้") — ค่าเดียว ทั้ง Month และ Year ใช้ร่วมกัน
+// วันอ้างอิงของ mock (GLOSSARY.md: "วันนี้") — ค่าเดียว ทั้ง Month และ All ใช้ร่วมกัน
 // แก้ค่านี้ทีเดียว → section ของทั้งสองหน้าขยับตาม (ไม่อ่านนาฬิกาเครื่อง)
 export const TODAY = '2026-12-05'
 
@@ -41,6 +41,7 @@ export type Course = CourseCatalogItem & {
   owned?: boolean
   startDate?: string
   followPrevious?: boolean
+  followPreviousWeeklyHours?: boolean
   weeklyHours: number
   estimatedWeeks: number
 }
@@ -50,6 +51,8 @@ export const scheduledHoursByDay = new Map<string, number>()
 
 export const estimatedWeeksFor = (hours: number, weeklyHours: number) => Math.ceil(hours / weeklyHours)
 const DEFAULT_WEEKLY_HOURS = 5
+const weeklyHoursFor = (weeklyHours: number | undefined, followPrevious: boolean, previousWeeklyHours: number) =>
+  followPrevious ? previousWeeklyHours : weeklyHours ?? DEFAULT_WEEKLY_HOURS
 const listeners = new Set<() => void>()
 let planVersion = 0
 const subscribe = (listener: () => void) => { listeners.add(listener); return () => listeners.delete(listener) }
@@ -57,6 +60,17 @@ export const usePlanVersion = () => useSyncExternalStore(subscribe, () => planVe
 
 export let subjects: Subject[] = []
 export let totalHours = 0
+
+export const calendarHoursForDay = (iso: string) => {
+  const specialDay = studyCalendar.specialDays.find(day => day.date === iso)
+  if (specialDay) return specialDay.hours
+  const schoolBreak = studyCalendar.breaks.find(period => period.start <= iso && iso <= period.end)
+  if (schoolBreak) return schoolBreak.hours
+  return [0, 6].includes(new Date(u(iso)).getUTCDay()) ? studyCalendar.weekendHours : studyCalendar.weekdayHours
+}
+
+export const calendarBudgetForWeek = (monday: number) =>
+  Array.from({ length: 7 }, (_, day) => calendarHoursForDay(isoOf(monday + day * MS))).reduce((sum, hours) => sum + hours, 0)
 
 const rebuildAxis = (lastCourseEnd: number) => {
   const last = new Date(lastCourseEnd)
@@ -80,15 +94,21 @@ const rebuildAxis = (lastCourseEnd: number) => {
 export const rebuildPlan = () => {
   const planById = new Map(studentCourses.map(c => [c.courseId, c]))
   const starts = new Map<string, number>(), ends = new Map<string, number>()
+  const weeklyHoursById = new Map<string, number>()
   scheduledHoursByDay.clear()
   for (const subject of courseCatalog) {
     let nextStart = DAY_START
-    for (const course of subject.courses) {
+    let previousWeeklyHours = DEFAULT_WEEKLY_HOURS
+    for (const [index, course] of subject.courses.entries()) {
       const student = planById.get(course.id)
       const start = Math.max(nextStart, !student?.followPrevious && student?.startDate ? u(student.startDate) : DAY_START)
-      const weeks = estimatedWeeksFor(course.hours, student?.weeklyHours ?? DEFAULT_WEEKLY_HOURS)
+      const followPreviousWeeklyHours = !!student?.followPreviousWeeklyHours && index > 0
+      const weeklyHours = weeklyHoursFor(student?.weeklyHours, followPreviousWeeklyHours, previousWeeklyHours)
+      const weeks = estimatedWeeksFor(course.hours, weeklyHours)
       const end = start + weeks * 7 * MS - MS
       starts.set(course.id, start); ends.set(course.id, end); nextStart = end + MS
+      weeklyHoursById.set(course.id, weeklyHours)
+      previousWeeklyHours = weeklyHours
       const dailyHours = course.hours / (weeks * 7)
       for (let day = start; day <= end; day += MS) {
         const iso = isoOf(day)
@@ -96,10 +116,11 @@ export const rebuildPlan = () => {
       }
     }
   }
-  subjects = courseCatalog.map(s => ({ name: s.name, color: s.color, courses: s.courses.map(c => {
+  subjects = courseCatalog.map(s => ({ name: s.name, color: s.color, courses: s.courses.map((c, index) => {
     const student = planById.get(c.id)
-    const weeklyHours = student?.weeklyHours ?? DEFAULT_WEEKLY_HOURS
-    return { ...c, owned: student?.owned, startDate: student?.startDate, followPrevious: student?.followPrevious, weeklyHours, estimatedWeeks: estimatedWeeksFor(c.hours, weeklyHours), start: isoOf(starts.get(c.id) ?? DAY_LAST), end: isoOf(ends.get(c.id) ?? DAY_LAST) }
+    const followPreviousWeeklyHours = !!student?.followPreviousWeeklyHours && index > 0
+    const weeklyHours = weeklyHoursById.get(c.id) ?? DEFAULT_WEEKLY_HOURS
+    return { ...c, owned: student?.owned, startDate: student?.startDate, followPrevious: student?.followPrevious, followPreviousWeeklyHours, weeklyHours, estimatedWeeks: estimatedWeeksFor(c.hours, weeklyHours), start: isoOf(starts.get(c.id) ?? DAY_LAST), end: isoOf(ends.get(c.id) ?? DAY_LAST) }
   }) }))
   totalHours = subjects.reduce((t, s) => t + s.courses.reduce((a, c) => a + c.hours, 0), 0)
   rebuildAxis(Math.max(...ends.values()))
@@ -109,6 +130,13 @@ export const setCourseWeeklyHours = (courseId: string, weeklyHours: number) => {
   const course = studentCourses.find(c => c.courseId === courseId)
   if (!course) return
   course.weeklyHours = weeklyHours
+  rebuildPlan(); planVersion += 1; listeners.forEach(listener => listener())
+}
+
+export const setCourseFollowPreviousWeeklyHours = (courseId: string, followPreviousWeeklyHours: boolean) => {
+  const course = studentCourses.find(c => c.courseId === courseId)
+  if (!course) return
+  course.followPreviousWeeklyHours = followPreviousWeeklyHours
   rebuildPlan(); planVersion += 1; listeners.forEach(listener => listener())
 }
 
@@ -127,12 +155,15 @@ export const setCourseFollowPrevious = (courseId: string, followPrevious: boolea
 }
 
 export const setStudyCalendar = (next: typeof studyCalendar) => {
+  const periods = [...next.breaks].sort((a, b) => a.start.localeCompare(b.start))
+  if (periods.some((period, index) => period.start > period.end || (index > 0 && periods[index - 1].end >= period.start))) return false
   Object.assign(studyCalendar, next)
   planVersion += 1; listeners.forEach(listener => listener())
+  return true
 }
 
 rebuildPlan()
-if (import.meta.env.DEV && (estimatedWeeksFor(30, 5) !== 6 || !studentCourses.some(c => c.courseId === 'MATH.2'))) throw new Error('weekly course calculation failed')
+if (import.meta.env.DEV && (estimatedWeeksFor(30, 5) !== 6 || weeklyHoursFor(3, true, 7) !== 7 || !studentCourses.some(c => c.courseId === 'MATH.2') || calendarBudgetForWeek(u('2026-12-07')) !== 13 || calendarBudgetForWeek(u('2026-12-21')) !== 14)) throw new Error('weekly course calculation failed')
 
 // จาก SAMPLE_DATA/exam-dates.md (เจ้าของจัดใหม่ตามภาพ Plan Canvas 20.37.58) — สอบจริง 2 + Mock 6, ทุกรายการ 1 วัน
 // สีตามตำนานภาพ: น้ำเงิน = สอบจริง, แดง = Mock · เข้ม = ซื้อแล้ว, อ่อน = ยังไม่ได้ซื้อ (ซื้อครบยกเว้น Mock CBT)
@@ -149,7 +180,7 @@ export const events: ExamEvent[] = [
 
 export { courseCatalog, studyCalendar, studentCourses }
 
-// --- สีชนิดสอบ (encoding เดียวกับรางป้ายของ Year: น้ำเงิน = สอบจริง, แดง = Mock) ---
+// --- สีชนิดสอบ (encoding เดียวกับ All: น้ำเงิน = สอบจริง, แดง = Mock) ---
 export const KIND_COLOR = { exam: '#2b6cd4', mock: '#ef6268' } as const
 
 // --- หน้า Month: หน้าต่างเดือน + agenda (กติกา section ล็อกไว้ใน GLOSSARY.md) ---

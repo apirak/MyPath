@@ -3,7 +3,7 @@
    ปรับ 24 ต.ค. 69: cover เต็ม 16/9 ไม่มี padding · แผงไม่มี border · ปุ่มเริ่มเรียนใต้ cover */
 
 /* คอร์สบนแผนกดได้ */
-.yp-bar,.yp-mobile-course,.monthly-course{cursor:pointer}
+.monthly-course{cursor:pointer}
 
 /* ---------- ส่วนแชร์ ---------- */
 .cdp-backdrop{position:fixed;inset:0;z-index:1;background:rgba(33,37,41,.45);animation:cdp-fade .15s}
@@ -45,10 +45,12 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 .cdp-rhythm>p{margin:2px 0 10px;color:#6d757e;font-size:12px}
 .cdp-rhythm label{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 10px;margin-top:9px;color:#495057;font-size:14px;font-weight:600}
 .cdp-rhythm label b{color:#0078c4;font-size:12px}
+.cdp-weekly>div:first-child{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#495057;font-size:14px;font-weight:600}
 .cdp-step-slider{grid-column:1/-1;position:relative;height:42px;width:100%}
-.cdp-step-track{position:absolute;top:9px;right:4px;left:4px;height:8px;overflow:hidden;border-radius:999px;background:#e9ecef}.cdp-step-track>i{display:block;width:var(--progress);height:100%;border-radius:inherit;background:#0078c4}
+.cdp-step-track{position:absolute;top:9px;right:4px;left:4px;height:9px;overflow:hidden;border-radius:999px;background:#e9ecef}.cdp-step-track>i{display:block;width:calc(var(--progress) + 9px);height:100%;border-radius:inherit;background:#0078c4}
 .cdp-step-input{position:absolute;z-index:2;top:0;right:0;left:0;width:100%;height:26px;margin:0;appearance:none;background:transparent;cursor:pointer}.cdp-step-input::-webkit-slider-thumb{width:26px;height:26px;appearance:none;border:0;border-radius:50%;background:transparent}.cdp-step-input::-moz-range-thumb{width:26px;height:26px;border:0;border-radius:50%;background:transparent}
-.cdp-step-marks{position:absolute;top:10px;right:4px;left:4px;display:flex;justify-content:space-between;color:#6d757e;font-size:10px;font-weight:700}.cdp-step-marks i{position:relative;width:0;height:15px;font-style:normal}.cdp-step-marks i::before{content:'';position:absolute;top:1px;left:0;width:5px;height:5px;border-radius:50%;background:#fff;transform:translateX(-50%)}.cdp-step-marks i.active::after{content:'';position:absolute;z-index:1;top:-10px;left:0;width:26px;height:26px;border:3px solid #fff;border-radius:50%;background:#0078c4;box-shadow:0 1px 3px #0078c455;transform:translateX(-50%)}.cdp-step-marks b{position:absolute;top:19px;left:0;font:inherit;transform:translateX(-50%)}
+.cdp-step-input:disabled{cursor:not-allowed}
+.cdp-step-marks{position:absolute;top:10px;right:9px;left:9px;display:flex;justify-content:space-between;color:#6d757e;font-size:10px;font-weight:700}.cdp-step-marks i{position:relative;width:0;height:15px;font-style:normal}.cdp-step-marks i::before{content:'';position:absolute;top:1px;left:0;width:5px;height:5px;border-radius:50%;background:#fff;transform:translateX(-50%)}.cdp-step-marks i.active::after{content:'';position:absolute;z-index:1;top:-10px;left:0;width:26px;height:26px;border:3px solid #fff;border-radius:50%;background:#0078c4;box-shadow:0 1px 3px #0078c455;transform:translateX(-50%)}.cdp-step-marks b{position:absolute;top:19px;left:0;font:inherit;transform:translateX(-50%)}
 .cdp-rhythm .cdp-start{grid-template-columns:1fr auto;margin-top:20px;padding-top:0;border-top:0}
 .cdp-start small{color:#6d757e;font-size:11px;font-weight:400}
 .cdp-start input{grid-column:1/-1;width:100%;min-height:34px;border:1px solid #cdd8e3;border-radius:7px;background:#fff;padding:5px 8px;color:#212529;font:inherit;font-size:13px}
@@ -104,6 +106,7 @@ header b .dot,.cdp-sheet-top .dot{display:inline-block;width:10px;height:10px;bo
 .cdp-follow i{display:grid;place-items:center;width:16px;height:16px;border:1.5px solid #0078c4;border-radius:4px;background:#fff}
 .cdp-follow i::after{content:'';width:7px;height:4px;border:solid #fff;border-width:0 0 2px 2px;transform:rotate(-45deg) scale(0);transition:transform .15s ease}
 .cdp-follow input:checked+i{background:#0078c4}.cdp-follow input:checked+i::after{transform:rotate(-45deg) scale(1)}.cdp-follow input:focus-visible+i{outline:2px solid #7ec2ed;outline-offset:2px}
+.cdp-follow:has(input:disabled){color:#adb5bd;cursor:not-allowed}.cdp-follow:has(input:disabled) i{border-color:#adb5bd;background:#f1f3f5}
 .cdp-start>input{grid-column:1/-1;width:100%;min-height:34px;border:1px solid #cdd8e3;border-radius:7px;background:#fff;padding:5px 8px;color:#212529;font:inherit;font-size:13px}
 .cdp-start>input:disabled{background:#f1f3f5;color:#adb5bd;cursor:not-allowed}
 .cdp-summary{flex:1;min-width:0;color:#6d757e;font-size:12px;line-height:1.5}

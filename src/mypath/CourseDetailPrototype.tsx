@@ -2,12 +2,12 @@
 //   desktop ≥641px = แผงข้างขวา · มือถือ ≤640px = bottom sheet (สลับสดตาม viewport)
 //   A/B/C + switcher ลบแล้ว — ดูผลการตัดสินที่ ai-knowledge/PAGES/MYPATH-COURSE-DETAIL-PROTOTYPE.md
 // ข้อมูล: plan.ts (แผน/ชั่วโมง/วันที่/การซื้อ) + courseDetail.ts (แพ็ก/เล่ม/ExamGym — mirror SAMPLE_DATA)
-// คลิกคอร์สบน /mypath และ /mypath/year → ตั้ง ?course=<รหัส> แล้ว overlay เปิดบนหน้าเดิม
+// คลิกคอร์สบน /mypath และ /mypath/all → ตั้ง ?course=<รหัส> แล้ว overlay เปิดบนหน้าเดิม
 import { useEffect, useState, type CSSProperties } from 'react'
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { X } from 'lucide-react'
 import HeaderButton from '../components/HeaderButton'
-import { subjects, setCourseFollowPrevious, setCourseStartDate, setCourseWeeklyHours, usePlanVersion, type Course, type Subject } from './plan'
+import { subjects, setCourseFollowPrevious, setCourseFollowPreviousWeeklyHours, setCourseStartDate, setCourseWeeklyHours, usePlanVersion, type Course, type Subject } from './plan'
 import { getCourseDetail, prices, covers, ONDEMAND_URL } from './courseDetail'
 import './CourseDetailPrototype.css'
 
@@ -45,20 +45,25 @@ function CtaUnderCover({ course }: { course: Course }) {
   )
 }
 
-function StepSlider({ course }: { course: Course }) {
+function StepSlider({ course, disabled = false }: { course: Course; disabled?: boolean }) {
   const progress = (course.weeklyHours - 1) / 9
   return <div className="cdp-step-slider" style={{ '--progress': `${progress * 100}%` } as CSSProperties}>
     <i className="cdp-step-track" aria-hidden="true"><i /></i>
-    <input className="cdp-step-input" aria-label="ชั่วโมงต่อสัปดาห์" type="range" min="1" max="10" step="1" value={course.weeklyHours} onChange={event => setCourseWeeklyHours(course.id, Number(event.target.value))} />
+    <input className="cdp-step-input" aria-label="ชั่วโมงต่อสัปดาห์" type="range" min="1" max="10" step="1" disabled={disabled} value={course.weeklyHours} onChange={event => setCourseWeeklyHours(course.id, Number(event.target.value))} />
     <span className="cdp-step-marks" aria-hidden="true">{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <i key={n} className={n === course.weeklyHours ? 'active' : ''}><b>{n}</b></i>)}</span>
   </div>
 }
 
-function StudyRhythmControls({ course }: { course: Course }) {
+function StudyRhythmControls({ cr }: { cr: CourseRef }) {
+  const { course, subject } = cr
+  const isFirstCourse = subject.courses[0]?.id === course.id
   return <section className="cdp-rhythm" aria-label="กำหนดเวลาเรียน">
-    <label>เวลาเรียนต่อสัปดาห์ <b>{course.weeklyHours} ชม.</b>
-      <StepSlider course={course} />
-    </label>
+    <div className="cdp-weekly">
+      <div><span>เวลาเรียนต่อสัปดาห์</span>
+        <label className="cdp-follow cdp-follow-hours" title={isFirstCourse ? 'ไม่มี Course ก่อนหน้า' : undefined}><input aria-label="ตาม Course ก่อนหน้า" type="checkbox" disabled={isFirstCourse} checked={!!course.followPreviousWeeklyHours} onChange={e => setCourseFollowPreviousWeeklyHours(course.id, e.target.checked)} /><i aria-hidden="true" />ตาม Course ก่อนหน้า</label>
+      </div>
+      <StepSlider course={course} disabled={course.followPreviousWeeklyHours} />
+    </div>
     <div className="cdp-start">
       <span>วันเริ่มต้น</span>
       <label className="cdp-follow"><input aria-label="ตาม Course ก่อนหน้า" type="checkbox" checked={!!course.followPrevious} onChange={e => setCourseFollowPrevious(course.id, e.target.checked)} /><i aria-hidden="true" />ตาม Course ก่อนหน้า</label>
@@ -101,7 +106,7 @@ function CourseDetailPanel({ ref: cr, onClose }: { ref: CourseRef; onClose: () =
             <CtaUnderCover course={course} />
           </div>
           <i className="cdp-divider" aria-hidden="true" />
-          <StudyRhythmControls course={course} />
+          <StudyRhythmControls cr={cr} />
           <i className="cdp-divider" aria-hidden="true" />
           <div className="cdp-summary">
             {d?.pack && <p>แพ็ก: {d.pack.name} · ครู {d.pack.teacher}</p>}

@@ -3,7 +3,7 @@ import Home from './pages/Home'
 import Courses from './pages/Courses'
 import MyPath from './pages/MyPath'
 import Profile from './pages/Profile'
-import MyPathYear from './pages/MyPathYear'
+import MyPathAllTimeline from './pages/MyPathAllTimeline'
 
 export default function App() {
   return (
@@ -11,9 +11,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/courses" element={<Courses />} />
       <Route path="/mypath" element={<MyPath />} />
-      <Route path="/mypath/year" element={<MyPathYear />} />
-      <Route path="/mypath/all" element={<MyPathYear mode="all" />} />
-      <Route path="/mypath/year-prototype" element={<MyPathYear mode="all" />} />
+      <Route path="/mypath/all" element={<MyPathAllTimeline />} />
       <Route path="/profile" element={<Profile />} />
     </Routes>
   )

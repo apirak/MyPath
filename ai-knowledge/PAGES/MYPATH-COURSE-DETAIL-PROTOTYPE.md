@@ -13,8 +13,9 @@
 - **แผง/sheet ไม่มี border** — เฉพาะเงา
 - **ปุ่มเริ่มเรียน ใต้ cover** (คอร์สที่ซื้อแล้ว) · คอร์สที่ยังไม่ซื้อเป็นปุ่ม "หาซื้อบน OnDemand" + ราคา — **ทุกปุ่มใช้ `HeaderButton` component ตัวเดียวกับหน้า Profile** · เริ่มเรียน = `variant="primary"` (น้ำเงิน #0078c4) ส่วนที่เหลือเป็น secondary/ขาว (✕ ปิด = `header-button--icon` + ไอคอน X จาก lucide) — mock: ทั้งเริ่มเรียนและหาซื้อเปิด `ONDEMAND_URL`
 - รายละเอียดเป็น **ระดับเล่ม** + บริบทแพ็ก · คอร์สไม่มีข้อมูล (10/25) แสดงการ์ดย่อ + ข้อความ "ยังไม่มีรายละเอียดเนื้อหา"
-- คลิกได้จากทุกที่ที่คอร์สปรากฏ: แถบ Year, เซลล์ Year มือถือ, การ์ด Month (ป้ายสอบ/Mock ไม่รวม)
+- คลิกได้จากทุกที่ที่คอร์สปรากฏ: แถบ All, เซลล์ All มือถือ, การ์ด Month (ป้ายสอบ/Mock ไม่รวม)
 - เปิดเป็น overlay บนหน้าเดิม (`?course=<รหัส>`) · ปิดด้วย ✕ / คลิกฉากหลัง / Esc · สถานะเทียบ `TODAY = 2026-12-05`
+- “ตาม Course ก่อนหน้า” ใช้ได้ทั้งวันเริ่มต้นและเวลาเรียนต่อสัปดาห์: เวลาเรียนจะคัดลอกค่าของคอร์สก่อนหน้าในวิชาเดียวกันและล็อก slider; คอร์สแรกของวิชาไม่มีคอร์สก่อนหน้า จึงปิดตัวเลือกนี้ไว้. ไม่ใช้ปฏิทินการเรียนเป็นแหล่งเวลา เพราะหลายคอร์สอาจเรียนทับช่วงเดียวกัน.
 
 ## ไฟล์
 
@@ -23,7 +24,7 @@
 | `src/mypath/courseDetail.ts` | mock รายละเอียด — mirror ของ SAMPLE_DATA (แพ็ก MATH/PHY + ExamGym ×3 + ราคา + covers + ส่วนแชร์) |
 | `src/mypath/CourseDetailPrototype.tsx` | SheetMobile (มือถือ) + DrawerDesktop (desktop) + ResponsiveDetail + overlay |
 | `src/mypath/CourseDetailPrototype.css` | สไตล์ (`cdp-*`) — ปุ่มไม่มีสไตล์เอง ใช้ HeaderButton ของแอป |
-| `src/pages/MyPathYear.tsx` / `MyPath.tsx` | onClick แถบ/เซลล์/การ์ด + mount `<CourseDetailOverlay />` |
+| `src/pages/MyPathAllTimeline.tsx` / `MyPath.tsx` | onClick แถบ/เซลล์/การ์ด + mount `<CourseDetailOverlay />` |
 | `src/components/HeaderButton.tsx` | ปุ่มกลางของแอป — pushable (ขอบทึบ + หน้าปุ่มลอย) + variant primary/secondary |
 
 แม็ปข้อมูล: MATH.1–5 ← TCAS70_Math · PHY.1–7 ← TCAS70_Physic · EX ×3 ← Exam_GYM_* · ที่เหลือไม่มีรายละเอียด (ดู `SAMPLE_DATA/courses.md` § รายละเอียดคอร์ส)

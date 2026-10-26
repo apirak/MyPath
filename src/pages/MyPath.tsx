@@ -15,7 +15,7 @@ import {
 // ปุ่ม ‹ › เลื่อนหน้าต่างเดือนภายในแกน ต.ค. 69 – ก.พ. 71 · เดือนเริ่มต้น = เดือนของ TODAY
 
 function Plate({ text, color, owned }: { text: string; color: string; owned: boolean }) {
-  // ปกสำรอง: ทึบสีวิชา = ซื้อแล้ว · แผ่นอ่อนขอบประ = ยังไม่ได้ซื้อ (encoding เดียวกับ Year)
+  // ปกสำรอง: ทึบสีวิชา = ซื้อแล้ว · แผ่นอ่อนขอบประ = ยังไม่ได้ซื้อ (encoding เดียวกับ All)
   return <span className="monthly-plate" style={owned ? { background: color, color: '#fff' } : { background: `${color}1c`, color, boxShadow: `inset 0 0 0 2px ${color}` }}>{text}</span>
 }
 

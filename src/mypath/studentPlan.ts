@@ -11,6 +11,7 @@ export type StudentCourse = {
   startDate?: string
   followPrevious?: boolean
   weeklyHours?: number
+  followPreviousWeeklyHours?: boolean
 }
 
 // ค่าเริ่มต้นแบบโรงเรียนไทย แก้ได้ภายหลังจากหน้าปฏิทินการเรียน

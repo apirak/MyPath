@@ -1,0 +1,103 @@
+import type { CSSProperties } from 'react'
+import BottomNav from '../components/BottomNav'
+import PathHeader from '../components/PathHeader'
+import { AXIS_END, AXIS_START, MS, TODAY, addDays, calendarBudgetForWeek, events, fmtDate, fmtShort, isoOf, scheduledHoursByDay, subjects, type Course, u } from '../mypath/plan'
+import { CourseDetailOverlay, useOpenCourse } from '../mypath/CourseDetailPrototype'
+import './MyPathAllTimeline.css'
+
+type Month = { start: string; end: string; days: number; label: string }
+type Timeline = { start: string; end: string; days: number; months: Month[]; label: string }
+
+const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.']
+
+function allTimeline(): Timeline {
+  const months: Month[] = []
+  for (let start = AXIS_START; u(start) < u(AXIS_END);) {
+    const [year, month] = start.slice(0, 7).split('-').map(Number)
+    const days = new Date(Date.UTC(year, month, 0)).getUTCDate()
+    const end = isoOf(Date.UTC(year, month, 1))
+    months.push({ start, end, days, label: `${monthNames[month - 1]} ${String(year + 543).slice(2)}` })
+    start = end
+  }
+  return { start: AXIS_START, end: AXIS_END, days: (u(AXIS_END) - u(AXIS_START)) / MS, months, label: 'ต.ค. 69 – เม.ย. 71' }
+}
+
+if (import.meta.env.DEV) {
+  const check = allTimeline()
+  if (check.months.reduce((total, month) => total + month.days, 0) !== check.days) throw new Error('prototype month axis is not continuous')
+}
+
+const position = (date: string, t: Timeline) => (u(date) - u(t.start)) / MS / t.days * 100
+const visible = (course: Course, t: Timeline) => u(course.start) < u(t.end) && u(addDays(course.end, 1)) > u(t.start)
+const monthColumns = (t: Timeline) => t.months.map(month => `minmax(${month.days * 3}px, ${month.days}fr)`).join(' ')
+const barText = (hex: string) => {
+  const value = parseInt(hex.slice(1), 16)
+  return (0.2126 * (value >> 16) + .7152 * ((value >> 8) & 255) + .0722 * (value & 255)) / 255 > .55 ? '#212529' : '#fff'
+}
+
+function MonthBands({ t }: { t: Timeline }) {
+  return <div className="tp-month-bands" aria-hidden="true" style={{ gridTemplateColumns: monthColumns(t) }}>
+    {t.months.map((month, index) => <i key={month.start} className={index % 2 ? 'alternate' : ''} />)}
+  </div>
+}
+
+function Axis({ children, t, className = '', style }: { children: React.ReactNode; t: Timeline; className?: string; style?: CSSProperties }) {
+  return <div className={`tp-axis ${className}`} style={style}><MonthBands t={t} />{children}</div>
+}
+
+function MonthHeader({ t }: { t: Timeline }) {
+  return <><b className="tp-label tp-month-label">แผนการเรียน</b>{t.months.map(month => <span key={month.start} className={`tp-month ${u(TODAY) >= u(month.start) && u(TODAY) < u(month.end) ? 'now' : ''}`}>{month.label}</span>)}</>
+}
+
+function EventRow({ t }: { t: Timeline }) {
+  const ends: number[] = []
+  const shown = events.filter(event => u(event.date) >= u(t.start) && u(event.date) < u(t.end)).sort((a, b) => u(a.date) - u(b.date)).map(event => {
+    const day = (u(event.date) - u(t.start)) / MS, half = Math.max(9, event.label.length * 1.1)
+    let lane = ends.findIndex(end => end <= day - half)
+    if (lane < 0) { lane = ends.length; ends.push(day + half) } else ends[lane] = day + half
+    return { event, lane }
+  })
+  const height = Math.max(76, ends.length * 44 + 24)
+  return <><b className="tp-label tp-events-label tp-load-label" style={{ minHeight: height }}>วันสำคัญ</b><Axis t={t} className="tp-events" style={{ minHeight: height }}>{shown.map(({ event, lane }) => <span key={event.id} className={`tp-event ${event.kind}${event.owned ? '' : ' no'}`} style={{ left: `${position(event.date, t)}%`, top: lane * 44 + 8, '--line': `${Math.max(8, height - lane * 44 - 55)}px` } as CSSProperties}>{event.label}<small>{fmtDate(event.date)}</small></span>)}{shown.map(({ event }) => <i key={`${event.id}-marker`} className={`tp-event-marker ${event.kind}${event.owned ? '' : ' no'}`} style={{ left: `${position(event.date, t)}%` }} />)}</Axis></>
+}
+
+function SubjectRow({ subject, t, open }: { subject: typeof subjects[number]; t: Timeline; open: (id: string) => void }) {
+  const style = { '--subject': subject.color } as CSSProperties
+  return <><b className="tp-label tp-subject" style={style}><i />{subject.name}</b><Axis t={t} style={style}>{subject.courses.filter(course => visible(course, t)).map(course => {
+    const left = Math.max(0, position(course.start, t)), right = Math.min(100, position(addDays(course.end, 1), t))
+    return <span key={course.id} className={`tp-course ${course.owned ? 'own' : ''}`} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={event => event.key === 'Enter' && open(course.id)} style={{ left: `calc(${left}% + 3px)`, width: `calc(${right - left}% - 6px)`, color: course.owned ? barText(subject.color) : undefined }} title={`${course.name} · ${fmtDate(course.start)} – ${fmtDate(course.end)}`}>{course.short}</span>
+  })}</Axis></>
+}
+
+function WeeklyLoad({ t }: { t: Timeline }) {
+  const firstMonday = u(t.start) - ((new Date(u(t.start)).getUTCDay() + 6) % 7) * MS
+  const weeks = [] as { start: number; end: number; demand: number }[]
+  for (let start = firstMonday; start < u(t.end); start += 7 * MS) {
+    const end = Math.min(start + 7 * MS, u(t.end))
+    const demand = Array.from({ length: (end - start) / MS }, (_, day) => scheduledHoursByDay.get(isoOf(start + day * MS)) ?? 0).reduce((sum, value) => sum + value, 0)
+    weeks.push({ start, end, demand })
+  }
+  const max = Math.max(...weeks.map(week => week.demand), 1)
+  return <><b className="tp-label tp-load-label">งบคอร์ส</b><Axis t={t} className="tp-load">{weeks.map(week => {
+    const left = Math.max(0, position(isoOf(week.start), t)), right = Math.min(100, position(isoOf(week.end), t))
+    const budget = calendarBudgetForWeek(week.start), state = week.demand > budget * 1.5 ? 'hot' : week.demand > budget ? 'warm' : ''
+    return <i key={week.start} className={state} title={`${fmtDate(isoOf(week.start))} – ${fmtDate(isoOf(week.end - MS))} · งบคอร์ส ${week.demand.toFixed(1)} ชม. / งบปฏิทิน ${budget.toFixed(1)} ชม.`} style={{ left: `${left}%`, width: `${Math.max(.1, right - left)}%`, height: `${Math.max(2, week.demand / max * 26)}px` }} />
+  })}</Axis></>
+}
+
+function MobileTimeline({ t, open }: { t: Timeline; open: (id: string) => void }) {
+  return <section className="tp-mobile"><div className="tp-mobile-head"><i />{subjects.map(subject => <b key={subject.name}><i style={{ background: subject.color }} />{subject.name}</b>)}</div><div className="tp-mobile-months">{t.months.map(month => {
+    const monthEvents = events.filter(event => u(event.date) >= u(month.start) && u(event.date) < u(month.end))
+    const now = u(TODAY) >= u(month.start) && u(TODAY) < u(month.end)
+    return <section key={month.start} className={`tp-mobile-month${now ? ' now' : ''}`}><b>{month.label}</b><div className="tp-mobile-month-content">{monthEvents.length > 0 && <div className="tp-mobile-events">{monthEvents.map(event => <span key={event.id} className={`tp-mobile-event ${event.kind}${event.owned ? '' : ' no'}`}>{event.label} · {fmtShort(event.date)}</span>)}</div>}<div className="tp-mobile-subjects">{subjects.map(subject => {
+      const courses = subject.courses.filter(course => u(course.start) < u(month.end) && u(addDays(course.end, 1)) > u(month.start))
+      const full = courses.some(course => u(course.start) <= u(month.start) && u(addDays(course.end, 1)) >= u(month.end))
+      return <div key={subject.name} className={`tp-mobile-cell${full ? ' full-month' : ''}`} style={{ '--subject': subject.color } as CSSProperties}>{courses.map(course => <span key={course.id} className={`tp-mobile-course ${course.owned ? 'own' : 'own-no'}`} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={event => event.key === 'Enter' && open(course.id)} style={{ color: course.owned ? barText(subject.color) : undefined }}>{course.short}</span>)}</div>
+    })}</div></div></section>
+  })}</div></section>
+}
+
+export default function MyPathAllTimeline() {
+  const t = allTimeline(), open = useOpenCourse()
+  return <main className="tp-page"><PathHeader active="all" period={t.label} showNavigation={false} /><div className="tp-scroll"><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><MonthHeader t={t} /><EventRow t={t} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} open={open} />)}<WeeklyLoad t={t} /></section></div><MobileTimeline t={t} open={open} /><CourseDetailOverlay /><BottomNav active="mypath" /></main>
+}
