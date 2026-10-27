@@ -9,6 +9,7 @@
 .course-progress-pin{position:absolute;bottom:8px;display:grid;place-items:center;transform:translateX(-50%)}
 .course-progress-pin.flag{transform:translateX(-3px)} /* เสาธงตรงจุด 30% */
 .course-progress-goal-line{position:absolute;inset:0 auto;border-left:1px dotted #3993ff;transform:translateX(-50%)}
+.course-progress-goal-line.passed{border-color:#fff} /* อยู่บนแถบฟ้าแล้ว → ขาวให้เห็นชัด */
 .course-progress-pin>img{width:16px;min-width:16px;height:16px}
 .course-progress-pin.walker{color:#1b3a6b}
 .course-progress-pin.walker.on-goal{bottom:-6px;width:20px;height:20px;border:1.5px solid #3993ff;border-radius:50%;background:#fff}
