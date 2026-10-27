@@ -5,6 +5,7 @@ import PathHeader from '../components/PathHeader'
 import BottomNav from '../components/BottomNav'
 // PROTOTYPE — คลิกการ์ดคอร์สเปิดรายละเอียด (desktop แผงขวา / มือถือ bottom sheet)
 import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailOverlay'
+import { CourseProgress, ProgressTestPanel } from '../mypath/CourseProgress'
 import {
   TODAY, AXIS_START, AXIS_END, u, addMonths, monthStartOf, dayOf, monthShortOf,
   fmtDate, fmtMonth, fmtShort, agendaFor, subjects, events, totalHours, KIND_COLOR, studyCalendar,
@@ -22,7 +23,7 @@ function Plate({ text, color, owned }: { text: string; color: string; owned: boo
 
 function CourseCard({ course, done = false }: { course: AgendaCourse; done?: boolean }) {
   const open = useOpenCourse()
-  return <article className={`monthly-course${done ? ' done' : ''}`} style={{ '--subject': course.color } as CSSProperties} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={e => { if (e.key === 'Enter') open(course.id) }}>
+  return <article className={`monthly-course${done ? ' done' : ''}${course.owned ? ' has-progress' : ''}`} style={{ '--subject': course.color } as CSSProperties} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={e => { if (e.key === 'Enter') open(course.id) }}>
     <div className="monthly-course-body">
       {course.cover ? <img src={course.cover} alt="" /> : <Plate text={course.short} color={course.color} owned={!!course.owned} />}
       <div>
@@ -31,6 +32,7 @@ function CourseCard({ course, done = false }: { course: AgendaCourse; done?: boo
         <small>{course.hours} ชม. · {fmtDate(course.start)} – {fmtDate(course.end)}{course.owned ? '' : ' · ยังไม่ได้ซื้อ'}</small>
       </div>
     </div>
+    {course.owned && <CourseProgress course={course} />}
   </article>
 }
 
@@ -123,6 +125,7 @@ export default function MyPath() {
         <pre>{JSON.stringify({ TODAY, totalHours, studyCalendar, subjects, events, agenda }, null, 2)}</pre>
       </details>
     </div>
+    <ProgressTestPanel />
     <BottomNav active="mypath" />
   </main>
 }
