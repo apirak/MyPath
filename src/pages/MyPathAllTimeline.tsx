@@ -1,5 +1,4 @@
 import type { CSSProperties } from 'react'
-import BottomNav from '../components/BottomNav'
 import PathHeader from '../components/PathHeader'
 import { AXIS_END, AXIS_START, MS, TODAY, addDays, calendarBudgetForWeek, events, fmtDate, fmtShort, isoOf, scheduledHoursByDay, subjects, type Course, u, usePlanVersion } from '../mypath/plan'
 import { CourseDetailOverlay, useOpenCourse } from '../mypath/CourseDetailOverlay'
@@ -90,8 +89,13 @@ function WeeklyLoad({ t, dayWidth }: { t: Timeline; dayWidth: number }) {
   })}</Axis></>
 }
 
+// หัววิชาของ timeline มือถือ — อยู่นอก .path-scroll ให้นิ่งคู่ header
+function MobileHead() {
+  return <div className="tp-mobile-head"><i />{subjects.map(subject => <b key={subject.name}><i style={{ background: subject.color }} />{subject.name}</b>)}</div>
+}
+
 function MobileTimeline({ t, open }: { t: Timeline; open: (id: string) => void }) {
-  return <section className="tp-mobile"><div className="tp-mobile-head"><i />{subjects.map(subject => <b key={subject.name}><i style={{ background: subject.color }} />{subject.name}</b>)}</div><div className="tp-mobile-months">{t.months.map(month => {
+  return <section className="tp-mobile"><div className="tp-mobile-months">{t.months.map(month => {
     const monthEvents = events.filter(event => u(event.date) >= u(month.start) && u(event.date) < u(month.end))
     const now = u(TODAY) >= u(month.start) && u(TODAY) < u(month.end)
     return <section key={month.start} className={`tp-mobile-month${now ? ' now' : ''}`}><b>{month.label}</b><div className="tp-mobile-month-content">{monthEvents.length > 0 && <div className="tp-mobile-events">{monthEvents.map(event => <span key={event.id} className={`tp-mobile-event ${event.kind}${event.owned ? '' : ' no'}`}>{event.label} · {fmtShort(event.date)}</span>)}</div>}<div className="tp-mobile-subjects" style={{ gridTemplateColumns: `repeat(${subjects.length},minmax(0,1fr))` }}>{subjects.map(subject => {
@@ -105,6 +109,7 @@ function MobileTimeline({ t, open }: { t: Timeline; open: (id: string) => void }
 export default function MyPathAllTimeline() {
   usePlanVersion()
   const t = allTimeline(), open = useOpenCourse()
-  if (subjects.length === 0) return <main className="tp-page"><PathHeader active="all" period={t.label} showNavigation={false} /><PlanEmptyState /><BottomNav active="mypath" /></main>
-  return <main className="tp-page"><PathHeader active="all" period={t.label} showNavigation={false} /><div className="tp-scroll"><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><MonthHeader t={t} /><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} /></section></div><MobileTimeline t={t} open={open} /><CourseDetailOverlay /><BottomNav active="mypath" /></main>
+  const header = <PathHeader active="all" period={t.label} showNavigation={false} />
+  if (subjects.length === 0) return <main className="path-page tp-page"><div className="path-screen">{header}<div className="path-scroll"><PlanEmptyState /></div></div></main>
+  return <main className="path-page tp-page"><div className="path-screen">{header}<MobileHead /><div className="path-scroll"><div className="tp-scroll"><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><MonthHeader t={t} /><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} /></section></div><MobileTimeline t={t} open={open} /></div><CourseDetailOverlay /></div></main>
 }

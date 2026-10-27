@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { CSSProperties, ReactNode } from 'react'
 import PathHeader from '../components/PathHeader'
-import BottomNav from '../components/BottomNav'
 // PROTOTYPE — คลิกการ์ดคอร์สเปิดรายละเอียด (desktop แผงขวา / มือถือ bottom sheet)
 import PlanEmptyState from '../mypath/PlanEmptyState'
 import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailOverlay'
@@ -114,19 +113,22 @@ export default function MyPath() {
   const agenda = agendaFor(month)
   const canPrev = u(month) > u(AXIS_START)
   const canNext = u(addMonths(month, 1)) < u(AXIS_END)
-  return <main className="monthly-prototype">
-    <div className="monthly-shell">
+  // key={month}: เปลี่ยนเดือน = remount scroller → กลับขึ้นบนสุด
+  return <main className="path-page">
+    <div className="path-screen">
       <PathHeader active="month" period={fmtMonth(month)} now={agenda.isCurrent}
         canPrev={canPrev} canNext={canNext}
         onPrev={() => go(-1)} onNext={() => go(1)} />
-      {subjects.length === 0 ? <PlanEmptyState /> : <Agenda agenda={agenda} />}
+      <div className="path-scroll" key={month}>
+        <div className="monthly-shell">{subjects.length === 0 ? <PlanEmptyState /> : <Agenda agenda={agenda} />}</div>
+      </div>
       <CourseDetailOverlay />
-      <details className="prototype-data">
-        <summary>ข้อมูล mock (plan.ts · วันนี้ = {fmtDate(TODAY)})</summary>
-        <pre>{JSON.stringify({ TODAY, totalHours, studyCalendar, subjects, events, agenda }, null, 2)}</pre>
-      </details>
     </div>
+    {/* ของ mock — อยู่นอก .path-screen จะได้ไม่ติดไปตอนย้ายเข้าแอปจริง */}
+    <details className="prototype-data">
+      <summary>ข้อมูล mock (plan.ts · วันนี้ = {fmtDate(TODAY)})</summary>
+      <pre>{JSON.stringify({ TODAY, totalHours, studyCalendar, subjects, events, agenda }, null, 2)}</pre>
+    </details>
     <ProgressTestPanel />
-    <BottomNav active="mypath" />
   </main>
 }
