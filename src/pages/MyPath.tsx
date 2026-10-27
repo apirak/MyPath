@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import type { CSSProperties, ReactNode } from 'react'
 import PathHeader from '../components/PathHeader'
 import BottomNav from '../components/BottomNav'
@@ -98,7 +99,15 @@ function Agenda({ agenda }: { agenda: Agenda }) {
 
 export default function MyPath() {
   usePlanVersion()
-  const [month, setMonth] = useState(monthStartOf(TODAY))
+  const [params, setParams] = useSearchParams()
+  // ?month=YYYY-MM คือเดือนที่เลือก · ไม่มี/ผิดรูป/นอกแกน → replace เป็นเดือนของ TODAY
+  const raw = params.get('month')
+  const valid = !!raw && /^\d{4}-(0[1-9]|1[0-2])$/.test(raw) && u(`${raw}-01`) >= u(AXIS_START) && u(`${raw}-01`) < u(AXIS_END)
+  const month = valid ? `${raw}-01` : monthStartOf(TODAY)
+  useEffect(() => {
+    if (!valid) setParams(p => { const n = new URLSearchParams(p); n.set('month', month.slice(0, 7)); return n }, { replace: true })
+  }, [valid, month, setParams])
+  const go = (step: number) => setParams(p => { const n = new URLSearchParams(p); n.set('month', addMonths(month, step).slice(0, 7)); return n })
   const agenda = agendaFor(month)
   const canPrev = u(month) > u(AXIS_START)
   const canNext = u(addMonths(month, 1)) < u(AXIS_END)
@@ -106,7 +115,7 @@ export default function MyPath() {
     <div className="monthly-shell">
       <PathHeader active="month" period={fmtMonth(month)} now={agenda.isCurrent}
         canPrev={canPrev} canNext={canNext}
-        onPrev={() => setMonth(addMonths(month, -1))} onNext={() => setMonth(addMonths(month, 1))} />
+        onPrev={() => go(-1)} onNext={() => go(1)} />
       <Agenda agenda={agenda} />
       <CourseDetailOverlay />
       <details className="prototype-data">
