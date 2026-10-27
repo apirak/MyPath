@@ -3,7 +3,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import PathHeader from '../components/PathHeader'
 import BottomNav from '../components/BottomNav'
 // PROTOTYPE — คลิกการ์ดคอร์สเปิดรายละเอียด (desktop แผงขวา / มือถือ bottom sheet)
-import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailPrototype'
+import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailOverlay'
 import {
   TODAY, AXIS_START, AXIS_END, u, addMonths, monthStartOf, dayOf, monthShortOf,
   fmtDate, fmtMonth, fmtShort, agendaFor, subjects, events, totalHours, KIND_COLOR, studyCalendar,

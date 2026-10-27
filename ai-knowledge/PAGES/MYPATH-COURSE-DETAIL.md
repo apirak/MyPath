@@ -1,4 +1,4 @@
-# My Path — Course Detail (Prototype)
+# My Path — Course Detail
 
 > **PROTOTYPE** — รวมเข้า main แล้วผ่าน PR #1 (24 ต.ค. 69) · ต้นฉบับเต็มยังอยู่บน branch `prototype/course-detail` (worktree `../mypath-course-detail`)
 
@@ -22,8 +22,8 @@
 | ไฟล์ | หน้าที่ |
 |---|---|
 | `src/mypath/courseDetail.ts` | mock รายละเอียด — mirror ของ SAMPLE_DATA (แพ็ก MATH/PHY + ExamGym ×3 + ราคา + covers + ส่วนแชร์) |
-| `src/mypath/CourseDetailPrototype.tsx` | SheetMobile (มือถือ) + DrawerDesktop (desktop) + ResponsiveDetail + overlay |
-| `src/mypath/CourseDetailPrototype.css` | สไตล์ (`cdp-*`) — ปุ่มไม่มีสไตล์เอง ใช้ HeaderButton ของแอป |
+| `src/mypath/CourseDetailOverlay.tsx` | SheetMobile (มือถือ) + DrawerDesktop (desktop) + ResponsiveDetail + overlay |
+| `src/mypath/CourseDetailOverlay.css` | สไตล์ (`cdp-*`) — ปุ่มไม่มีสไตล์เอง ใช้ HeaderButton ของแอป |
 | `src/pages/MyPathAllTimeline.tsx` / `MyPath.tsx` | onClick แถบ/เซลล์/การ์ด + mount `<CourseDetailOverlay />` |
 | `src/components/HeaderButton.tsx` | ปุ่มกลางของแอป — pushable (ขอบทึบ + หน้าปุ่มลอย) + variant primary/secondary |
 

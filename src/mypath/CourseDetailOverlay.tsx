@@ -1,15 +1,15 @@
 // PROTOTYPE — หน้ารายละเอียดคอร์ส แบบเดียวที่เหลือ (D ที่เจ้าของเลือก, 24 ต.ค. 69):
 //   desktop ≥641px = แผงข้างขวา · มือถือ ≤640px = bottom sheet (สลับสดตาม viewport)
-//   A/B/C + switcher ลบแล้ว — ดูผลการตัดสินที่ ai-knowledge/PAGES/MYPATH-COURSE-DETAIL-PROTOTYPE.md
+//   A/B/C + switcher ลบแล้ว — ดูผลการตัดสินที่ ai-knowledge/PAGES/MYPATH-COURSE-DETAIL.md
 // ข้อมูล: plan.ts (แผน/ชั่วโมง/วันที่/การซื้อ) + courseDetail.ts (แพ็ก/เล่ม/ExamGym — mirror SAMPLE_DATA)
 // คลิกคอร์สบน /mypath และ /mypath/all → ตั้ง ?course=<รหัส> แล้ว overlay เปิดบนหน้าเดิม
 import { useEffect, useState, type CSSProperties } from 'react'
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { X } from 'lucide-react'
 import HeaderButton from '../components/HeaderButton'
-import { subjects, setCourseFollowPrevious, setCourseFollowPreviousWeeklyHours, setCourseStartDate, setCourseWeeklyHours, usePlanVersion, type Course, type Subject } from './plan'
+import { isFirstCourse, subjects, setCourseFollowPrevious, setCourseFollowPreviousWeeklyHours, setCourseStartDate, setCourseWeeklyHours, usePlanVersion, type Course, type Subject } from './plan'
 import { getCourseDetail, prices, covers, ONDEMAND_URL } from './courseDetail'
-import './CourseDetailPrototype.css'
+import './CourseDetailOverlay.css'
 
 /* ---------- helpers ที่ใช้ร่วม ---------- */
 
@@ -55,18 +55,18 @@ function StepSlider({ course, disabled = false }: { course: Course; disabled?: b
 }
 
 function StudyRhythmControls({ cr }: { cr: CourseRef }) {
-  const { course, subject } = cr
-  const isFirstCourse = subject.courses[0]?.id === course.id
+  const { course } = cr
+  const firstCourse = isFirstCourse(course.id)
   return <section className="cdp-rhythm" aria-label="กำหนดเวลาเรียน">
     <div className="cdp-weekly">
       <div><span>เวลาเรียนต่อสัปดาห์</span>
-        <label className="cdp-follow cdp-follow-hours" title={isFirstCourse ? 'ไม่มี Course ก่อนหน้า' : undefined}><input aria-label="ตาม Course ก่อนหน้า" type="checkbox" disabled={isFirstCourse} checked={!!course.followPreviousWeeklyHours} onChange={e => setCourseFollowPreviousWeeklyHours(course.id, e.target.checked)} /><i aria-hidden="true" />ตาม Course ก่อนหน้า</label>
+        <label className="cdp-follow cdp-follow-hours" title={firstCourse ? 'ไม่มี Course ก่อนหน้า' : undefined}><input aria-label="ตาม Course ก่อนหน้า" type="checkbox" disabled={firstCourse} checked={!!course.followPreviousWeeklyHours} onChange={e => setCourseFollowPreviousWeeklyHours(course.id, e.target.checked)} /><i aria-hidden="true" />ตาม Course ก่อนหน้า</label>
       </div>
       <StepSlider course={course} disabled={course.followPreviousWeeklyHours} />
     </div>
     <div className="cdp-start">
       <span>วันเริ่มต้น</span>
-      <label className="cdp-follow"><input aria-label="ตาม Course ก่อนหน้า" type="checkbox" checked={!!course.followPrevious} onChange={e => setCourseFollowPrevious(course.id, e.target.checked)} /><i aria-hidden="true" />ตาม Course ก่อนหน้า</label>
+      <label className="cdp-follow" title={firstCourse ? 'ไม่มี Course ก่อนหน้า' : undefined}><input aria-label="ตาม Course ก่อนหน้า" type="checkbox" disabled={firstCourse} checked={!!course.followPrevious} onChange={e => setCourseFollowPrevious(course.id, e.target.checked)} /><i aria-hidden="true" />ตาม Course ก่อนหน้า</label>
       <input aria-label="วันเริ่มต้น" type="date" disabled={!!course.followPrevious} value={course.startDate ?? ''} onChange={e => setCourseStartDate(course.id, e.target.value || undefined)} />
     </div>
   </section>

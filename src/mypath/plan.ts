@@ -12,7 +12,7 @@ export const addDays = (iso: string, n: number) => isoOf(u(iso) + n * MS)
 export const AXIS_START = '2026-10-01'
 export let AXIS_END = '2028-03-01' // exclusive; recalc ถึงสิ้นเดือนของคอร์สสุดท้าย
 export let TOTAL_DAYS = (u(AXIS_END) - u(AXIS_START)) / MS
-const DAY_START = u('2026-09-28') // วันเริ่ม simulation (จันทร์ที่เริ่มเล่ม 1)
+const DAY_START = u('2026-08-01') // วันเริ่ม simulation; แกน All ยังเริ่ม 1 ต.ค.
 // เผื่อเวลาหลังแกน All เพื่อไม่ตัดคอร์สที่ยังเรียนไม่จบเมื่อปรับปฏิทิน
 const DAY_LAST = u('2028-04-30')
 
@@ -53,6 +53,7 @@ export const estimatedWeeksFor = (hours: number, weeklyHours: number) => Math.ce
 const DEFAULT_WEEKLY_HOURS = 5
 const weeklyHoursFor = (weeklyHours: number | undefined, followPrevious: boolean, previousWeeklyHours: number) =>
   followPrevious ? previousWeeklyHours : weeklyHours ?? DEFAULT_WEEKLY_HOURS
+export const isFirstCourse = (courseId: string) => courseCatalog.some(subject => subject.courses[0]?.id === courseId)
 const listeners = new Set<() => void>()
 let planVersion = 0
 const subscribe = (listener: () => void) => { listeners.add(listener); return () => listeners.delete(listener) }
@@ -101,7 +102,8 @@ export const rebuildPlan = () => {
     let previousWeeklyHours = DEFAULT_WEEKLY_HOURS
     for (const [index, course] of subject.courses.entries()) {
       const student = planById.get(course.id)
-      const start = Math.max(nextStart, !student?.followPrevious && student?.startDate ? u(student.startDate) : DAY_START)
+      const followPrevious = !!student?.followPrevious && index > 0
+      const start = Math.max(nextStart, !followPrevious && student?.startDate ? u(student.startDate) : DAY_START)
       const followPreviousWeeklyHours = !!student?.followPreviousWeeklyHours && index > 0
       const weeklyHours = weeklyHoursFor(student?.weeklyHours, followPreviousWeeklyHours, previousWeeklyHours)
       const weeks = estimatedWeeksFor(course.hours, weeklyHours)
@@ -120,7 +122,7 @@ export const rebuildPlan = () => {
     const student = planById.get(c.id)
     const followPreviousWeeklyHours = !!student?.followPreviousWeeklyHours && index > 0
     const weeklyHours = weeklyHoursById.get(c.id) ?? DEFAULT_WEEKLY_HOURS
-    return { ...c, owned: student?.owned, startDate: student?.startDate, followPrevious: student?.followPrevious, followPreviousWeeklyHours, weeklyHours, estimatedWeeks: estimatedWeeksFor(c.hours, weeklyHours), start: isoOf(starts.get(c.id) ?? DAY_LAST), end: isoOf(ends.get(c.id) ?? DAY_LAST) }
+    return { ...c, owned: student?.owned, startDate: student?.startDate, followPrevious: !!student?.followPrevious && index > 0, followPreviousWeeklyHours, weeklyHours, estimatedWeeks: estimatedWeeksFor(c.hours, weeklyHours), start: isoOf(starts.get(c.id) ?? DAY_LAST), end: isoOf(ends.get(c.id) ?? DAY_LAST) }
   }) }))
   totalHours = subjects.reduce((t, s) => t + s.courses.reduce((a, c) => a + c.hours, 0), 0)
   rebuildAxis(Math.max(...ends.values()))
@@ -152,7 +154,7 @@ export const setCourseStartDate = (courseId: string, startDate?: string) => {
 export const setCourseFollowPrevious = (courseId: string, followPrevious: boolean) => {
   const course = studentCourses.find(c => c.courseId === courseId)
   if (!course) return
-  course.followPrevious = followPrevious
+  course.followPrevious = !isFirstCourse(courseId) && followPrevious
   rebuildPlan(); planVersion += 1; listeners.forEach(listener => listener())
 }
 
@@ -165,7 +167,7 @@ export const setStudyCalendar = (next: typeof studyCalendar) => {
 }
 
 rebuildPlan()
-if (import.meta.env.DEV && (estimatedWeeksFor(30, 5) !== 6 || weeklyHoursFor(3, true, 7) !== 7 || !studentCourses.some(c => c.courseId === 'MATH.2') || calendarBudgetForWeek(u('2026-12-07')) !== 13 || calendarBudgetForWeek(u('2026-12-21')) !== 14)) throw new Error('weekly course calculation failed')
+if (import.meta.env.DEV && (estimatedWeeksFor(30, 5) !== 6 || weeklyHoursFor(3, true, 7) !== 7 || !isFirstCourse('MATH.1') || isFirstCourse('MATH.2') || !studentCourses.some(c => c.courseId === 'MATH.2') || calendarBudgetForWeek(u('2026-12-07')) !== 13 || calendarBudgetForWeek(u('2026-12-21')) !== 14)) throw new Error('weekly course calculation failed')
 
 // จาก SAMPLE_DATA/exam-dates.md (เจ้าของจัดใหม่ตามภาพ Plan Canvas 20.37.58) — สอบจริง 2 + Mock 6, ทุกรายการ 1 วัน
 // สีตามตำนานภาพ: น้ำเงิน = สอบจริง, แดง = Mock · เข้ม = ซื้อแล้ว, อ่อน = ยังไม่ได้ซื้อ (ซื้อครบยกเว้น Mock CBT)

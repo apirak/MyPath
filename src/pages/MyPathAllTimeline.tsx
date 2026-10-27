@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react'
 import BottomNav from '../components/BottomNav'
 import PathHeader from '../components/PathHeader'
 import { AXIS_END, AXIS_START, MS, TODAY, addDays, calendarBudgetForWeek, events, fmtDate, fmtShort, isoOf, scheduledHoursByDay, subjects, type Course, u, usePlanVersion } from '../mypath/plan'
-import { CourseDetailOverlay, useOpenCourse } from '../mypath/CourseDetailPrototype'
+import { CourseDetailOverlay, useOpenCourse } from '../mypath/CourseDetailOverlay'
 import './MyPathAllTimeline.css'
 
 type Month = { start: string; end: string; days: number; label: string }
