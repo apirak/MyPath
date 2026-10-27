@@ -136,6 +136,8 @@ export const setCourseWeeklyHours = (courseId: string, weeklyHours: number) => {
 export const setCourseFollowPreviousWeeklyHours = (courseId: string, followPreviousWeeklyHours: boolean) => {
   const course = studentCourses.find(c => c.courseId === courseId)
   if (!course) return
+  const current = subjects.flatMap(subject => subject.courses).find(course => course.id === courseId)
+  if (!followPreviousWeeklyHours && current?.followPreviousWeeklyHours) course.weeklyHours = current.weeklyHours
   course.followPreviousWeeklyHours = followPreviousWeeklyHours
   rebuildPlan(); planVersion += 1; listeners.forEach(listener => listener())
 }
