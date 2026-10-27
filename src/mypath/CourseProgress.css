@@ -5,11 +5,13 @@
 .course-progress-track>i{position:absolute;inset:0 auto 0 0;border-radius:999px}
 .course-progress-track>i.plan{background:#d3e6ff}
 .course-progress-track>i.fill{background:#3993ff}
-.course-progress-pin{position:absolute;bottom:6px;display:grid;place-items:center;transform:translateX(-50%)}
+/* ไอคอนวางบนขอบบนของแถบพอดี (bottom = ความสูงแถบ) · เส้นประอยู่ในแถบเท่านั้น */
+.course-progress-pin{position:absolute;bottom:8px;display:grid;place-items:center;transform:translateX(-50%)}
+.course-progress-pin.flag{transform:translateX(-3px)} /* เสาธงตรงจุด 30% */
+.course-progress-goal-line{position:absolute;inset:0 auto;border-left:1px dotted #3993ff;transform:translateX(-50%)}
 .course-progress-pin>img{width:16px;min-width:16px;height:16px}
-.course-progress-pin.goal::after{content:'';position:absolute;top:100%;height:10px;border-left:1px dotted #8a96a3}
 .course-progress-pin.walker{color:#1b3a6b}
-.course-progress-pin.walker.on-goal{bottom:-4px;width:20px;height:20px;border:1.5px solid #3993ff;border-radius:50%;background:#fff}
+.course-progress-pin.walker.on-goal{bottom:-6px;width:20px;height:20px;border:1.5px solid #3993ff;border-radius:50%;background:#fff}
 .course-progress-foot{display:flex;align-items:center;gap:12px;margin-top:8px;color:#6d757e;font-size:12px}
 .course-progress-foot b{color:#3993ff}
 .course-progress-message{display:inline-flex;align-items:center;gap:4px;margin-left:auto;text-align:right}

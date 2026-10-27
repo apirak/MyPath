@@ -26,7 +26,8 @@ export function CourseProgress({ course }: { course: { id: string; start: string
     <div className="course-progress-track">
       {next !== undefined && <i className="plan" style={{ width: `${next}%` }} />}
       <i className="fill" style={{ width: `${value}%` }} />
-      {GOALS.map((goal, i) => value !== goal && <span key={goal} className="course-progress-pin goal" style={{ left: `${goal}%` }}>
+      {GOALS.map(goal => value !== goal && <b key={goal} className="course-progress-goal-line" style={{ left: `${goal}%` }} />)}
+      {GOALS.map((goal, i) => value !== goal && <span key={goal} className={`course-progress-pin${i === 0 && !passed[0] ? ' flag' : ''}`} style={{ left: `${goal}%` }}>
         <img src={passed[i] ? checkedIcon : i === 0 ? flagIcon : trophyIcon} alt="" />
       </span>)}
       {value < 100
