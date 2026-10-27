@@ -2,6 +2,7 @@ import { useMemo, useState, type CSSProperties } from 'react'
 import { CalendarDays, Plus, Trash2, X } from 'lucide-react'
 import HeaderButton from '../components/HeaderButton'
 import { setStudyCalendar, studyCalendar, usePlanVersion } from './plan'
+import { subjectGroups } from './courseCatalog'
 import type { StudyCalendar } from './studentPlan'
 import './StudyCalendarPanel.css'
 import './StudyCalendarPanelOverrides.css'
@@ -40,16 +41,6 @@ function Calendar({ selected, settings, onSelect }: { selected: string; settings
   })}</div><p><i className="special" /> วันพิเศษ <i className="break" /> ช่วงปิดเทอม</p></div>
 }
 
-function WeekSummary({ settings }: { settings: StudyCalendar }) {
-  const total = settings.weekdayHours * 5 + settings.weekendHours * 2
-  return <section className="scp-summary"><span>เรียนสัปดาห์ละ</span><strong>{total} <small>ชม.</small></strong></section>
-}
-
-const subjectGroups = [
-  { name: 'TPAT / TGAT', subjects: ['TPAT', 'TGAT'] },
-  { name: 'กลุ่มคณิตศาสตร์และวิทยาศาสตร์', subjects: ['คณิต', 'วิทยาศาสตร์', 'ฟิสิกส์', 'เคมี', 'ชีววิทยา'] },
-  { name: 'กลุ่มภาษาและสังคม', subjects: ['ภาษาไทย', 'สังคม', 'อังกฤษ', 'ฝรั่งเศส', 'เยอรมัน', 'ญี่ปุ่น', 'เกาหลี', 'จีน', 'สเปน', 'บาลี'] },
-]
 const subjectCount = subjectGroups.reduce((sum, group) => sum + group.subjects.length, 0)
 
 function SubjectPicker({ settings, setSettings }: { settings: StudyCalendar; setSettings: (next: StudyCalendar) => void }) {
@@ -76,7 +67,7 @@ function SpecialPicker({ selected, settings, setSettings }: Omit<CalendarProps, 
 
 function VariantD(props: CalendarProps) {
   const [showSpecial, setShowSpecial] = useState(false)
-  return <div className="scp-layout scp-layout-d"><SubjectPicker {...props} /><WeekSummary {...props} /><section className="scp-cards"><article><b>วันเรียนปกติ</b><span>จันทร์–ศุกร์</span><StepSlider label="เรียนได้ต่อวัน" value={props.settings.weekdayHours} onChange={weekdayHours => props.setSettings({ ...props.settings, weekdayHours })} /></article><article><b>วันหยุดประจำสัปดาห์</b><span>เสาร์, อาทิตย์ และวันหยุด</span><StepSlider label="เรียนได้ต่อวัน" value={props.settings.weekendHours} onChange={weekendHours => props.setSettings({ ...props.settings, weekendHours })} /></article></section><BreakEditor {...props} /><section className="scp-special-settings">{!showSpecial ? <HeaderButton onClick={() => setShowSpecial(true)}><CalendarDays size={18} />ตั้งค่าวันพิเศษ</HeaderButton> : <><header><div><b>ตั้งค่าวันพิเศษ</b><span>เลือกวัน แล้วกำหนดจำนวนชั่วโมง</span></div><HeaderButton className="header-button--icon scp-icon-button" aria-label="ซ่อนการตั้งค่าวันพิเศษ" onClick={() => setShowSpecial(false)}><X size={18} /></HeaderButton></header><div><Calendar {...props} /><SpecialPicker {...props} /></div></>}</section></div>
+  return <div className="scp-layout scp-layout-d"><SubjectPicker {...props} /><section className="scp-cards"><article><b>วันเรียนปกติ</b><span>จันทร์–ศุกร์</span><StepSlider label="เรียนได้ต่อวัน" value={props.settings.weekdayHours} onChange={weekdayHours => props.setSettings({ ...props.settings, weekdayHours })} /></article><article><b>วันหยุดประจำสัปดาห์</b><span>เสาร์, อาทิตย์ และวันหยุด</span><StepSlider label="เรียนได้ต่อวัน" value={props.settings.weekendHours} onChange={weekendHours => props.setSettings({ ...props.settings, weekendHours })} /></article></section><BreakEditor {...props} /><section className="scp-special-settings">{!showSpecial ? <HeaderButton onClick={() => setShowSpecial(true)}><CalendarDays size={18} />ตั้งค่าวันพิเศษ</HeaderButton> : <><header><div><b>ตั้งค่าวันพิเศษ</b><span>เลือกวัน แล้วกำหนดจำนวนชั่วโมง</span></div><HeaderButton className="header-button--icon scp-icon-button" aria-label="ซ่อนการตั้งค่าวันพิเศษ" onClick={() => setShowSpecial(false)}><X size={18} /></HeaderButton></header><div><Calendar {...props} /><SpecialPicker {...props} /></div></>}</section></div>
 }
 
 type CalendarProps = { selected: string; onSelect: (date: string) => void; settings: StudyCalendar; setSettings: (next: StudyCalendar) => void }

@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import PathHeader from '../components/PathHeader'
 import BottomNav from '../components/BottomNav'
 // PROTOTYPE — คลิกการ์ดคอร์สเปิดรายละเอียด (desktop แผงขวา / มือถือ bottom sheet)
+import PlanEmptyState from '../mypath/PlanEmptyState'
 import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailOverlay'
 import { CourseProgress, ProgressTestPanel } from '../mypath/CourseProgress'
 import {
@@ -118,7 +119,7 @@ export default function MyPath() {
       <PathHeader active="month" period={fmtMonth(month)} now={agenda.isCurrent}
         canPrev={canPrev} canNext={canNext}
         onPrev={() => go(-1)} onNext={() => go(1)} />
-      <Agenda agenda={agenda} />
+      {subjects.length === 0 ? <PlanEmptyState /> : <Agenda agenda={agenda} />}
       <CourseDetailOverlay />
       <details className="prototype-data">
         <summary>ข้อมูล mock (plan.ts · วันนี้ = {fmtDate(TODAY)})</summary>

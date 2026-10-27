@@ -3,6 +3,7 @@ import BottomNav from '../components/BottomNav'
 import PathHeader from '../components/PathHeader'
 import { AXIS_END, AXIS_START, MS, TODAY, addDays, calendarBudgetForWeek, events, fmtDate, fmtShort, isoOf, scheduledHoursByDay, subjects, type Course, u, usePlanVersion } from '../mypath/plan'
 import { CourseDetailOverlay, useOpenCourse } from '../mypath/CourseDetailOverlay'
+import PlanEmptyState from '../mypath/PlanEmptyState'
 import './MyPathAllTimeline.css'
 
 type Month = { start: string; end: string; days: number; label: string }
@@ -65,7 +66,7 @@ function EventRow({ t, dayWidth }: { t: Timeline; dayWidth: number }) {
 
 function SubjectRow({ subject, t, dayWidth, open }: { subject: typeof subjects[number]; t: Timeline; dayWidth: number; open: (id: string) => void }) {
   const style = { '--subject': subject.color } as CSSProperties
-  return <><b className="tp-label tp-subject" style={style}><i />{subject.name}</b><Axis t={t} dayWidth={dayWidth} style={style}>{subject.courses.filter(course => visible(course, t)).map(course => {
+  return <><b className="tp-label tp-subject" style={style}><i />{subject.name}</b><Axis t={t} dayWidth={dayWidth} style={style}>{subject.courses.length === 0 && <span className="tp-no-course">ยังไม่มีคอร์ส</span>}{subject.courses.filter(course => visible(course, t)).map(course => {
     const left = Math.max(0, position(course.start, t)), right = Math.min(100, position(addDays(course.end, 1), t))
     return <span key={course.id} className={`tp-course ${course.owned ? 'own' : ''}`} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={event => event.key === 'Enter' && open(course.id)} style={{ left: `calc(${left}% + 3px)`, width: `calc(${right - left}% - 6px)`, color: course.owned ? barText(subject.color) : undefined }} title={`${course.name} · ${fmtDate(course.start)} – ${fmtDate(course.end)}`}>{course.short}</span>
   })}</Axis></>
@@ -93,7 +94,7 @@ function MobileTimeline({ t, open }: { t: Timeline; open: (id: string) => void }
   return <section className="tp-mobile"><div className="tp-mobile-head"><i />{subjects.map(subject => <b key={subject.name}><i style={{ background: subject.color }} />{subject.name}</b>)}</div><div className="tp-mobile-months">{t.months.map(month => {
     const monthEvents = events.filter(event => u(event.date) >= u(month.start) && u(event.date) < u(month.end))
     const now = u(TODAY) >= u(month.start) && u(TODAY) < u(month.end)
-    return <section key={month.start} className={`tp-mobile-month${now ? ' now' : ''}`}><b>{month.label}</b><div className="tp-mobile-month-content">{monthEvents.length > 0 && <div className="tp-mobile-events">{monthEvents.map(event => <span key={event.id} className={`tp-mobile-event ${event.kind}${event.owned ? '' : ' no'}`}>{event.label} · {fmtShort(event.date)}</span>)}</div>}<div className="tp-mobile-subjects">{subjects.map(subject => {
+    return <section key={month.start} className={`tp-mobile-month${now ? ' now' : ''}`}><b>{month.label}</b><div className="tp-mobile-month-content">{monthEvents.length > 0 && <div className="tp-mobile-events">{monthEvents.map(event => <span key={event.id} className={`tp-mobile-event ${event.kind}${event.owned ? '' : ' no'}`}>{event.label} · {fmtShort(event.date)}</span>)}</div>}<div className="tp-mobile-subjects" style={{ gridTemplateColumns: `repeat(${subjects.length},minmax(0,1fr))` }}>{subjects.map(subject => {
       const courses = subject.courses.filter(course => u(course.start) < u(month.end) && u(addDays(course.end, 1)) > u(month.start))
       const full = courses.some(course => u(course.start) <= u(month.start) && u(addDays(course.end, 1)) >= u(month.end))
       return <div key={subject.name} className={`tp-mobile-cell${full ? ' full-month' : ''}`} style={{ '--subject': subject.color } as CSSProperties}>{courses.map(course => <span key={course.id} className={`tp-mobile-course ${course.owned ? 'own' : 'own-no'}`} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={event => event.key === 'Enter' && open(course.id)} style={{ color: course.owned ? barText(subject.color) : undefined }}>{course.short}</span>)}</div>
@@ -104,5 +105,6 @@ function MobileTimeline({ t, open }: { t: Timeline; open: (id: string) => void }
 export default function MyPathAllTimeline() {
   usePlanVersion()
   const t = allTimeline(), open = useOpenCourse()
+  if (subjects.length === 0) return <main className="tp-page"><PathHeader active="all" period={t.label} showNavigation={false} /><PlanEmptyState /><BottomNav active="mypath" /></main>
   return <main className="tp-page"><PathHeader active="all" period={t.label} showNavigation={false} /><div className="tp-scroll"><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><MonthHeader t={t} /><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} /></section></div><MobileTimeline t={t} open={open} /><CourseDetailOverlay /><BottomNav active="mypath" /></main>
 }

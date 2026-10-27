@@ -1,0 +1,26 @@
+/* Empty state เมื่อยังไม่ได้เลือกวิชาที่เรียน (All + Month) */
+.pes{width:min(1133px,100%);margin:0 auto;padding-top:6px}
+.pes-hint{display:flex;justify-content:flex-end;align-items:flex-end;gap:4px;margin-right:56px}
+.pes-hint>div{padding-bottom:6px;text-align:right}
+.pes-hint b{font-size:18px}
+.pes-hint p{margin:4px 0 0;color:#495057;font-size:14px}
+.pes-hint em{color:#0078c4;font-style:normal;font-weight:700}
+.pes-hint svg{width:96px;height:72px;flex:none;fill:none;stroke:#495057;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.pes-banner{display:grid;justify-items:center;gap:8px;margin-top:16px;border-radius:16px;background:#1d5fae url(/mypath/plan-header-bg.png) center/cover;padding:32px 24px;color:#fff;text-align:center}
+.pes-banner h2,.pes-banner p{text-wrap:balance}
+.pes-banner h2{margin:0;font-size:32px;font-weight:700;line-height:44px}
+.pes-banner p{margin:0;font-size:16px;line-height:24px}
+.pes-cta{position:relative;width:min(800px,100%);margin-top:18px}
+.pes-cta img{position:absolute;right:0;top:-33px;z-index:2;pointer-events:none}
+.pes-cta .header-button{width:100%;min-height:48px;font-size:16px}
+.pes-cta .header-button__front{justify-content:center;gap:10px}
+@media(max-width:640px){
+  .tp-page .pes{padding-left:16px;padding-right:16px}
+  .pes-hint{margin-right:24px}
+  .pes-hint b{font-size:16px}
+  .pes-hint p{font-size:13px}
+  .pes-hint svg{width:64px;height:48px}
+  .pes-banner{padding:24px 16px}
+  .pes-banner h2{font-size:22px;line-height:30px}
+  .pes-banner p{font-size:14px;line-height:21px}
+}

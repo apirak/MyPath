@@ -1,6 +1,6 @@
 // แผนเรียน mock ของ My Path — ข้อมูล + simulation คิดวันที่ + เรขาคณิตแกนเวลา day-exact
 // ที่มา = SAMPLE_DATA/ (courses.md + study-plan.md สำหรับคอร์ส, exam-dates.md สำหรับสอบ) — mirror ด้วยมือ
-import { courseCatalog, type CourseCatalogItem } from './courseCatalog'
+import { courseCatalog, subjectGroups, type CatalogSubject, type CourseCatalogItem } from './courseCatalog'
 import { studyCalendar, studentCourses } from './studentPlan'
 import { useSyncExternalStore } from 'react'
 
@@ -92,12 +92,19 @@ const rebuildAxis = (lastCourseEnd: number) => {
 }
 
 // คอร์สในวิชาเดียวกันต่อกันวันถัดไป; หนึ่งสัปดาห์ของคอร์สยาว 7 วันปฏิทินเสมอ
+// วิชาที่เรียน = เฉพาะวิชาที่เปิดในปฏิทินการเรียน เรียงตาม subjectGroups; วิชาที่ยังไม่มีคอร์สได้แถวว่างสีเทา
+// ปิดวิชาไม่แตะ studentCourses → เปิดกลับมาแล้วคอร์สกลับมาพร้อมค่าเดิม
+const enabledSubjects = (): CatalogSubject[] => subjectGroups.flatMap(group => group.subjects)
+  .filter(name => studyCalendar.subjects.includes(name))
+  .map(name => courseCatalog.find(subject => subject.name === name) ?? { name, color: '#adb5bd', courses: [] })
+
 export const rebuildPlan = () => {
+  const catalog = enabledSubjects()
   const planById = new Map(studentCourses.map(c => [c.courseId, c]))
   const starts = new Map<string, number>(), ends = new Map<string, number>()
   const weeklyHoursById = new Map<string, number>()
   scheduledHoursByDay.clear()
-  for (const subject of courseCatalog) {
+  for (const subject of catalog) {
     let nextStart = DAY_START
     let previousWeeklyHours = DEFAULT_WEEKLY_HOURS
     for (const [index, course] of subject.courses.entries()) {
@@ -118,14 +125,14 @@ export const rebuildPlan = () => {
       }
     }
   }
-  subjects = courseCatalog.map(s => ({ name: s.name, color: s.color, courses: s.courses.map((c, index) => {
+  subjects = catalog.map(s => ({ name: s.name, color: s.color, courses: s.courses.map((c, index) => {
     const student = planById.get(c.id)
     const followPreviousWeeklyHours = !!student?.followPreviousWeeklyHours && index > 0
     const weeklyHours = weeklyHoursById.get(c.id) ?? DEFAULT_WEEKLY_HOURS
     return { ...c, owned: student?.owned, startDate: student?.startDate, followPrevious: !!student?.followPrevious && index > 0, followPreviousWeeklyHours, weeklyHours, estimatedWeeks: estimatedWeeksFor(c.hours, weeklyHours), start: isoOf(starts.get(c.id) ?? DAY_LAST), end: isoOf(ends.get(c.id) ?? DAY_LAST) }
   }) }))
   totalHours = subjects.reduce((t, s) => t + s.courses.reduce((a, c) => a + c.hours, 0), 0)
-  rebuildAxis(Math.max(...ends.values()))
+  rebuildAxis(Math.max(u(TODAY), ...ends.values()))
 }
 
 export const setCourseWeeklyHours = (courseId: string, weeklyHours: number) => {
@@ -162,7 +169,7 @@ export const setStudyCalendar = (next: typeof studyCalendar) => {
   const periods = [...next.breaks].sort((a, b) => a.start.localeCompare(b.start))
   if (periods.some((period, index) => period.start > period.end || (index > 0 && periods[index - 1].end >= period.start))) return false
   Object.assign(studyCalendar, next)
-  planVersion += 1; listeners.forEach(listener => listener())
+  rebuildPlan(); planVersion += 1; listeners.forEach(listener => listener())
   return true
 }
 
