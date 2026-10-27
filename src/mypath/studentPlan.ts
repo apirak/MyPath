@@ -4,6 +4,7 @@ export type StudyCalendar = {
   weekendHours: number
   specialDays: { date: string; hours: number }[]
   breaks: { id: number; start: string; end: string; hours: number }[]
+  subjects: string[]
 }
 export type StudentCourse = {
   courseId: string
@@ -20,6 +21,7 @@ export const studyCalendar: StudyCalendar = {
   weekendHours: 3,
   specialDays: [{ date: '2026-12-12', hours: 5 }],
   breaks: [{ id: 1, start: '2026-12-21', end: '2027-01-03', hours: 2 }],
+  subjects: ['TPAT', 'TGAT', 'คณิต', 'ฟิสิกส์', 'เคมี'],
 }
 
 export const studentCourses: StudentCourse[] = [

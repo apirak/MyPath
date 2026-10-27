@@ -45,6 +45,24 @@ function WeekSummary({ settings }: { settings: StudyCalendar }) {
   return <section className="scp-summary"><span>เรียนสัปดาห์ละ</span><strong>{total} <small>ชม.</small></strong></section>
 }
 
+const subjectGroups = [
+  { name: 'TPAT / TGAT', subjects: ['TPAT', 'TGAT'] },
+  { name: 'กลุ่มคณิตศาสตร์และวิทยาศาสตร์', subjects: ['คณิต', 'วิทยาศาสตร์', 'ฟิสิกส์', 'เคมี', 'ชีววิทยา'] },
+  { name: 'กลุ่มภาษาและสังคม', subjects: ['ภาษาไทย', 'สังคม', 'อังกฤษ', 'ฝรั่งเศส', 'เยอรมัน', 'ญี่ปุ่น', 'เกาหลี', 'จีน', 'สเปน', 'บาลี'] },
+]
+const subjectCount = subjectGroups.reduce((sum, group) => sum + group.subjects.length, 0)
+
+function SubjectPicker({ settings, setSettings }: { settings: StudyCalendar; setSettings: (next: StudyCalendar) => void }) {
+  const setSubjects = (subjects: string[], on: boolean) => setSettings({ ...settings, subjects: on ? [...new Set([...settings.subjects, ...subjects])] : settings.subjects.filter(subject => !subjects.includes(subject)) })
+  return <section className="scp-subjects"><div className="scp-section-title"><div><b>วิชาที่เรียน</b><span>เปิด {settings.subjects.length} จาก {subjectCount} วิชา</span></div></div>{subjectGroups.map(group => {
+    const allOn = group.subjects.every(subject => settings.subjects.includes(subject))
+    return <div key={group.name} className="scp-subject-group"><header><b>{group.name}</b><button onClick={() => setSubjects(group.subjects, !allOn)}>{allOn ? 'ยกเลิกทั้งหมด' : 'เลือกทั้งหมด'}</button></header><div>{group.subjects.map(subject => {
+      const on = settings.subjects.includes(subject)
+      return <button key={subject} aria-pressed={on} onClick={() => setSubjects([subject], !on)}>{subject}</button>
+    })}</div></div>
+  })}</section>
+}
+
 function BreakEditor({ settings, setSettings }: { settings: StudyCalendar; setSettings: (next: StudyCalendar) => void }) {
   const patch = (id: number, change: Partial<StudyCalendar['breaks'][number]>) => setSettings({ ...settings, breaks: settings.breaks.map(period => period.id === id ? { ...period, ...change } : period) })
   return <section className="scp-breaks"><div className="scp-section-title"><div><b>ปิดเทอม</b><span>กำหนดช่วงที่ไม่มีเวลาเรียนหรือเรียนได้มากขึ้น</span></div><HeaderButton className="header-button--icon scp-icon-button" aria-label="เพิ่มช่วงปิดเทอม" onClick={() => setSettings({ ...settings, breaks: [...settings.breaks, { id: Date.now(), start: '2027-01-10', end: '2027-01-17', hours: 2 }] })}><Plus size={18} /></HeaderButton></div>{settings.breaks.map(period => <article key={period.id}><div className="scp-break-dates"><input aria-label="วันเริ่มปิดเทอม" type="date" value={period.start} onChange={event => patch(period.id, { start: event.target.value })} /><span>ถึง</span><input aria-label="วันจบปิดเทอม" type="date" value={period.end} onChange={event => patch(period.id, { end: event.target.value })} /><button aria-label="ลบช่วงปิดเทอม" onClick={() => setSettings({ ...settings, breaks: settings.breaks.filter(item => item.id !== period.id) })}><Trash2 size={17} /></button></div><StepSlider label="เรียนได้ต่อวัน" value={period.hours} min={0} onChange={hours => patch(period.id, { hours })} /></article>)}</section>
@@ -58,7 +76,7 @@ function SpecialPicker({ selected, settings, setSettings }: Omit<CalendarProps, 
 
 function VariantD(props: CalendarProps) {
   const [showSpecial, setShowSpecial] = useState(false)
-  return <div className="scp-layout scp-layout-d"><WeekSummary {...props} /><section className="scp-cards"><article><b>วันเรียนปกติ</b><span>จันทร์–ศุกร์</span><StepSlider label="เรียนได้ต่อวัน" value={props.settings.weekdayHours} onChange={weekdayHours => props.setSettings({ ...props.settings, weekdayHours })} /></article><article><b>วันหยุดประจำสัปดาห์</b><span>เสาร์, อาทิตย์ และวันหยุด</span><StepSlider label="เรียนได้ต่อวัน" value={props.settings.weekendHours} onChange={weekendHours => props.setSettings({ ...props.settings, weekendHours })} /></article></section><BreakEditor {...props} /><section className="scp-special-settings">{!showSpecial ? <HeaderButton onClick={() => setShowSpecial(true)}><CalendarDays size={18} />ตั้งค่าวันพิเศษ</HeaderButton> : <><header><div><b>ตั้งค่าวันพิเศษ</b><span>เลือกวัน แล้วกำหนดจำนวนชั่วโมง</span></div><HeaderButton className="header-button--icon scp-icon-button" aria-label="ซ่อนการตั้งค่าวันพิเศษ" onClick={() => setShowSpecial(false)}><X size={18} /></HeaderButton></header><div><Calendar {...props} /><SpecialPicker {...props} /></div></>}</section></div>
+  return <div className="scp-layout scp-layout-d"><SubjectPicker {...props} /><WeekSummary {...props} /><section className="scp-cards"><article><b>วันเรียนปกติ</b><span>จันทร์–ศุกร์</span><StepSlider label="เรียนได้ต่อวัน" value={props.settings.weekdayHours} onChange={weekdayHours => props.setSettings({ ...props.settings, weekdayHours })} /></article><article><b>วันหยุดประจำสัปดาห์</b><span>เสาร์, อาทิตย์ และวันหยุด</span><StepSlider label="เรียนได้ต่อวัน" value={props.settings.weekendHours} onChange={weekendHours => props.setSettings({ ...props.settings, weekendHours })} /></article></section><BreakEditor {...props} /><section className="scp-special-settings">{!showSpecial ? <HeaderButton onClick={() => setShowSpecial(true)}><CalendarDays size={18} />ตั้งค่าวันพิเศษ</HeaderButton> : <><header><div><b>ตั้งค่าวันพิเศษ</b><span>เลือกวัน แล้วกำหนดจำนวนชั่วโมง</span></div><HeaderButton className="header-button--icon scp-icon-button" aria-label="ซ่อนการตั้งค่าวันพิเศษ" onClick={() => setShowSpecial(false)}><X size={18} /></HeaderButton></header><div><Calendar {...props} /><SpecialPicker {...props} /></div></>}</section></div>
 }
 
 type CalendarProps = { selected: string; onSelect: (date: string) => void; settings: StudyCalendar; setSettings: (next: StudyCalendar) => void }
