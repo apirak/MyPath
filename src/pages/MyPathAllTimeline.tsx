@@ -10,7 +10,7 @@ type Timeline = { start: string; end: string; days: number; months: Month[]; lab
 
 const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.']
 const MONTH_DAY_WIDTH = 2.2
-const BUDGET_RADIUS = 6
+const LOAD_PLOT = 34, LOAD_BASE = 1
 
 function allTimeline(): Timeline {
   const months: Month[] = []
@@ -71,19 +71,21 @@ function SubjectRow({ subject, t, dayWidth, open }: { subject: typeof subjects[n
   })}</Axis></>
 }
 
-function WeeklyLoad({ t, dayWidth, radius }: { t: Timeline; dayWidth: number; radius: number }) {
+function WeeklyLoad({ t, dayWidth }: { t: Timeline; dayWidth: number }) {
   const firstMonday = u(t.start) - ((new Date(u(t.start)).getUTCDay() + 6) % 7) * MS
-  const weeks = [] as { start: number; end: number; demand: number }[]
+  const weeks = [] as { start: number; end: number; demand: number; plan: number }[]
   for (let start = firstMonday; start < u(t.end); start += 7 * MS) {
     const end = Math.min(start + 7 * MS, u(t.end))
     const demand = Array.from({ length: (end - start) / MS }, (_, day) => scheduledHoursByDay.get(isoOf(start + day * MS)) ?? 0).reduce((sum, value) => sum + value, 0)
-    weeks.push({ start, end, demand })
+    weeks.push({ start, end, demand, plan: calendarBudgetForWeek(start) })
   }
-  const max = Math.max(...weeks.map(week => week.demand), 1)
-  return <><b className="tp-label tp-load-label">งบคอร์ส</b><Axis t={t} dayWidth={dayWidth} className="tp-load" style={{ '--budget-radius': `${radius}px` } as CSSProperties}>{weeks.map(week => {
-    const left = Math.max(0, position(isoOf(week.start), t)), right = Math.min(100, position(isoOf(week.end), t))
-    const budget = calendarBudgetForWeek(week.start), state = week.demand > budget * 1.5 ? 'hot' : week.demand > budget ? 'warm' : ''
-    return <i key={week.start} className={state} title={`${fmtDate(isoOf(week.start))} – ${fmtDate(isoOf(week.end - MS))} · งบคอร์ส ${week.demand.toFixed(1)} ชม. / งบปฏิทิน ${budget.toFixed(1)} ชม.`} style={{ left: `${left}%`, width: `${Math.max(.1, right - left)}%`, height: `${Math.max(2, week.demand / max * 26)}px` }} />
+  const max = Math.max(...weeks.flatMap(week => [week.demand, week.plan]), 1), y = (hours: number) => hours / max * LOAD_PLOT
+  return <><b className="tp-label tp-load-label tp-week-label">ชั่วโมงเรียน/สัปดาห์<button className="tp-help" popoverTarget="tp-load-help" aria-label="วิธีอ่านกราฟชั่วโมงเรียนต่อสัปดาห์">?</button><div id="tp-load-help" className="tp-help-pop" popover="auto"><b>วิธีอ่านกราฟนี้</b><p>แต่ละแท่งคือจำนวนชั่วโมงเรียนรวมใน 1 สัปดาห์ เทียบกับเวลาที่ลงไว้ในปฏิทินการเรียน</p><ul><li><i className="ok" />เรียนตามแผน</li><li><i className="over" />ส่วนที่เรียนเกินแผน</li><li><i className="plan" />เวลาที่ลงไว้ในปฏิทินการเรียน</li></ul><p>ชี้ที่แท่งเพื่อดูจำนวนชั่วโมงของสัปดาห์นั้น</p></div></b><Axis t={t} dayWidth={dayWidth} className="tp-load">{weeks.map(week => {
+    const left = Math.max(0, position(isoOf(week.start), t)), right = Math.min(100, position(isoOf(week.end), t)), over = week.demand - week.plan
+    return <span key={week.start} className="tp-week" title={`${fmtDate(isoOf(week.start))} – ${fmtDate(isoOf(week.end - MS))} · ลงไว้ ${week.plan.toFixed(1)} ชม. · เรียนจริง ${week.demand.toFixed(1)} ชม.${over > 0 ? ` · เกิน ${over.toFixed(1)} ชม.` : ''}`} style={{ left: `${left}%`, width: `${Math.max(.1, right - left)}%` }}>
+      <b className="tp-bar" style={{ bottom: LOAD_BASE, height: Math.max(3, y(week.demand)) }}>{over > 0 && <i className="over" style={{ height: y(over) }} />}<i className="ok" /></b>
+      <i className="tp-plan" style={{ bottom: LOAD_BASE + y(week.plan) }} />
+    </span>
   })}</Axis></>
 }
 
@@ -102,5 +104,5 @@ function MobileTimeline({ t, open }: { t: Timeline; open: (id: string) => void }
 export default function MyPathAllTimeline() {
   usePlanVersion()
   const t = allTimeline(), open = useOpenCourse()
-  return <main className="tp-page"><PathHeader active="all" period={t.label} showNavigation={false} /><div className="tp-scroll"><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><MonthHeader t={t} /><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} radius={BUDGET_RADIUS} /></section></div><MobileTimeline t={t} open={open} /><CourseDetailOverlay /><BottomNav active="mypath" /></main>
+  return <main className="tp-page"><PathHeader active="all" period={t.label} showNavigation={false} /><div className="tp-scroll"><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><MonthHeader t={t} /><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} /></section></div><MobileTimeline t={t} open={open} /><CourseDetailOverlay /><BottomNav active="mypath" /></main>
 }

@@ -35,7 +35,7 @@ Lets a learner set their usual available study time, personal school-break perio
 - Daily capacity priority: special day → school-break range → normal weekly setting.
 - A school-break range may not overlap another range. A special day inside a school-break range replaces that day's break hours.
 - Calendar budget is the sum of the final hours for Monday–Sunday. For example, changing one weekday from 1 to 5 hours raises an 11-hour base week to 15 hours.
-- Course budget is the planned course-hours total for that same week. The load chart is normal at or under Calendar budget, orange above it through 150%, and red above 150%.
+- Course budget is the planned course-hours total for that same week. The All weekly-hours chart shows hours within Calendar budget in green and hours above it in red on the same bar, with Calendar budget drawn as a dashed line.
 - Actual study time will later be recorded per course and day; it is intentionally not part of this mock yet.
 - A one-digit special-day hour marker is circular; `10` is a same-height pill.
 - Sliders are visually cloned from the course weekly-hours control; this panel allows 0 (“พัก”).
