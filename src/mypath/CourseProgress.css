@@ -8,6 +8,8 @@
 /* ไอคอนวางบนขอบบนของแถบพอดี (bottom = ความสูงแถบ) · เส้นประอยู่ในแถบเท่านั้น */
 .course-progress-pin{position:absolute;bottom:8px;display:grid;place-items:center;transform:translateX(-50%)}
 .course-progress-pin.flag{transform:translateX(-3px)} /* เสาธงตรงจุด 30% */
+.course-progress-pin.start{transform:none} /* 0% → ชิดซ้าย ไม่ล้นขอบ */
+.course-progress-pin.end{transform:translateX(-100%)} /* 100% → ชิดขวา */
 .course-progress-goal-line{position:absolute;inset:0 auto;border-left:1px dotted #3993ff;transform:translateX(-50%)}
 .course-progress-goal-line.passed{border-color:#fff} /* อยู่บนแถบฟ้าแล้ว → ขาวให้เห็นชัด */
 .course-progress-pin>img{width:16px;min-width:16px;height:16px}

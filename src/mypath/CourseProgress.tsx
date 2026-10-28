@@ -32,8 +32,8 @@ export function CourseProgress({ course }: { course: { id: string; start: string
         <img src={passed[i] ? checkedIcon : i === 0 ? flagIcon : trophyIcon} alt="" />
       </span>)}
       {value < 100
-        ? <span className={`course-progress-pin walker${(GOALS as readonly number[]).includes(value) ? ' on-goal' : ''}`} style={{ left: `${value}%` }}><img src={walkerIcon} alt="" /></span>
-        : <span className="course-progress-pin" style={{ left: '100%' }}><img src={confettiIcon} alt="" /></span>}
+        ? <span className={`course-progress-pin walker${(GOALS as readonly number[]).includes(value) ? ' on-goal' : ''}${value === 0 ? ' start' : ''}`} style={{ left: `${value}%` }}><img src={walkerIcon} alt="" /></span>
+        : <span className="course-progress-pin end" style={{ left: '100%' }}><img src={confettiIcon} alt="" /></span>}
     </div>
     <div className="course-progress-foot">
       <span>คืบหน้า <b>{value}%</b></span>
