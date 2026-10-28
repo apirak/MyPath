@@ -12,6 +12,7 @@ import checkedIcon from '../assets/mypath/progress/checked.svg'
 import walkerIcon from '../assets/mypath/progress/walker.svg'
 import confettiIcon from '../assets/mypath/progress/confetti.svg'
 import eggIcon from '../assets/mypath/progress/egg-speak.svg'
+import HeaderButton from '../components/HeaderButton'
 import './CourseProgress.css'
 
 // แถบความคืบหน้าบนการ์ดคอร์สที่ซื้อแล้ว — Figma 20-46258 (การ์ด) + 3-37233 (สถานะแต่ละ step)
@@ -40,9 +41,9 @@ export function CourseProgress({ course }: { course: { id: string; start: string
         {message.text}{message.date && <> <b>{fmtDate(message.date)}</b></>}
         {message.egg && <img src={eggIcon} alt="" />}
       </span>
-      <button type="button" className="course-progress-start" onClick={stop} onKeyDown={e => e.stopPropagation()}>
+      <HeaderButton type="button" variant="primary" className="course-progress-start" onClick={stop} onKeyDown={e => e.stopPropagation()}>
         <Play size={14} fill="currentColor" />{label}
-      </button>
+      </HeaderButton>
     </div>
   </div>
 }

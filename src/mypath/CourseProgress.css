@@ -18,9 +18,8 @@
 .course-progress-message{display:inline-flex;align-items:center;gap:4px;margin-left:auto;text-align:right}
 .course-progress-message.success{color:#45a72c}
 .course-progress-message>img{width:16px;height:16px}
-.course-progress-start{display:inline-flex;align-items:center;gap:6px;flex:none;border:0;border-radius:8px;background:#0078c4;padding:7px 14px;color:#fff;font-size:13px;font-weight:700;cursor:pointer}
-.course-progress-start:hover{background:#0067a8}
-@media(max-width:640px){.course-progress{padding:22px 10px 10px}.course-progress-foot{flex-wrap:wrap;gap:6px 12px;font-size:11px}.course-progress-start{width:100%;justify-content:center}}
+.course-progress-start{flex:none;font-size:13px}
+@media(max-width:640px){.course-progress{padding:22px 10px 10px}.course-progress-foot{flex-wrap:wrap;gap:6px 12px;font-size:11px}.course-progress-start{width:100%}}
 
 /* แผงทดสอบ (mock) */
 .progress-test-toggle{position:fixed;right:16px;bottom:84px;z-index:40;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:#212529;color:#fff;box-shadow:0 4px 14px #0004;cursor:pointer}
