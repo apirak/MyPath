@@ -1,5 +1,5 @@
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import HeaderButton from './HeaderButton'
 import StudyCalendarPanel from '../mypath/StudyCalendarPanel'
@@ -16,11 +16,16 @@ type PathHeaderProps = {
   onNext?: () => void
 }
 
+// แท็บที่แสดงล่าสุด — Month/All เป็นคนละหน้า header จึง mount ใหม่ เลื่อน pill เฉพาะตอนสลับแท็บ ไม่ใช่ตอนโหลดหน้า
+let lastTab: PathHeaderProps['active'] | null = null
+
 export default function PathHeader({ active, period, now = false, showNavigation = true, canPrev = false, canNext = false, onPrev, onNext }: PathHeaderProps) {
   const [calendarOpen, setCalendarOpen] = useState(false)
   const { search } = useLocation() // พก ?month= (และ query อื่น) ข้ามแท็บ
+  const [slide] = useState(() => lastTab !== null && lastTab !== active) // ล็อกตอน mount — re-render ภายหลังต้องไม่ลบ class
+  useEffect(() => { lastTab = active }, [active])
   return <header className="monthly-header path-header">
-    <div className="monthly-tabs">
+    <div className={slide ? 'monthly-tabs slide' : 'monthly-tabs'} data-active={active}>
       {active === 'month' ? <button className="active">Month</button> : <Link to={{ pathname: '/mypath', search }}>Month</Link>}
       {active === 'all' ? <button className="active">All</button> : <Link to={{ pathname: '/mypath/all', search }}>All</Link>}
     </div>
