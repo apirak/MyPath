@@ -11,10 +11,10 @@ b.tp-events-label.tp-load-label{background:#fff;border-bottom:1px solid #e9ecef}
 .tp-load i.ok{flex:1;background:#5ccb3c}.tp-load i.over{flex:none;background:#ff7a7f}.tp-help-pop li i.ok{background:#5ccb3c}.tp-help-pop li i.over{background:#ff7a7f}
 .tp-plan{position:absolute;left:0;right:0;border-top:1.5px dashed #868e96;opacity:.7}.tp-help-pop li i.plan{height:0;border-radius:0;border-top:1.5px dashed #868e96}
 .tp-no-course{position:absolute;top:50%;left:12px;z-index:2;transform:translateY(-50%);color:#adb5bd;font-size:12px}
-/* All เต็มจอ ไม่มีกรอบ — ป้ายซ้ายอยู่นอก .tp-scroll (แถวตรงกันด้วย subgrid) ตอน overscroll เด้งแค่เนื้อหา, ท้องฟ้าอยู่หลังแถวแรก, กราฟชั่วโมงชิดล่าง */
+/* All เต็มจอ ไม่มีกรอบ — .tp-scroll กว้างเต็ม (คอลัมน์แรก 176px ว่าง) ป้ายซ้ายวางทับจากนอก scroller (แถวตรงกันด้วย subgrid) ตอน overscroll เด้งแค่เนื้อหา; แถวธงไม่มีป้ายทับ ธงเลยเลื่อนผ่านไปถึงขอบจอ, ท้องฟ้าอยู่หลังแถวแรก, กราฟชั่วโมงชิดล่าง */
 .tp-board{position:relative;flex:1;display:grid;grid-template-columns:176px minmax(0,1fr);grid-template-rows:auto auto repeat(var(--rows),auto) 1fr auto}
-.tp-full .tp-scroll{grid-column:2;grid-row:1/-1;position:relative;z-index:1;display:grid;grid-template-rows:subgrid;width:auto;margin:0;border:0;border-radius:0;background:transparent}
-.tp-board>.tp-label{grid-column:1}.tp-scroll .tp-axis{grid-column:1/-1}
+.tp-full .tp-scroll{grid-column:2;grid-row:1/-1;position:relative;z-index:1;display:grid;grid-template-rows:subgrid;width:auto;margin:0 0 0 -176px;border:0;border-radius:0;background:transparent}
+.tp-board>.tp-label{grid-column:1}.tp-board>.tp-events-label{pointer-events:none}.tp-scroll>span.tp-month:first-of-type{grid-column-start:2}
 .tp-full .tp-month-label,.tp-full .tp-month{border-top:2px solid #dee2e6}
 .tp-board b.tp-events-label.tp-load-label,.tp-events-top{background:transparent;border:0}
 .tp-events-top .tp-month-bands,.tp-events-top::after{display:none}

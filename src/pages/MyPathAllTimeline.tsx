@@ -47,7 +47,7 @@ function Axis({ children, t, dayWidth, className = '', style }: { children: Reac
   return <div className={`tp-axis ${className}`} style={style}><MonthBands t={t} dayWidth={dayWidth} />{children}</div>
 }
 
-// แต่ละแถว = [ป้ายซ้าย, เนื้อหา] — ป้ายอยู่นอก .tp-scroll ตอน overscroll เด้งจะได้นิ่ง (เด้งแค่เนื้อหา)
+// แต่ละแถว = [ป้ายซ้าย, เนื้อหา] — ป้ายอยู่นอก .tp-scroll วางทับคอลัมน์แรก ตอน overscroll เด้งจะได้นิ่ง (เด้งแค่เนื้อหา)
 type Row = [ReactNode, ReactNode]
 
 function monthHeader(t: Timeline): Row {
@@ -128,5 +128,5 @@ export default function MyPathAllTimeline() {
   const header = <PathHeader active="all" period={t.label} showNavigation={false} />
   const rows: Row[] = [eventRow(t, MONTH_DAY_WIDTH), monthHeader(t), ...subjects.map(subject => subjectRow(subject, t, MONTH_DAY_WIDTH, open)), [<b className="tp-label tp-spacer" />, <Axis t={t} dayWidth={MONTH_DAY_WIDTH} className="tp-spacer">{null}</Axis>], weeklyLoad(t, MONTH_DAY_WIDTH)]
   if (subjects.length === 0) return <main className="path-page tp-page"><div className="path-screen">{header}<div className="path-scroll"><PlanEmptyState /></div></div></main>
-  return <main className="path-page tp-page tp-full tp-sky-page"><div className="path-screen">{header}<MobileHead /><div className="path-scroll"><div className="tp-board" style={{ '--rows': subjects.length } as CSSProperties}><Sky />{rows.map(([label], i) => <Fragment key={i}>{label}</Fragment>)}<div className="tp-scroll" style={{ gridTemplateColumns: monthColumns(t) }} onScroll={e => e.currentTarget.parentElement!.style.setProperty('--sx', String(e.currentTarget.scrollLeft))}>{rows.map(([, axis], i) => <Fragment key={i}>{axis}</Fragment>)}</div></div><MobileTimeline t={t} open={open} /></div><CourseDetailOverlay /></div></main>
+  return <main className="path-page tp-page tp-full tp-sky-page"><div className="path-screen">{header}<MobileHead /><div className="path-scroll"><div className="tp-board" style={{ '--rows': subjects.length } as CSSProperties}><Sky />{rows.map(([label], i) => <Fragment key={i}>{label}</Fragment>)}<div className="tp-scroll" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }} onScroll={e => e.currentTarget.parentElement!.style.setProperty('--sx', String(e.currentTarget.scrollLeft))}>{rows.map(([, axis], i) => <Fragment key={i}>{axis}</Fragment>)}</div></div><MobileTimeline t={t} open={open} /></div><CourseDetailOverlay /></div></main>
 }
