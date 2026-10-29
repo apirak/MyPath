@@ -1,4 +1,4 @@
-import { useRef, type CSSProperties } from 'react'
+import { type CSSProperties } from 'react'
 import PathHeader from '../components/PathHeader'
 import { AXIS_END, AXIS_START, MS, TODAY, addDays, calendarBudgetForWeek, events, fmtDate, fmtShort, isoOf, scheduledHoursByDay, subjects, type Course, u, usePlanVersion } from '../mypath/plan'
 import { CourseDetailOverlay, useOpenCourse } from '../mypath/CourseDetailOverlay'
@@ -51,7 +51,7 @@ function MonthHeader({ t }: { t: Timeline }) {
   return <><b className="tp-label tp-month-label">แผนการเรียน</b>{t.months.map(month => <span key={month.start} className={`tp-month ${u(TODAY) >= u(month.start) && u(TODAY) < u(month.end) ? 'now' : ''}`}>{month.label}</span>)}</>
 }
 
-// ธงวันสำคัญอยู่เหนือหัวเดือน นอกตาราง (ใน .tp-events-strip) ชั้นแรกชิดตารางแล้วซ้อนขึ้น — กว้างประมาณเป็น px ที่ความกว้างวันต่ำสุด เลยไม่ทับกัน
+// ธงวันสำคัญอยู่เหนือหัวเดือน (ใน .tp-events-strip — scroller เดียวกับตาราง) ชั้นแรกชิดตารางแล้วซ้อนขึ้น — กว้างประมาณเป็น px ที่ความกว้างวันต่ำสุด เลยไม่ทับกัน
 function EventRow({ t, dayWidth }: { t: Timeline; dayWidth: number }) {
   const ends: number[] = []
   const shown = events.filter(event => u(event.date) >= u(t.start) && u(event.date) < u(t.end)).sort((a, b) => u(a.date) - u(b.date)).map(event => {
@@ -90,7 +90,7 @@ function WeeklyLoad({ t, dayWidth }: { t: Timeline; dayWidth: number }) {
   })}</Axis></>
 }
 
-// ฉากท้องฟ้าหลังธงวันสำคัญ — parallax ตาม --sx (scrollLeft): เมฆ 0.4 (ไกล 0.2), หญ้าเลื่อน 1:1 อยู่ใน strip
+// ฉากท้องฟ้าหลังธงวันสำคัญ — sticky ซ้าย, parallax ตาม --sx (scrollLeft): เมฆ 0.4 (ไกล 0.2), หญ้าเลื่อน 1:1 อยู่ใน strip
 const CLOUDS = [{ left: -4, top: 34, scale: 1.1, dur: 30, far: false }, { left: 30, top: 10, scale: .6, dur: 40, far: true }, { left: 52, top: 46, scale: 1, dur: 34, far: false }, { left: 78, top: 16, scale: .7, dur: 44, far: true }, { left: 104, top: 40, scale: 1.2, dur: 32, far: false }, { left: 124, top: 8, scale: .6, dur: 42, far: true }]
 const GRASS = [1, 4.5, 9, 13, 18.5, 22, 27, 31.5, 35, 40, 44.5, 48, 53, 57.5, 61, 66, 70.5, 74, 79, 83.5, 87, 92, 96, 99]
 function Sky() {
@@ -121,8 +121,8 @@ function MobileTimeline({ t, open }: { t: Timeline; open: (id: string) => void }
 
 export default function MyPathAllTimeline() {
   usePlanVersion()
-  const t = allTimeline(), open = useOpenCourse(), strip = useRef<HTMLDivElement>(null)
+  const t = allTimeline(), open = useOpenCourse()
   const header = <PathHeader active="all" period={t.label} showNavigation={false} />
   if (subjects.length === 0) return <main className="path-page tp-page"><div className="path-screen">{header}<div className="path-scroll"><PlanEmptyState /></div></div></main>
-  return <main className="path-page tp-page tp-full tp-sky-page"><div className="path-screen">{header}<MobileHead /><div className="path-scroll"><div className="tp-sky"><Sky /><div ref={strip} className="tp-events-strip"><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} /><Grass /></section></div></div><div className="tp-scroll" onScroll={e => { const x = e.currentTarget.scrollLeft; if (strip.current) { strip.current.scrollLeft = x; strip.current.parentElement!.style.setProperty('--sx', String(x)) } }}><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}`, '--rows': subjects.length } as CSSProperties}><MonthHeader t={t} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<b className="tp-label tp-spacer" /><Axis t={t} dayWidth={MONTH_DAY_WIDTH} className="tp-spacer">{null}</Axis><WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} /></section></div><MobileTimeline t={t} open={open} /></div><CourseDetailOverlay /></div></main>
+  return <main className="path-page tp-page tp-full tp-sky-page"><div className="path-screen">{header}<MobileHead /><div className="path-scroll"><div className="tp-scroll" onScroll={e => e.currentTarget.style.setProperty('--sx', String(e.currentTarget.scrollLeft))}><div className="tp-sky"><Sky /><section className="tp-grid tp-events-strip" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} /><Grass /></section></div><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}`, '--rows': subjects.length } as CSSProperties}><MonthHeader t={t} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<b className="tp-label tp-spacer" /><Axis t={t} dayWidth={MONTH_DAY_WIDTH} className="tp-spacer">{null}</Axis><WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} /></section></div><MobileTimeline t={t} open={open} /></div><CourseDetailOverlay /></div></main>
 }

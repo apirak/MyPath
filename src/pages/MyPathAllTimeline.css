@@ -11,25 +11,24 @@ b.tp-events-label.tp-load-label{background:#fff;border-bottom:1px solid #e9ecef}
 .tp-load i.ok{flex:1;background:#5ccb3c}.tp-load i.over{flex:none;background:#ff7a7f}.tp-help-pop li i.ok{background:#5ccb3c}.tp-help-pop li i.over{background:#ff7a7f}
 .tp-plan{position:absolute;left:0;right:0;border-top:1.5px dashed #868e96;opacity:.7}.tp-help-pop li i.plan{height:0;border-radius:0;border-top:1.5px dashed #868e96}
 .tp-no-course{position:absolute;top:50%;left:12px;z-index:2;transform:translateY(-50%);color:#adb5bd;font-size:12px}
-/* All เต็มจอ ไม่มีกรอบ — ธงอยู่ใน strip นอกตาราง เลื่อนแนวนอนตาม .tp-scroll, ตารางยืดเต็มความสูง กราฟชั่วโมงชิดล่าง */
-.tp-sky{position:relative;z-index:8;margin-bottom:-6px;padding-top:14px}
-.tp-events-strip{position:relative;overflow:hidden;pointer-events:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 32px);mask-image:linear-gradient(90deg,transparent,#000 32px)}
-.tp-events-strip .tp-grid,.tp-events-strip b.tp-events-label.tp-load-label,.tp-events-top{background:transparent;border:0}
+/* All เต็มจอ ไม่มีกรอบ — ท้องฟ้า+ธงอยู่ใน .tp-scroll เดียวกับตาราง เลื่อนแนวนอนพร้อมกันโดยไม่ต้อง sync, ตารางยืดเต็มความสูง กราฟชั่วโมงชิดล่าง */
+.tp-sky{position:relative;z-index:8;display:grid;width:max-content;min-width:100%;margin-bottom:-6px}
+.tp-events-strip{grid-area:1/1;position:relative;padding-top:14px}
+.tp-events-strip.tp-grid,.tp-events-strip b.tp-events-label.tp-load-label,.tp-events-top{background:transparent;border:0}
 .tp-events-top .tp-month-bands,.tp-events-top::after{display:none}
 .tp-events-top .tp-event-marker{bottom:-1px}
 .tp-full .path-scroll{display:flex;flex-direction:column;padding:0}
-.tp-full .tp-scroll{position:relative;z-index:9;flex:1;display:flex;margin:0;border:0;border-top:2px solid #dee2e6;border-radius:0}
-.tp-full .tp-scroll .tp-grid{min-height:100%;grid-template-rows:auto repeat(var(--rows),auto) 1fr auto}
+.tp-full .tp-scroll{flex:1;display:flex;flex-direction:column;container-type:inline-size;margin:0;border:0;border-radius:0}
+.tp-full .tp-sky+.tp-grid{position:relative;z-index:9;flex:1;grid-template-rows:auto repeat(var(--rows),auto) 1fr auto;border-top:2px solid #dee2e6}
 .tp-full .tp-spacer{min-height:0;border-bottom:1px solid #dee2e6}
 /* มือถือ: วันสำคัญอยู่ในตารางรายเดือนแล้ว ไม่ต้องมี strip */
 @media(max-width:640px){.tp-sky,.tp-full .tp-scroll{display:none}.tp-full .path-scroll{display:block;padding:0 0 24px}}
 /* ท้องฟ้าหลังธงวันสำคัญ — flat style ตาม theme Learn Anywhere (ฟ้า cyan → mint) */
-.tp-sky-page .tp-sky{overflow:hidden;background:linear-gradient(#9fe7fb,#bdf0f2 60%,#d6f6ec)}
-.tp-sky-scene{position:absolute;inset:0 0 6px;pointer-events:none}
+.tp-sky-page .tp-sky{overflow:clip;background:linear-gradient(#9fe7fb,#bdf0f2 60%,#d6f6ec)}
+.tp-sky-scene{grid-area:1/1;position:sticky;left:0;width:100cqw;margin-bottom:6px;overflow:clip;pointer-events:none}
 .tp-clouds{position:absolute;inset:0;transform:translateX(calc(var(--sx,0) * -.4px))}
 .tp-clouds.far{transform:translateX(calc(var(--sx,0) * -.2px));opacity:.7}
 .tp-cloud{position:absolute;height:auto;fill:#effdff;animation:tp-drift 30s ease-in-out infinite alternate}
-.tp-sky-page .tp-events-strip .tp-grid{position:relative}
 .tp-grass-row{position:absolute;inset:auto 0 5px 176px;height:14px;z-index:0}
 .tp-grass{position:absolute;bottom:0;width:16px;height:auto;fill:#8cc63f;transform-origin:50% 100%;animation:tp-sway 3.2s ease-in-out infinite}
 .tp-grass:nth-child(3n){fill:#a6cf4f}
