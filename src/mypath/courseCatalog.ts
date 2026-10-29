@@ -12,17 +12,17 @@ export type CatalogSubject = { name: string; color: string; courses: CourseCatal
 
 // วิชาทั้งหมดที่เลือกได้ในปฏิทินการเรียน — ลำดับนี้คือลำดับแถวใน All (ภายหลังผู้เรียนจะจัดเองได้)
 export const subjectGroups = [
-  { name: 'TPAT / TGAT', subjects: ['TPAT', 'TGAT'] },
-  { name: 'กลุ่มคณิตศาสตร์และวิทยาศาสตร์', subjects: ['คณิต', 'วิทยาศาสตร์', 'ฟิสิกส์', 'เคมี', 'ชีววิทยา'] },
+  { name: 'TGAT / TPAT', subjects: ['TGAT', 'TPAT1', 'TPAT2', 'TPAT3', 'TPAT4', 'TPAT5'] },
+  { name: 'กลุ่มคณิตศาสตร์และวิทยาศาสตร์', subjects: ['คณิต 1', 'คณิต 2', 'วิทยาศาสตร์', 'ฟิสิกส์', 'เคมี', 'ชีววิทยา'] },
   { name: 'กลุ่มภาษาและสังคม', subjects: ['ภาษาไทย', 'สังคม', 'อังกฤษ', 'ฝรั่งเศส', 'เยอรมัน', 'ญี่ปุ่น', 'เกาหลี', 'จีน', 'สเปน', 'บาลี'] },
 ]
 
 export const courseCatalog: CatalogSubject[] = [
-  { name: 'TPAT', color: '#a51d1d', courses: [
+  { name: 'TPAT3', color: '#a51d1d', courses: [
     { id: 'TPAT3.1', name: 'ติวเข้มความถนัด วิศวะ (TPAT3)', short: 'ติวเข้ม TPAT3', abbr: 'ติวเข้ม', hours: 30 },
     { id: 'TPAT3.2', name: 'ตะลุยโจทย์ TPAT3 · ทำข้อสอบเก่า', short: 'ทำข้อสอบเก่า', abbr: 'ทำข้อสอบ', hours: 18 },
   ]},
-  { name: 'คณิต', color: '#0078c4', courses: [
+  { name: 'คณิต 1', color: '#0078c4', courses: [
     { id: 'MATH.1', name: 'Applied Math Admissions TCAS เล่ม 1 (For Dek70)', short: 'เล่ม 1', abbr: 'ล. 1', hours: 24, cover: '/cover/Math_TCAS70_1.png' },
     { id: 'MATH.2', name: 'Applied Math Admissions TCAS เล่ม 2 (For Dek70)', short: 'เล่ม 2', abbr: 'ล. 2', hours: 24, cover: '/cover/Math_TCAS70_2.png' },
     { id: 'MATH.3', name: 'Applied Math Admissions TCAS เล่ม 3', short: 'เล่ม 3', abbr: 'ล. 3', hours: 18, cover: '/cover/Math_TCAS70_3.png' },
