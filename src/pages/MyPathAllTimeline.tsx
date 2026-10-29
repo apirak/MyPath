@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { useRef, type CSSProperties } from 'react'
 import PathHeader from '../components/PathHeader'
 import { AXIS_END, AXIS_START, MS, TODAY, addDays, calendarBudgetForWeek, events, fmtDate, fmtShort, isoOf, scheduledHoursByDay, subjects, type Course, u, usePlanVersion } from '../mypath/plan'
 import { CourseDetailOverlay, useOpenCourse } from '../mypath/CourseDetailOverlay'
@@ -51,16 +51,17 @@ function MonthHeader({ t }: { t: Timeline }) {
   return <><b className="tp-label tp-month-label">แผนการเรียน</b>{t.months.map(month => <span key={month.start} className={`tp-month ${u(TODAY) >= u(month.start) && u(TODAY) < u(month.end) ? 'now' : ''}`}>{month.label}</span>)}</>
 }
 
+// ธงวันสำคัญอยู่เหนือหัวเดือน นอกตาราง (ใน .tp-events-strip) ชั้นแรกชิดตารางแล้วซ้อนขึ้น — กว้างประมาณเป็น px ที่ความกว้างวันต่ำสุด เลยไม่ทับกัน
 function EventRow({ t, dayWidth }: { t: Timeline; dayWidth: number }) {
   const ends: number[] = []
   const shown = events.filter(event => u(event.date) >= u(t.start) && u(event.date) < u(t.end)).sort((a, b) => u(a.date) - u(b.date)).map(event => {
-    const day = (u(event.date) - u(t.start)) / MS, half = Math.max(9, event.label.length * 1.1)
+    const day = (u(event.date) - u(t.start)) / MS, half = (Math.min(118, event.label.length * 6.5 + 14) / 2 + 4) / dayWidth
     let lane = ends.findIndex(end => end <= day - half)
     if (lane < 0) { lane = ends.length; ends.push(day + half) } else ends[lane] = day + half
     return { event, lane }
   })
   const height = Math.max(76, ends.length * 44 + 24)
-  return <><b className="tp-label tp-events-label tp-load-label" style={{ minHeight: height }}>วันสำคัญ</b><Axis t={t} dayWidth={dayWidth} className="tp-events" style={{ minHeight: height }}>{shown.map(({ event, lane }) => <span key={event.id} className={`tp-event ${event.kind}${event.owned ? '' : ' no'}`} style={{ left: `${position(event.date, t)}%`, top: lane * 44 + 8, '--line': `${Math.max(8, height - lane * 44 - 55)}px` } as CSSProperties}>{event.label}<small>{fmtDate(event.date)}</small></span>)}{shown.map(({ event }) => <i key={`${event.id}-marker`} className={`tp-event-marker ${event.kind}${event.owned ? '' : ' no'}`} style={{ left: `${position(event.date, t)}%` }} />)}</Axis></>
+  return <><b className="tp-label tp-events-label tp-load-label" style={{ minHeight: height }}></b><Axis t={t} dayWidth={dayWidth} className="tp-events tp-events-top" style={{ minHeight: height }}>{shown.map(({ event, lane }) => <span key={event.id} className={`tp-event ${event.kind}${event.owned ? '' : ' no'}`} style={{ left: `${position(event.date, t)}%`, bottom: lane * 44 + 20, '--line': `${lane * 44 + 14}px` } as CSSProperties}>{event.label}<small>{fmtDate(event.date)}</small></span>)}{shown.map(({ event }) => <i key={`${event.id}-marker`} className={`tp-event-marker ${event.kind}${event.owned ? '' : ' no'}`} style={{ left: `${position(event.date, t)}%` }} />)}</Axis></>
 }
 
 function SubjectRow({ subject, t, dayWidth, open }: { subject: typeof subjects[number]; t: Timeline; dayWidth: number; open: (id: string) => void }) {
@@ -89,6 +90,18 @@ function WeeklyLoad({ t, dayWidth }: { t: Timeline; dayWidth: number }) {
   })}</Axis></>
 }
 
+// ฉากท้องฟ้าหลังธงวันสำคัญ — parallax ตาม --sx (scrollLeft): เมฆ 0.4 (ไกล 0.2), หญ้าเลื่อน 1:1 อยู่ใน strip
+const CLOUDS = [{ left: -4, top: 34, scale: 1.1, dur: 30, far: false }, { left: 30, top: 10, scale: .6, dur: 40, far: true }, { left: 52, top: 46, scale: 1, dur: 34, far: false }, { left: 78, top: 16, scale: .7, dur: 44, far: true }, { left: 104, top: 40, scale: 1.2, dur: 32, far: false }, { left: 124, top: 8, scale: .6, dur: 42, far: true }]
+const GRASS = [1, 4.5, 9, 13, 18.5, 22, 27, 31.5, 35, 40, 44.5, 48, 53, 57.5, 61, 66, 70.5, 74, 79, 83.5, 87, 92, 96, 99]
+function Sky() {
+  return <div className="tp-sky-scene" aria-hidden="true">
+    {[true, false].map(far => <div key={String(far)} className={`tp-clouds${far ? ' far' : ''}`}>{CLOUDS.filter(c => c.far === far).map((c, i) => <svg key={i} className="tp-cloud" viewBox="0 0 260 56" style={{ left: `${c.left}%`, top: c.top, width: 260 * c.scale, animationDuration: `${c.dur}s`, animationDelay: `${-i * 9}s` }}><path d="M0 56c6-14 26-20 44-14 6-18 32-26 50-12 12-24 52-26 66 0 10-8 28-6 36 6 14-6 32-2 44 12 8 0 16 4 20 8z" /></svg>)}</div>)}
+  </div>
+}
+function Grass() {
+  return <div className="tp-grass-row" aria-hidden="true">{GRASS.map((left, i) => <svg key={left} className="tp-grass" viewBox="0 0 20 10" style={{ left: `${left}%`, animationDelay: `${-i * .37}s`, scale: i % 3 ? '1' : '1.4' }}><path d="M1 10C3 6 4 4 4 0c2 3 3 6 3 10M6 10c1-4 3-6 7-8-2 3-3 5-3 8M10 10c2-3 5-5 9-5-3 2-5 3-6 5z" /></svg>)}</div>
+}
+
 // หัววิชาของ timeline มือถือ — อยู่นอก .path-scroll ให้นิ่งคู่ header
 function MobileHead() {
   return <div className="tp-mobile-head"><i />{subjects.map(subject => <b key={subject.name}><i style={{ background: subject.color }} />{subject.name}</b>)}</div>
@@ -108,8 +121,8 @@ function MobileTimeline({ t, open }: { t: Timeline; open: (id: string) => void }
 
 export default function MyPathAllTimeline() {
   usePlanVersion()
-  const t = allTimeline(), open = useOpenCourse()
+  const t = allTimeline(), open = useOpenCourse(), strip = useRef<HTMLDivElement>(null)
   const header = <PathHeader active="all" period={t.label} showNavigation={false} />
   if (subjects.length === 0) return <main className="path-page tp-page"><div className="path-screen">{header}<div className="path-scroll"><PlanEmptyState /></div></div></main>
-  return <main className="path-page tp-page"><div className="path-screen">{header}<MobileHead /><div className="path-scroll"><div className="tp-scroll"><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><MonthHeader t={t} /><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} /></section></div><MobileTimeline t={t} open={open} /></div><CourseDetailOverlay /></div></main>
+  return <main className="path-page tp-page tp-full tp-sky-page"><div className="path-screen">{header}<MobileHead /><div className="path-scroll"><div className="tp-sky"><Sky /><div ref={strip} className="tp-events-strip"><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} /><Grass /></section></div></div><div className="tp-scroll" onScroll={e => { const x = e.currentTarget.scrollLeft; if (strip.current) { strip.current.scrollLeft = x; strip.current.parentElement!.style.setProperty('--sx', String(x)) } }}><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}`, '--rows': subjects.length } as CSSProperties}><MonthHeader t={t} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<b className="tp-label tp-spacer" /><Axis t={t} dayWidth={MONTH_DAY_WIDTH} className="tp-spacer">{null}</Axis><WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} /></section></div><MobileTimeline t={t} open={open} /></div><CourseDetailOverlay /></div></main>
 }
