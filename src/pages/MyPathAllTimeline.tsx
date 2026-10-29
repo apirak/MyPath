@@ -1,6 +1,6 @@
-import { type CSSProperties } from 'react'
+import { type CSSProperties, useLayoutEffect, useRef } from 'react'
 import PathHeader from '../components/PathHeader'
-import { AXIS_END, AXIS_START, MS, TODAY, addDays, calendarBudgetForWeek, events, fmtDate, fmtShort, isoOf, scheduledHoursByDay, setCourseStartDate, subjects, type Course, u, usePlanVersion } from '../mypath/plan'
+import { AXIS_END, AXIS_START, MS, TODAY, addDays, axisLabel, calendarBudgetForWeek, events, fmtDate, fmtShort, holdAxis, isoOf, scheduledHoursByDay, setCourseStartDate, subjects, type Course, u, usePlanVersion } from '../mypath/plan'
 import { CourseDetailOverlay, useOpenCourse } from '../mypath/CourseDetailOverlay'
 import PlanEmptyState from '../mypath/PlanEmptyState'
 import './MyPathAllTimeline.css'
@@ -21,7 +21,7 @@ function allTimeline(): Timeline {
     months.push({ start, end, days, label: `${monthNames[month - 1]} ${String(year + 543).slice(2)}` })
     start = end
   }
-  return { start: AXIS_START, end: AXIS_END, days: (u(AXIS_END) - u(AXIS_START)) / MS, months, label: 'ต.ค. 69 – เม.ย. 71' }
+  return { start: AXIS_START, end: AXIS_END, days: (u(AXIS_END) - u(AXIS_START)) / MS, months, label: axisLabel }
 }
 
 if (import.meta.env.DEV) {
@@ -71,11 +71,12 @@ function dragStart(event: React.PointerEvent<HTMLElement>, course: Course, t: Ti
   const pxPerDay = grip.closest('.tp-axis')!.getBoundingClientRect().width / t.days
   let last = 0
   grip.setPointerCapture(event.pointerId)
+  holdAxis(true)
   grip.onpointermove = move => {
     const days = Math.round((move.clientX - startX) / pxPerDay)
     if (days !== last) { last = days; setCourseStartDate(course.id, addDays(base, days)) }
   }
-  grip.onpointerup = grip.onpointercancel = () => { grip.onpointermove = grip.onpointerup = grip.onpointercancel = null }
+  grip.onpointerup = grip.onpointercancel = () => { grip.onpointermove = grip.onpointerup = grip.onpointercancel = null; holdAxis(false) }
 }
 
 function SubjectRow({ subject, t, dayWidth, open }: { subject: typeof subjects[number]; t: Timeline; dayWidth: number; open: (id: string) => void }) {
@@ -135,10 +136,33 @@ function MobileTimeline({ t, open }: { t: Timeline; open: (id: string) => void }
   })}</div></section>
 }
 
+// scroll ของ All ต่อ session JS (รีเฟรช = เริ่มใหม่): ครั้งแรกเลื่อนไปวันนี้ — desktop วันนี้กลางจอ (browser clamp ที่ขอบเอง),
+// มือถือเดือนนี้ชิดใต้หัววิชา · ครั้งต่อไปคืนตำแหน่งเดิมเป็น px (แกนขยับระหว่างนั้นได้ ยอมรับ)
+let savedScroll: number[][] | undefined
+function useScrollToToday(t: Timeline) {
+  const ref = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const page = ref.current, grid = page?.querySelector<HTMLElement>('.tp-scroll')
+    if (!page || !grid) return
+    const scrollers = [grid, page], saved = savedScroll
+    if (saved) scrollers.forEach((el, i) => { el.scrollLeft = saved[i][0]; el.scrollTop = saved[i][1] })
+    else if (grid.clientWidth) {
+      const axis = grid.querySelector('.tp-axis')!.getBoundingClientRect(), box = grid.getBoundingClientRect()
+      const today = axis.left - box.left + grid.scrollLeft + position(TODAY, t) / 100 * axis.width
+      grid.scrollLeft = today - (176 + grid.clientWidth) / 2 // 176 = คอลัมน์ชื่อวิชา sticky
+    } else {
+      const now = page.querySelector('.tp-mobile-month.now'), head = page.querySelector<HTMLElement>('.tp-mobile-head')
+      if (now && head) page.scrollTop += now.getBoundingClientRect().top - page.getBoundingClientRect().top - head.offsetHeight
+    }
+    return () => { savedScroll = scrollers.map(el => [el.scrollLeft, el.scrollTop]) }
+  }, [])
+  return ref
+}
+
 export default function MyPathAllTimeline() {
   usePlanVersion()
-  const t = allTimeline(), open = useOpenCourse()
+  const t = allTimeline(), open = useOpenCourse(), scrollRef = useScrollToToday(t)
   const header = <PathHeader active="all" period={t.label} showNavigation={false} />
   if (subjects.length === 0) return <main className="path-page tp-page"><div className="path-screen">{header}<div className="path-scroll"><PlanEmptyState /></div></div></main>
-  return <main className="path-page tp-page tp-full tp-sky-page"><div className="path-screen">{header}<div className="path-scroll"><div className="tp-scroll" onScroll={e => e.currentTarget.style.setProperty('--sx', String(e.currentTarget.scrollLeft))}><div className="tp-sky"><Sky /><section className="tp-grid tp-events-strip" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} /><Grass /></section></div><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}`, '--rows': subjects.length } as CSSProperties}><MonthHeader t={t} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<b className="tp-label tp-spacer" /><Axis t={t} dayWidth={MONTH_DAY_WIDTH} className="tp-spacer">{null}</Axis><WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} /></section></div><MobileTimeline t={t} open={open} /></div><CourseDetailOverlay /></div></main>
+  return <main className="path-page tp-page tp-full tp-sky-page"><div className="path-screen">{header}<div className="path-scroll" ref={scrollRef}><div className="tp-scroll" onScroll={e => e.currentTarget.style.setProperty('--sx', String(e.currentTarget.scrollLeft))}><div className="tp-sky"><Sky /><section className="tp-grid tp-events-strip" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} /><Grass /></section></div><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}`, '--rows': subjects.length } as CSSProperties}><MonthHeader t={t} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<b className="tp-label tp-spacer" /><Axis t={t} dayWidth={MONTH_DAY_WIDTH} className="tp-spacer">{null}</Axis><WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} /></section></div><MobileTimeline t={t} open={open} /></div><CourseDetailOverlay /></div></main>
 }

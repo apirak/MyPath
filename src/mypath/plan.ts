@@ -9,10 +9,11 @@ export const MS = 86_400_000
 export const u = (iso: string) => { const [y, m, d] = iso.split('-').map(Number); return Date.UTC(y, m - 1, d) }
 export const isoOf = (ms: number) => new Date(ms).toISOString().slice(0, 10)
 export const addDays = (iso: string, n: number) => isoOf(u(iso) + n * MS)
-export const AXIS_START = '2026-10-01'
-export let AXIS_END = '2028-03-01' // exclusive; recalc ถึงสิ้นเดือนของคอร์สสุดท้าย
+// แกนเดือนครอบทุกคอร์ส + วันสอบ: เริ่มต้นเดือนของสิ่งแรก ถึงสิ้นเดือนของสิ่งสุดท้าย (หรือ TODAY) — recalc ทุก rebuildPlan
+export let AXIS_START = '2026-10-01'
+export let AXIS_END = '2028-03-01' // exclusive
 export let TOTAL_DAYS = (u(AXIS_END) - u(AXIS_START)) / MS
-const DAY_START = u('2026-08-01') // วันเริ่ม simulation; แกน All ยังเริ่ม 1 ต.ค.
+const DAY_START = u('2026-08-01') // วันเริ่ม simulation = วันเริ่มเร็วสุดที่ลากคอร์สไปได้
 // เผื่อเวลาหลังแกน All เพื่อไม่ตัดคอร์สที่ยังเรียนไม่จบเมื่อปรับปฏิทิน
 const DAY_LAST = u('2028-04-30')
 
@@ -73,8 +74,16 @@ export const calendarHoursForDay = (iso: string) => {
 export const calendarBudgetForWeek = (monday: number) =>
   Array.from({ length: 7 }, (_, day) => calendarHoursForDay(isoOf(monday + day * MS))).reduce((sum, hours) => sum + hours, 0)
 
-const rebuildAxis = (lastCourseEnd: number) => {
-  const last = new Date(lastCourseEnd)
+// ระหว่างลากหัวคอร์ส แกนคงที่ (คอลัมน์ไม่กระโดดใต้เมาส์) — ปล่อยแล้วค่อยคิดแกนใหม่
+let axisHeld = false
+export const holdAxis = (hold: boolean) => {
+  axisHeld = hold
+  if (!hold) { rebuildPlan(); planVersion += 1; listeners.forEach(listener => listener()) }
+}
+
+const rebuildAxis = (first: number, lastDay: number) => {
+  const last = new Date(lastDay)
+  AXIS_START = `${isoOf(first).slice(0, 7)}-01`
   AXIS_END = isoOf(Date.UTC(last.getUTCFullYear(), last.getUTCMonth() + 1, 1))
   TOTAL_DAYS = (u(AXIS_END) - u(AXIS_START)) / MS
   const out: { label: string; days: number }[] = []
@@ -132,7 +141,8 @@ export const rebuildPlan = () => {
     return { ...c, owned: student?.owned, startDate: student?.startDate, followPrevious: !!student?.followPrevious && index > 0, followPreviousWeeklyHours, weeklyHours, estimatedWeeks: estimatedWeeksFor(c.hours, weeklyHours), start: isoOf(starts.get(c.id) ?? DAY_LAST), end: isoOf(ends.get(c.id) ?? DAY_LAST) }
   }) }))
   totalHours = subjects.reduce((t, s) => t + s.courses.reduce((a, c) => a + c.hours, 0), 0)
-  rebuildAxis(Math.max(u(TODAY), ...ends.values()))
+  const eventDays = events.map(event => u(event.date))
+  if (!axisHeld) rebuildAxis(Math.min(...starts.values(), ...eventDays), Math.max(u(TODAY), ...ends.values(), ...eventDays))
 }
 
 export const setCourseWeeklyHours = (courseId: string, weeklyHours: number) => {
@@ -173,8 +183,6 @@ export const setStudyCalendar = (next: typeof studyCalendar) => {
   return true
 }
 
-rebuildPlan()
-if (import.meta.env.DEV && (estimatedWeeksFor(30, 5) !== 6 || weeklyHoursFor(3, true, 7) !== 7 || !isFirstCourse('MATH.1') || isFirstCourse('MATH.2') || !studentCourses.some(c => c.courseId === 'MATH.2') || calendarBudgetForWeek(u('2026-12-07')) !== 13 || calendarBudgetForWeek(u('2026-12-21')) !== 14)) throw new Error('weekly course calculation failed')
 
 // จาก SAMPLE_DATA/exam-dates.md (เจ้าของจัดใหม่ตามภาพ Plan Canvas 20.37.58) — สอบจริง 2 + Mock 6, ทุกรายการ 1 วัน
 // สีตามตำนานภาพ: น้ำเงิน = สอบจริง, แดง = Mock · เข้ม = ซื้อแล้ว, อ่อน = ยังไม่ได้ซื้อ (ซื้อครบยกเว้น Mock CBT)
@@ -188,6 +196,10 @@ export const events: ExamEvent[] = [
   { id: 'M6', date: '2028-01-23', label: 'Mock 2 A-Level', kind: 'mock', owned: true },
   { id: 'X2', date: '2028-02-06', label: 'สอบ A-Level', kind: 'exam', owned: true },
 ]
+
+// คิดแผนครั้งแรกหลังประกาศ events (แกนเดือนอ่านวันสอบด้วย)
+rebuildPlan()
+if (import.meta.env.DEV && (estimatedWeeksFor(30, 5) !== 6 || weeklyHoursFor(3, true, 7) !== 7 || !isFirstCourse('MATH.1') || isFirstCourse('MATH.2') || !studentCourses.some(c => c.courseId === 'MATH.2') || calendarBudgetForWeek(u('2026-12-07')) !== 13 || calendarBudgetForWeek(u('2026-12-21')) !== 14)) throw new Error('weekly course calculation failed')
 
 export { courseCatalog, studyCalendar, studentCourses }
 
