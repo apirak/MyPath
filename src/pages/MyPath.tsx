@@ -8,7 +8,7 @@ import { useOpenCourse, CourseDetailOverlay } from '../mypath/CourseDetailOverla
 import { CourseProgress, ProgressTestPanel } from '../mypath/CourseProgress'
 import {
   TODAY, AXIS_START, AXIS_END, u, addMonths, monthStartOf, dayOf, monthShortOf,
-  fmtDate, fmtMonth, fmtShort, agendaFor, subjects, events, totalHours, KIND_COLOR, studyCalendar,
+  fmtDate, fmtMonth, fmtShort, agendaFor, subjects, KIND_COLOR,
   usePlanVersion,
   type Agenda, type AgendaCourse, type ExamEvent,
 } from '../mypath/plan'
@@ -124,11 +124,6 @@ export default function MyPath() {
       </div>
       <CourseDetailOverlay />
     </div>
-    {/* ของ mock — อยู่นอก .path-screen จะได้ไม่ติดไปตอนย้ายเข้าแอปจริง */}
-    <details className="prototype-data">
-      <summary>ข้อมูล mock (plan.ts · วันนี้ = {fmtDate(TODAY)})</summary>
-      <pre>{JSON.stringify({ TODAY, totalHours, studyCalendar, subjects, events, agenda }, null, 2)}</pre>
-    </details>
     <ProgressTestPanel />
   </main>
 }
