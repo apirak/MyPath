@@ -36,3 +36,6 @@ b.tp-events-label.tp-load-label{background:#fff;border-bottom:1px solid #e9ecef}
 @keyframes tp-drift{to{translate:50px 0}}
 @keyframes tp-sway{0%,100%{rotate:-6deg}50%{rotate:6deg}}
 @media(prefers-reduced-motion:reduce){.tp-cloud,.tp-grass{animation:none}}
+/* ขีดหน้า course = มีวันเริ่มของตัวเอง; คอร์สที่ "ตาม Course ก่อนหน้า" ไม่มีขีด (desktop + มือถือ); มือถือมีขีดเฉพาะเดือนที่เริ่ม */
+.tp-course.no-lead{padding:0 6px}.tp-course.no-lead::before{display:none}
+@media(max-width:640px){.tp-mobile-course{position:relative;border-top:0;border-radius:7px;padding:10px 2px 4px}.tp-mobile-course::before{position:absolute;top:3px;right:5px;left:5px;height:3px;border-radius:2px;background:var(--subject);content:''}.tp-mobile-course.own::before{background:#fff}.tp-mobile-course.no-lead{padding-top:5px}.tp-mobile-course.no-lead::before{display:none}}

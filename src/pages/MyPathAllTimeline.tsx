@@ -68,7 +68,7 @@ function SubjectRow({ subject, t, dayWidth, open }: { subject: typeof subjects[n
   const style = { '--subject': subject.color } as CSSProperties
   return <><b className="tp-label tp-subject" style={style}><i />{subject.name}</b><Axis t={t} dayWidth={dayWidth} style={style}>{subject.courses.length === 0 && <span className="tp-no-course">ยังไม่มีคอร์ส</span>}{subject.courses.filter(course => visible(course, t)).map(course => {
     const left = Math.max(0, position(course.start, t)), right = Math.min(100, position(addDays(course.end, 1), t))
-    return <span key={course.id} className={`tp-course ${course.owned ? 'own' : ''}`} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={event => event.key === 'Enter' && open(course.id)} style={{ left: `calc(${left}% + 3px)`, width: `calc(${right - left}% - 6px)`, color: course.owned ? barText(subject.color) : undefined }} title={`${course.name} · ${fmtDate(course.start)} – ${fmtDate(course.end)}`}>{course.short}</span>
+    return <span key={course.id} className={`tp-course${course.owned ? ' own' : ''}${course.followPrevious ? ' no-lead' : ''}`} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={event => event.key === 'Enter' && open(course.id)} style={{ left: `calc(${left}% + 3px)`, width: `calc(${right - left}% - 6px)`, color: course.owned ? barText(subject.color) : undefined }} title={`${course.name} · ${fmtDate(course.start)} – ${fmtDate(course.end)}`}>{course.short}</span>
   })}</Axis></>
 }
 
@@ -114,7 +114,7 @@ function MobileTimeline({ t, open }: { t: Timeline; open: (id: string) => void }
     return <section key={month.start} className={`tp-mobile-month${now ? ' now' : ''}`}><b>{month.label}</b><div className="tp-mobile-month-content">{monthEvents.length > 0 && <div className="tp-mobile-events">{monthEvents.map(event => <span key={event.id} className={`tp-mobile-event ${event.kind}${event.owned ? '' : ' no'}`}>{event.label} · {fmtShort(event.date)}</span>)}</div>}<div className="tp-mobile-subjects" style={{ gridTemplateColumns: `repeat(${subjects.length},minmax(0,1fr))` }}>{subjects.map(subject => {
       const courses = subject.courses.filter(course => u(course.start) < u(month.end) && u(addDays(course.end, 1)) > u(month.start))
       const full = courses.some(course => u(course.start) <= u(month.start) && u(addDays(course.end, 1)) >= u(month.end))
-      return <div key={subject.name} className={`tp-mobile-cell${full ? ' full-month' : ''}`} style={{ '--subject': subject.color } as CSSProperties}>{courses.map(course => <span key={course.id} className={`tp-mobile-course ${course.owned ? 'own' : 'own-no'}`} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={event => event.key === 'Enter' && open(course.id)} style={{ color: course.owned ? barText(subject.color) : undefined }}>{course.short}</span>)}</div>
+      return <div key={subject.name} className={`tp-mobile-cell${full ? ' full-month' : ''}`} style={{ '--subject': subject.color } as CSSProperties}>{courses.map(course => <span key={course.id} className={`tp-mobile-course ${course.owned ? 'own' : 'own-no'}${course.followPrevious || u(course.start) < u(month.start) ? ' no-lead' : ''}`} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={event => event.key === 'Enter' && open(course.id)} style={{ color: course.owned ? barText(subject.color) : undefined }}>{course.short}</span>)}</div>
     })}</div></div></section>
   })}</div></section>
 }
