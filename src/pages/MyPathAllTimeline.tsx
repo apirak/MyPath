@@ -1,6 +1,6 @@
 import { type CSSProperties } from 'react'
 import PathHeader from '../components/PathHeader'
-import { AXIS_END, AXIS_START, MS, TODAY, addDays, calendarBudgetForWeek, events, fmtDate, fmtShort, isoOf, scheduledHoursByDay, subjects, type Course, u, usePlanVersion } from '../mypath/plan'
+import { AXIS_END, AXIS_START, MS, TODAY, addDays, calendarBudgetForWeek, events, fmtDate, fmtShort, isoOf, scheduledHoursByDay, setCourseStartDate, subjects, type Course, u, usePlanVersion } from '../mypath/plan'
 import { CourseDetailOverlay, useOpenCourse } from '../mypath/CourseDetailOverlay'
 import PlanEmptyState from '../mypath/PlanEmptyState'
 import './MyPathAllTimeline.css'
@@ -64,11 +64,25 @@ function EventRow({ t, dayWidth }: { t: Timeline; dayWidth: number }) {
   return <><b className="tp-label tp-events-label tp-load-label" style={{ minHeight: height }}></b><Axis t={t} dayWidth={dayWidth} className="tp-events tp-events-top" style={{ minHeight: height }}>{shown.map(({ event, lane }) => <span key={event.id} className={`tp-event ${event.kind}${event.owned ? '' : ' no'}`} style={{ left: `${position(event.date, t)}%`, bottom: lane * 44 + 20, '--line': `${lane * 44 + 14}px` } as CSSProperties}>{event.label}<small>{fmtDate(event.date)}</small></span>)}{shown.map(({ event }) => <i key={`${event.id}-marker`} className={`tp-event-marker ${event.kind}${event.owned ? '' : ' no'}`} style={{ left: `${position(event.date, t)}%` }} />)}</Axis></>
 }
 
+// ลากเส้นขาวหัวคอร์สซ้าย/ขวาเพื่อเลื่อนวันเริ่ม (เฉพาะคอร์สที่ไม่ได้ต่อจากคอร์สก่อน) — แปลง px เป็นวันจากความกว้าง axis
+function dragStart(event: React.PointerEvent<HTMLElement>, course: Course, t: Timeline) {
+  event.stopPropagation()
+  const grip = event.currentTarget, startX = event.clientX, base = course.start
+  const pxPerDay = grip.closest('.tp-axis')!.getBoundingClientRect().width / t.days
+  let last = 0
+  grip.setPointerCapture(event.pointerId)
+  grip.onpointermove = move => {
+    const days = Math.round((move.clientX - startX) / pxPerDay)
+    if (days !== last) { last = days; setCourseStartDate(course.id, addDays(base, days)) }
+  }
+  grip.onpointerup = grip.onpointercancel = () => { grip.onpointermove = grip.onpointerup = grip.onpointercancel = null }
+}
+
 function SubjectRow({ subject, t, dayWidth, open }: { subject: typeof subjects[number]; t: Timeline; dayWidth: number; open: (id: string) => void }) {
   const style = { '--subject': subject.color } as CSSProperties
   return <><b className="tp-label tp-subject" style={style}><i />{subject.name}</b><Axis t={t} dayWidth={dayWidth} style={style}>{subject.courses.length === 0 && <span className="tp-no-course">ยังไม่มีคอร์ส</span>}{subject.courses.filter(course => visible(course, t)).map(course => {
     const left = Math.max(0, position(course.start, t)), right = Math.min(100, position(addDays(course.end, 1), t))
-    return <span key={course.id} className={`tp-course${course.owned ? ' own' : ''}${course.followPrevious ? ' no-lead' : ''}`} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={event => event.key === 'Enter' && open(course.id)} style={{ left: `calc(${left}% + 3px)`, width: `calc(${right - left}% - 6px)`, color: course.owned ? barText(subject.color) : undefined }} title={`${course.name} · ${fmtDate(course.start)} – ${fmtDate(course.end)}`}>{course.short}</span>
+    return <span key={course.id} className={`tp-course${course.owned ? ' own' : ''}${course.followPrevious ? ' no-lead' : ''}`} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={event => event.key === 'Enter' && open(course.id)} style={{ left: `calc(${left}% + 3px)`, width: `calc(${right - left}% - 6px)`, color: course.owned ? barText(subject.color) : undefined }} title={`${course.name} · ${fmtDate(course.start)} – ${fmtDate(course.end)}`}>{!course.followPrevious && <i className="tp-grip" aria-hidden="true" onPointerDown={event => dragStart(event, course, t)} onClick={event => event.stopPropagation()} />}{course.short}</span>
   })}</Axis></>
 }
 
