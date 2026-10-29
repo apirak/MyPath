@@ -40,3 +40,14 @@ b.tp-events-label.tp-load-label{background:#fff;border-bottom:1px solid #e9ecef}
 /* ขีดหน้า course = มีวันเริ่มของตัวเอง; คอร์สที่ "ตาม Course ก่อนหน้า" ไม่มีขีด (desktop + มือถือ); มือถือมีขีดเฉพาะเดือนที่เริ่ม */
 .tp-course.no-lead{padding:0 6px}.tp-course.no-lead::before{display:none}
 @media(max-width:640px){.tp-mobile-course{position:relative;border-top:0;border-radius:7px;padding:10px 2px 4px}.tp-mobile-course::before{position:absolute;top:3px;right:5px;left:5px;height:3px;border-radius:2px;background:var(--subject);content:''}.tp-mobile-course.own::before{background:#fff}.tp-mobile-course.no-lead{padding-top:5px}.tp-mobile-course.no-lead::before{display:none}}
+/* มือถือ: .path-scroll เลื่อนทั้งสองแกน — หัววิชา sticky top, ชื่อเดือน sticky left, วันสำคัญของเดือนอยู่กับที่ (sticky left กว้างเท่าจอ), ปิดเด้งเพราะ sticky จะเด้งตาม */
+@media(max-width:640px){
+  .tp-full .path-scroll{overscroll-behavior:none}
+  .tp-mobile{width:max(100%, calc(78px + var(--n) * var(--col) + (var(--n) - 1) * 6px))}
+  .tp-mobile-subjects{grid-template-columns:repeat(var(--n),minmax(var(--col),1fr))}
+  .tp-mobile-head{position:sticky;top:0;z-index:3;display:grid;grid-template-columns:62px 1fr;gap:0;padding:8px 16px 8px 0}
+  .tp-mobile-head>i{position:sticky;left:0;z-index:1;width:auto;margin:0;background:inherit}
+  .tp-mobile-month{grid-template-columns:62px 1fr;padding:0 16px 0 0}
+  .tp-mobile-month>b{position:sticky;left:0;z-index:1;padding-left:20px;background:inherit}
+  .tp-mobile-events{position:sticky;left:62px;width:calc(100vw - 78px)}
+}

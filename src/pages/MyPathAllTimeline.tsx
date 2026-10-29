@@ -102,16 +102,18 @@ function Grass() {
   return <div className="tp-grass-row" aria-hidden="true">{GRASS.map((left, i) => <svg key={left} className="tp-grass" viewBox="0 0 20 10" style={{ left: `${left}%`, animationDelay: `${-i * .37}s`, scale: i % 3 ? '1' : '1.4' }}><path d="M1 10C3 6 4 4 4 0c2 3 3 6 3 10M6 10c1-4 3-6 7-8-2 3-3 5-3 8M10 10c2-3 5-5 9-5-3 2-5 3-6 5z" /></svg>)}</div>
 }
 
-// หัววิชาของ timeline มือถือ — อยู่นอก .path-scroll ให้นิ่งคู่ header
+// หัววิชาของ timeline มือถือ — sticky top ใน .path-scroll (scroller เดียวทั้งสองแกน) เลื่อนแนวนอนพร้อมคอลัมน์วิชา
 function MobileHead() {
-  return <div className="tp-mobile-head"><i />{subjects.map(subject => <b key={subject.name}><i style={{ background: subject.color }} />{subject.name}</b>)}</div>
+  return <div className="tp-mobile-head"><i /><div className="tp-mobile-subjects">{subjects.map(subject => <b key={subject.name}><i style={{ background: subject.color }} />{subject.name}</b>)}</div></div>
 }
 
 function MobileTimeline({ t, open }: { t: Timeline; open: (id: string) => void }) {
-  return <section className="tp-mobile"><div className="tp-mobile-months">{t.months.map(month => {
+  // เกิน 6 วิชา → คอลัมน์กว้างคงที่ เห็น ~5.5 คอลัมน์ (โผล่ครึ่งให้รู้ว่าเลื่อนต่อได้)
+  const col = subjects.length > 6 ? 'calc((100vw - 78px - 30px) / 5.5)' : '0px'
+  return <section className="tp-mobile" style={{ '--n': subjects.length, '--col': col } as CSSProperties}><MobileHead /><div className="tp-mobile-months">{t.months.map(month => {
     const monthEvents = events.filter(event => u(event.date) >= u(month.start) && u(event.date) < u(month.end))
     const now = u(TODAY) >= u(month.start) && u(TODAY) < u(month.end)
-    return <section key={month.start} className={`tp-mobile-month${now ? ' now' : ''}`}><b>{month.label}</b><div className="tp-mobile-month-content">{monthEvents.length > 0 && <div className="tp-mobile-events">{monthEvents.map(event => <span key={event.id} className={`tp-mobile-event ${event.kind}${event.owned ? '' : ' no'}`}>{event.label} · {fmtShort(event.date)}</span>)}</div>}<div className="tp-mobile-subjects" style={{ gridTemplateColumns: `repeat(${subjects.length},minmax(0,1fr))` }}>{subjects.map(subject => {
+    return <section key={month.start} className={`tp-mobile-month${now ? ' now' : ''}`}><b>{month.label}</b><div className="tp-mobile-month-content">{monthEvents.length > 0 && <div className="tp-mobile-events">{monthEvents.map(event => <span key={event.id} className={`tp-mobile-event ${event.kind}${event.owned ? '' : ' no'}`}>{event.label} · {fmtShort(event.date)}</span>)}</div>}<div className="tp-mobile-subjects">{subjects.map(subject => {
       const courses = subject.courses.filter(course => u(course.start) < u(month.end) && u(addDays(course.end, 1)) > u(month.start))
       const full = courses.some(course => u(course.start) <= u(month.start) && u(addDays(course.end, 1)) >= u(month.end))
       return <div key={subject.name} className={`tp-mobile-cell${full ? ' full-month' : ''}`} style={{ '--subject': subject.color } as CSSProperties}>{courses.map(course => <span key={course.id} className={`tp-mobile-course ${course.owned ? 'own' : 'own-no'}${course.followPrevious || u(course.start) < u(month.start) ? ' no-lead' : ''}`} role="button" tabIndex={0} onClick={() => open(course.id)} onKeyDown={event => event.key === 'Enter' && open(course.id)} style={{ color: course.owned ? barText(subject.color) : undefined }}>{course.short}</span>)}</div>
@@ -124,5 +126,5 @@ export default function MyPathAllTimeline() {
   const t = allTimeline(), open = useOpenCourse()
   const header = <PathHeader active="all" period={t.label} showNavigation={false} />
   if (subjects.length === 0) return <main className="path-page tp-page"><div className="path-screen">{header}<div className="path-scroll"><PlanEmptyState /></div></div></main>
-  return <main className="path-page tp-page tp-full tp-sky-page"><div className="path-screen">{header}<MobileHead /><div className="path-scroll"><div className="tp-scroll" onScroll={e => e.currentTarget.style.setProperty('--sx', String(e.currentTarget.scrollLeft))}><div className="tp-sky"><Sky /><section className="tp-grid tp-events-strip" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} /><Grass /></section></div><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}`, '--rows': subjects.length } as CSSProperties}><MonthHeader t={t} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<b className="tp-label tp-spacer" /><Axis t={t} dayWidth={MONTH_DAY_WIDTH} className="tp-spacer">{null}</Axis><WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} /></section></div><MobileTimeline t={t} open={open} /></div><CourseDetailOverlay /></div></main>
+  return <main className="path-page tp-page tp-full tp-sky-page"><div className="path-screen">{header}<div className="path-scroll"><div className="tp-scroll" onScroll={e => e.currentTarget.style.setProperty('--sx', String(e.currentTarget.scrollLeft))}><div className="tp-sky"><Sky /><section className="tp-grid tp-events-strip" style={{ gridTemplateColumns: `176px ${monthColumns(t)}` }}><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} /><Grass /></section></div><section className="tp-grid" style={{ gridTemplateColumns: `176px ${monthColumns(t)}`, '--rows': subjects.length } as CSSProperties}><MonthHeader t={t} />{subjects.map(subject => <SubjectRow key={subject.name} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} open={open} />)}<b className="tp-label tp-spacer" /><Axis t={t} dayWidth={MONTH_DAY_WIDTH} className="tp-spacer">{null}</Axis><WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} /></section></div><MobileTimeline t={t} open={open} /></div><CourseDetailOverlay /></div></main>
 }
