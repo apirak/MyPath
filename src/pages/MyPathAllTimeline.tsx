@@ -64,17 +64,20 @@ function EventRow({ t, dayWidth }: { t: Timeline; dayWidth: number }) {
   return <><b className="tp-label tp-events-label tp-load-label" style={{ minHeight: height }}></b><Axis t={t} dayWidth={dayWidth} className="tp-events tp-events-top" style={{ minHeight: height }}>{shown.map(({ event, lane }) => <span key={event.id} className={`tp-event ${event.kind}${event.owned ? '' : ' no'}`} style={{ left: `${position(event.date, t)}%`, bottom: lane * 44 + 20, '--line': `${lane * 44 + 14}px` } as CSSProperties}>{event.label}<small>{fmtDate(event.date)}</small></span>)}{shown.map(({ event }) => <i key={`${event.id}-marker`} className={`tp-event-marker ${event.kind}${event.owned ? '' : ' no'}`} style={{ left: `${position(event.date, t)}%` }} />)}</Axis></>
 }
 
-// ลากเส้นขาวหัวคอร์สซ้าย/ขวาเพื่อเลื่อนวันเริ่ม (เฉพาะคอร์สที่ไม่ได้ต่อจากคอร์สก่อน) — แปลง px เป็นวันจากความกว้าง axis
+// ลากเส้นขาวหัวคอร์สซ้าย/ขวาเพื่อเลื่อนวันเริ่มทีละสัปดาห์ (เฉพาะคอร์สที่ไม่ได้ต่อจากคอร์สก่อน) — แปลง px เป็นวันจากความกว้าง axis
 function dragStart(event: React.PointerEvent<HTMLElement>, course: Course, t: Timeline) {
   event.stopPropagation()
   const grip = event.currentTarget, startX = event.clientX, base = course.start
   const pxPerDay = grip.closest('.tp-axis')!.getBoundingClientRect().width / t.days
-  let last = 0
+  let last = base
   grip.setPointerCapture(event.pointerId)
   holdAxis(true)
   grip.onpointermove = move => {
-    const days = Math.round((move.clientX - startX) / pxPerDay)
-    if (days !== last) { last = days; setCourseStartDate(course.id, addDays(base, days)) }
+    // snap ไปวันจันทร์ที่ใกล้ที่สุด ให้ตรงกับแท่งชั่วโมงเรียน/สัปดาห์
+    const raw = u(base) + (move.clientX - startX) / pxPerDay * MS
+    const monday = raw - ((new Date(raw).getUTCDay() + 6) % 7) * MS - raw % MS
+    const next = isoOf(raw - monday >= 3.5 * MS ? monday + 7 * MS : monday)
+    if (next !== last) { last = next; setCourseStartDate(course.id, next) }
   }
   grip.onpointerup = grip.onpointercancel = () => { grip.onpointermove = grip.onpointerup = grip.onpointercancel = null; holdAxis(false) }
 }
