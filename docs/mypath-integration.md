@@ -1,0 +1,176 @@
+# การนำ My Path SDK ไปใช้ใน Learn Anywhere
+
+คู่มือสำหรับทีม Learn Anywhere (React web) ที่จะวาง My Path ไว้ในแท็บที่ 3. ที่มาของการตัดสินใจอยู่ใน [ADR-0001](adr/0001-mypath-as-react-sdk.md) แผนการทำ SDK อยู่ใน [mypath-sdk-plan.md](mypath-sdk-plan.md).
+
+> **สถานะ:** SDK ยังไม่ได้ publish. หัวข้อที่มีเครื่องหมาย ⏳ ยังรอผล grill ของ ticket ที่ระบุ
+
+## ภาพรวม
+
+```
+Learn Anywhere (host)                         My Path SDK
+─────────────────────                         ───────────
+API ของ host ──► toMyPathData() ──► data ───► <MyPath>
+                                    today ──►
+backend ◄── savePlan ◄──────────── onPlanChange
+shop    ◄────────────────────────── onBuyCourse
+player  ◄────────────────────────── onStartCourse
+```
+
+- host เป็นเจ้าของข้อมูลทั้งหมด SDK แค่แสดงผลและแจ้งว่าผู้ใช้แก้อะไร
+- SDK ไม่ยิง API, ไม่ใช้ localStorage, ไม่ส่ง analytics
+- ข้อกำหนด: React ต้องเป็นเวอร์ชันที่ตรงกับ peerDependencies ของ SDK (ตอนนี้ใช้ 19) และไม่ต้องติดตั้ง react-router หรือ Tailwind เพิ่มเพื่อ SDK
+
+## ขั้นที่ 1 — ติดตั้ง
+
+เลือกวิธีใดวิธีหนึ่ง:
+
+| วิธี | เหมาะกับ | ข้อดี | ข้อเสีย |
+|---|---|---|---|
+| **A. npm install จาก registry** (แนะนำ) | ใช้งานจริง | ปักเวอร์ชันได้ชัดตาม semver, CI ง่าย, ได้ไฟล์ที่ build แล้ว | ต้องมี private registry และ token |
+| **B. Git submodule** | ไม่อยากใช้ registry | ไม่ต้องมี registry, เห็น source ตรงๆ | CI ต้องดึง submodule และต้องมีสิทธิ์อ่าน repo นี้, host ต้อง compile source เอง |
+| **C. `file:` link แบบ local** | dev ทั้งสอง repo พร้อมกัน | แก้ SDK แล้วเห็นผลใน host ทันที | ใช้บนเครื่อง dev เท่านั้น ห้ามใช้ build จริง |
+
+### A. npm install จาก registry ⏳ T11
+
+```bash
+npm install @ondemand/mypath
+```
+
+ถ้าเป็น private registry (เช่น GitHub Packages) ให้เพิ่ม `.npmrc` ที่ root ของ repo host:
+
+```
+@ondemand:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NPM_TOKEN}
+```
+
+`NPM_TOKEN` อ่านจาก environment variable ของเครื่อง dev และ CI ห้าม commit token ลง repo. ชื่อ package และ registry จะชัดหลัง grill T11.
+
+### B. Git submodule (ไม่ใช้ npm registry)
+
+ดึง repo นี้มาไว้ใน repo ของ Learn Anywhere แล้วปักไว้ที่ tag ของเวอร์ชันที่ต้องการ:
+
+```bash
+git submodule add git@github.com:apirak/MyPath.git vendor/mypath
+```
+
+```bash
+git -C vendor/mypath checkout mypath-v1.0.0
+```
+
+```bash
+git add .gitmodules vendor/mypath && git commit -m "chore: add My Path SDK v1.0.0"
+```
+
+ให้ host compile source ของ SDK ไปพร้อมกับโค้ดตัวเอง แบบเดียวกับที่ host จำลองใน repo นี้ทำ คือชี้ชื่อ package ไปที่ `index.ts`:
+
+```ts
+// vite.config.ts ของ host
+import { fileURLToPath } from 'node:url'
+
+export default defineConfig({
+  resolve: {
+    alias: { '@ondemand/mypath': fileURLToPath(new URL('./vendor/mypath/packages/mypath/src/index.ts', import.meta.url)) },
+    dedupe: ['react', 'react-dom'],
+  },
+})
+```
+
+```jsonc
+// tsconfig.json ของ host
+{ "compilerOptions": { "paths": { "@ondemand/mypath": ["./vendor/mypath/packages/mypath/src/index.ts"] } } }
+```
+
+ถ้า host ใช้ Next.js แทน Vite ให้ใช้ `transpilePackages` และตั้ง alias ใน `webpack` / `turbopack` แทน.
+
+สิ่งที่ต้องระวังเมื่อใช้ submodule:
+- **CI:** ต้อง checkout submodule ด้วย (เช่น `actions/checkout` ตั้ง `submodules: true`) และ CI ต้องมีสิทธิ์อ่าน repo `apirak/MyPath` ผ่าน deploy key หรือ token
+- **Dev คนใหม่:** clone ด้วย `git clone --recurse-submodules` หรือรัน `git submodule update --init` หลัง clone ไม่อย่างนั้นโฟลเดอร์ `vendor/mypath` จะว่าง
+- **อัปเดตเวอร์ชัน:** `git -C vendor/mypath fetch --tags`, checkout tag ใหม่ แล้ว commit ตัวชี้ submodule. อ่าน changelog ก่อนขึ้นเวอร์ชันใหญ่
+- **ห้ามแก้โค้ดใน `vendor/mypath` จาก repo host.** ถ้าต้องแก้ ให้แก้ใน repo นี้แล้วออก tag ใหม่
+
+### C. `file:` link สำหรับ dev สองฝั่งพร้อมกัน
+
+วาง repo ทั้งสองไว้ข้างกัน (`../MyPath` กับ `../learn-anywhere`) แล้วในเครื่อง dev:
+
+```bash
+npm install ../MyPath/packages/mypath
+```
+
+npm จะสร้าง symlink ไปที่โฟลเดอร์ SDK. ต้องตั้ง `resolve.dedupe: ['react', 'react-dom']` ใน Vite เหมือนวิธี B ไม่อย่างนั้นจะได้ React สองชุด และ hook จะ error (`Invalid hook call`). ก่อน commit ให้คืนค่า `package.json` กลับเป็นวิธี A หรือ B.
+
+## ขั้นที่ 2 — วาง component ในแท็บที่ 3
+
+```tsx
+import { MyPath } from '@ondemand/mypath'
+import '@ondemand/mypath/style.css'                    // วิธี A เท่านั้น — วิธี B/C ได้ CSS จาก index.ts อัตโนมัติ
+
+export function MyPathTab() {
+  const { data, today, isLoading } = useMyPathData()   // host ดึงจาก API ของตัวเอง
+  const savePlan = useSaveStudentPlan()
+
+  if (isLoading) return <Spinner />
+  return (
+    <div className="h-full">                            {/* กล่องที่สูงแน่นอน SDK เติมเต็มและ scroll ข้างในเอง */}
+      <MyPath
+        data={data}
+        today={today}                                   // ใช้วันที่จาก server ไม่ใช้นาฬิกาเครื่อง
+        onPlanChange={savePlan}
+        onBuyCourse={id => navigate(`/shop/${id}`)}
+        onStartCourse={id => navigate(`/learn/${id}`)}
+      />
+    </div>
+  )
+}
+```
+
+- SDK ไม่รู้ว่ามี tab bar หรือ header ของ host. host เป็นคนให้กล่องที่มีความสูงแน่นอน
+- CSS ของ SDK อยู่ใต้ `.mypath-root` ทั้งหมด ไม่แตะ style ของ host
+
+## ขั้นที่ 3 — เขียนตัวแปลงข้อมูล (adapter) ⏳ T2
+
+API ของ Learn Anywhere คงไม่ได้ส่งข้อมูลรูปเดียวกับ `MyPathData` พอดี ให้เขียนฟังก์ชันแปลงไว้จุดเดียว:
+
+```ts
+import type { MyPathData } from '@ondemand/mypath'
+
+export const toMyPathData = (res: LearnAnywhereMyPathResponse): MyPathData => ({
+  catalog: /* … */,
+  plan: /* … */,
+  events: /* … */,
+  courseDetails: /* … */,
+  progress: /* … */,
+})
+```
+
+ถ้า SDK เปลี่ยนรูปข้อมูล TypeScript จะเตือนที่ฟังก์ชันนี้ที่เดียว. รูปข้อมูลที่แน่นอนรอ grill T2.
+
+## ขั้นที่ 4 — รับการเปลี่ยนแปลงแล้วบันทึก
+
+SDK รับแผนแบบ controlled เมื่อผู้ใช้แก้แผน SDK จะเรียก `onPlanChange(newPlan)` แล้ว host ต้อง:
+
+1. บันทึกลง backend
+2. ส่งแผนใหม่กลับเข้า `data` (แนะนำให้อัปเดตหน้าจอทันทีก่อนรอผลจาก server เพื่อไม่ให้ UI ค้าง)
+
+ถ้าไม่ส่งกลับ หน้าจอจะกลับไปเป็นแผนเดิม.
+
+## ขั้นที่ 5 — งานฝั่ง backend
+
+ต้องมี endpoint สำหรับ: ดึง catalog คอร์ส, ดึงแผนของนักเรียน, ดึงวันสอบ, ดึงความคืบหน้า และบันทึกแผน.
+
+**ความรับผิดชอบเรื่อง PDPA [DP-001]:** ข้อมูลนักเรียนทั้งหมดผ่าน host อย่างเดียว การจัดเก็บ สิทธิ์เข้าถึง และการขอความยินยอมจากผู้ปกครอง (กรณีผู้เยาว์) จึงเป็นหน้าที่ของ Learn Anywhere.
+
+## Deep link / ปุ่ม back ⏳ T7
+
+ถ้า host ต้องการลิงก์ตรงไปยังคอร์ส หรือให้ปุ่ม back ของ browser ปิดหน้ารายละเอียดได้ host จะส่ง `view` / `onViewChange` เพิ่ม แล้วเก็บค่าไว้ใน URL ของตัวเอง. หน้าตาของ prop นี้รอ grill T7.
+
+## เมื่อ SDK ออกเวอร์ชันใหม่
+
+- **minor / patch:** `npm update` (วิธี A) หรือ checkout tag ใหม่ใน submodule (วิธี B) ได้เลย
+- **major:** props หรือรูปข้อมูลเปลี่ยน ต้องอ่าน changelog แล้วแก้ adapter ตาม
+
+## ข้อกำหนดที่ SDK ต้องรักษา (สำหรับทีม SDK)
+
+เพื่อให้วิธี B และ C ใช้ได้:
+- source ของ SDK ต้อง compile ได้ด้วย TypeScript + React ธรรมดา ห้ามพึ่ง Vite plugin หรือ macro พิเศษ
+- `index.ts` ต้อง import `mypath.css` เอง เพื่อให้คนที่ compile จาก source ได้ CSS ไปด้วยโดยไม่ต้องตั้งค่าเพิ่ม
+- ทุก release ต้องมี git tag `mypath-vX.Y.Z` ตรงกับเวอร์ชันใน `package.json`

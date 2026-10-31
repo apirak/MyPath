@@ -1,6 +1,6 @@
 # แผนทำ My Path เป็น SDK
 
-เหตุผลระดับสถาปัตยกรรมอยู่ใน [ADR-0001](adr/0001-mypath-as-react-sdk.md). เอกสารนี้คือแผนลงมือทำ: ลำดับขั้น เหตุผลของแต่ละขั้น และรายการ ticket.
+เหตุผลระดับสถาปัตยกรรมอยู่ใน [ADR-0001](adr/0001-mypath-as-react-sdk.md). วิธีที่ Learn Anywhere นำ SDK ไปใช้ (npm / git submodule / link แบบ local) อยู่ใน [mypath-integration.md](mypath-integration.md). เอกสารนี้คือแผนลงมือทำ: ลำดับขั้น เหตุผลของแต่ละขั้น และรายการ ticket.
 
 ## เป้าหมาย
 
@@ -110,6 +110,6 @@ src/prototype/              ← ของเดิม ไม่แก้ → /pr
 | T8 | UI: Study calendar panel | ไม่ต้อง | T5 | |
 | T9 | UI: Course progress (แผงทดสอบอยู่ฝั่ง host) | ไม่ต้อง | T5 | ใช้ข้อสรุปเรื่อง progress จาก T2 |
 | T10 | ตรวจว่าครบเท่า prototype + ลบ `src/prototype` | **Grill** (สั้น) | T6–T9 | ตกลงเกณฑ์ "ครบแล้ว" ก่อน ว่าจะเทียบหน้าไหน สถานะไหน ทั้ง desktop และ mobile. ready-for-human |
-| T11 | Library build + publish | **Grill** | T10 | ประเด็น: ชื่อ package, registry, การนับเวอร์ชัน, lucide-react ใส่ไปใน bundle หรือเป็น peer, ต้องใช้ React เวอร์ชันขั้นต่ำเท่าไร (ตอนนี้ใช้ 19) |
+| T11 | Library build + publish | **Grill** | T10 | ต้องรักษาให้ host ใช้ผ่าน git submodule ได้ด้วย (ดู mypath-integration.md). ประเด็น: ชื่อ package, registry, การนับเวอร์ชัน, lucide-react ใส่ไปใน bundle หรือเป็น peer, ต้องใช้ React เวอร์ชันขั้นต่ำเท่าไร (ตอนนี้ใช้ 19) |
 
 T6–T9 ทำพร้อมกันได้หลัง T5 เสร็จ.
