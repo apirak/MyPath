@@ -105,7 +105,7 @@ import { MyPath } from '@learn/mypath'
 import '@learn/mypath/style.css'                    // วิธี A เท่านั้น — วิธี B/C ได้ CSS จาก index.ts อัตโนมัติ
 
 export function MyPathTab() {
-  const { data, today, isLoading } = useMyPathData()   // host ดึงจาก API ของตัวเอง
+  const { data, isLoading } = useMyPathData()         // host ดึงจาก API ของตัวเอง แล้วแปลงด้วย toMyPathData()
   const savePlan = useSaveStudentPlan()
 
   if (isLoading) return <Spinner />
@@ -113,7 +113,7 @@ export function MyPathTab() {
     <div className="h-full">                            {/* กล่องที่สูงแน่นอน SDK เติมเต็มและ scroll ข้างในเอง */}
       <MyPath
         data={data}
-        today={today}                                   // ใช้วันที่จาก server ไม่ใช้นาฬิกาเครื่อง
+        // today="2026-12-05"                           // ไม่บังคับ: ส่งเมื่อทดสอบหรือต้องการยึดเวลา server
         onPlanChange={savePlan}
         onBuyCourse={id => navigate(`/shop/${id}`)}
         onStartCourse={id => navigate(`/learn/${id}`)}
@@ -125,8 +125,10 @@ export function MyPathTab() {
 
 - SDK ไม่รู้ว่ามี tab bar หรือ header ของ host. host เป็นคนให้กล่องที่มีความสูงแน่นอน
 - CSS ของ SDK อยู่ใต้ `.mypath-root` ทั้งหมด ไม่แตะ style ของ host
+- `today` ไม่บังคับ ถ้าไม่ส่ง SDK ใช้วันตามเวลาไทยจากนาฬิกาเครื่อง และเปลี่ยนวันเองเมื่อข้ามเที่ยงคืน ถ้าส่ง ให้เป็น `'YYYY-MM-DD'` ตามเวลาไทยที่ host แปลงจากเวลา server เอง SDK จะใช้ค่านั้นตายตัว
+- `onBuyCourse` ส่งแค่ `courseId` host เป็นคนตัดสินว่าจะพาไปซื้อเล่มเดี่ยวหรือทั้งแพ็ก
 
-## ขั้นที่ 3 — เขียนตัวแปลงข้อมูล (adapter) ⏳ T2
+## ขั้นที่ 3 — เขียนตัวแปลงข้อมูล (adapter)
 
 API ของ Learn Anywhere คงไม่ได้ส่งข้อมูลรูปเดียวกับ `MyPathData` พอดี ให้เขียนฟังก์ชันแปลงไว้จุดเดียว:
 
@@ -134,24 +136,38 @@ API ของ Learn Anywhere คงไม่ได้ส่งข้อมูล
 import type { MyPathData } from '@learn/mypath'
 
 export const toMyPathData = (res: LearnAnywhereMyPathResponse): MyPathData => ({
-  catalog: /* … */,
-  plan: /* … */,
-  events: /* … */,
-  courseDetails: /* … */,
-  progress: /* … */,
+  catalog: /* กลุ่ม → วิชา (id, ชื่อ, สี) → คอร์สเรียงตามลำดับเล่ม */,
+  plan: /* แผนเรียนที่บันทึกไว้ล่าสุด: { calendar, courses } */,
+  events: /* สอบจริง / Mock เฉพาะที่เกี่ยวกับนักเรียนคนนี้ */,
+  owned: /* id ของคอร์สและ Mock ที่ซื้อแล้ว */,
+  progress: /* courseId → 0–100 */,
+  prices: /* courseId → { now, was? } เป็นบาท ราคาเดียวกับร้านค้า */,
+  packs: /* packId → { name, teacher } */,
+  courseDetails: /* courseId → { packId?, volume?, examgym? } */,
 })
 ```
 
-ถ้า SDK เปลี่ยนรูปข้อมูล TypeScript จะเตือนที่ฟังก์ชันนี้ที่เดียว. รูปข้อมูลที่แน่นอนรอ grill T2.
+type ทั้งหมดและเหตุผลของแต่ละฟิลด์อยู่ใน [สัญญาข้อมูล](mypath-sdk-plan.md#สัญญาข้อมูล). ถ้า SDK เปลี่ยนรูปข้อมูล TypeScript จะเตือนที่ฟังก์ชันนี้ที่เดียว.
+
+ข้อควรรู้:
+- ทุกวันที่เป็น `'YYYY-MM-DD'` ตามเวลาไทย
+- วิชาอ้างด้วย `id` ไม่ใช่ชื่อ ทั้งใน catalog และ `plan.calendar.subjects`
+- แผนเก็บเฉพาะค่าที่นักเรียนตั้ง ไม่ต้องสร้าง `StudentCourse` ให้ครบทุกคอร์ส คอร์สที่ไม่มีใช้ค่าเริ่มต้น
+- ข้อมูลที่ SDK ไม่รู้จัก (เช่น id ที่ไม่มีใน catalog) จะไม่แสดง แต่ไม่ทำให้หน้าพัง ระหว่าง dev ดูคำเตือนได้ใน console
 
 ## ขั้นที่ 4 — รับการเปลี่ยนแปลงแล้วบันทึก
 
-SDK รับแผนแบบ controlled เมื่อผู้ใช้แก้แผน SDK จะเรียก `onPlanChange(newPlan)` แล้ว host ต้อง:
+SDK รับแผนแบบ controlled เมื่อผู้ใช้แก้แผนเสร็จ SDK จะเรียก `onPlanChange(plan)` พร้อมแผนเรียนทั้งก้อน (`{ calendar, courses }`) ไม่ใช่เฉพาะส่วนที่เปลี่ยน แล้ว host ต้อง:
 
 1. บันทึกลง backend
 2. ส่งแผนใหม่กลับเข้า `data` (แนะนำให้อัปเดตหน้าจอทันทีก่อนรอผลจาก server เพื่อไม่ให้ UI ค้าง)
 
 ถ้าไม่ส่งกลับ หน้าจอจะกลับไปเป็นแผนเดิม.
+
+- แผนที่ส่งมาไม่มีการซื้อ วันสอบ หรือความคืบหน้า host เปลี่ยนค่าเหล่านี้เองฝ่ายเดียว
+- การลากคอร์สในหน้า All ยิงครั้งเดียวตอนปล่อย ส่วน slider / สวิตช์ / ช่องวันที่ ยิงทันที
+- กด "เริ่มเรียน" ในคอร์สที่ยังไม่มีวันเริ่มต้น SDK จะยิง `onPlanChange` (ตรึงวันเริ่ม) ก่อน `onStartCourse`
+- SDK ส่งทุกรายการในแผนกลับไปครบ รวมถึงรายการที่ไม่รู้จัก บันทึกทับได้เลยโดยไม่ต้อง merge
 
 ## ขั้นที่ 5 — งานฝั่ง backend
 

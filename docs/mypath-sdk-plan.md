@@ -8,9 +8,9 @@ Learn Anywhere ตัวจริง (React web) ติดตั้ง package �
 
 ```tsx
 <MyPath
-  data={{ catalog, plan, events, courseDetails, progress }}
-  today="2026-12-05"
-  onPlanChange={plan => save(plan)}         // ผู้ใช้แก้วันเริ่ม/ชั่วโมง/ปฏิทิน
+  data={{ catalog, plan, events, owned, progress, prices, packs, courseDetails }}
+  today="2026-12-05"                        // ไม่บังคับ ไม่ส่ง = วันตามเวลาไทยจากนาฬิกาเครื่อง
+  onPlanChange={plan => save(plan)}         // แผนทั้งก้อน เมื่อผู้ใช้แก้วันเริ่ม/ชั่วโมง/ปฏิทิน
   onBuyCourse={courseId => openShop(courseId)}
   onStartCourse={courseId => openPlayer(courseId)}
 />
@@ -95,6 +95,234 @@ src/prototype/              ← ของเดิม ไม่แก้ → /pr
 | `PathHeader.tsx` | ใช้ `<Link to="/mypath">` | ย้ายเข้า SDK และเปลี่ยนปุ่ม Month/All ให้สลับ state ภายใน |
 | `BottomNav.tsx` | ใช้ทั้ง prototype และหน้าอื่น | เป็นของ host |
 | `BrowserRouter` ใน `main.tsx` | ครอบทั้งแอป | เป็นของ host SDK ไม่ต้องอยู่ใต้ router |
+
+## สัญญาข้อมูล
+
+ข้อสรุปจาก grill #3 ใบ 03 (#7) สร้าง type และ fixtures ตามนี้ทุกตัวอักษร. หัวข้อย่อยถัดจากภาพรวมคือเหตุผลของแต่ละข้อ
+
+### ภาพรวม type
+
+```ts
+type ISODate = string   // 'YYYY-MM-DD' วันในปฏิทินตามเวลาไทย
+
+type MyPathProps = {
+  data: MyPathData
+  today?: ISODate                                  // ไม่ส่ง = วันตามเวลาไทยจากนาฬิกาเครื่อง
+  onPlanChange: (plan: StudentPlan) => void        // แผนทั้งก้อน
+  onBuyCourse: (courseId: string) => void
+  onStartCourse: (courseId: string) => void
+}
+
+type MyPathData = {
+  catalog: SubjectGroup[]                          // ลำดับใน array = ลำดับที่แสดง
+  plan: StudentPlan
+  events: ExamEvent[]                              // เฉพาะที่เกี่ยวกับนักเรียนคนนี้
+  owned: string[]                                  // id ของคอร์สและ Mock ที่ซื้อแล้ว
+  progress: Record<string, number>                 // courseId → 0–100
+  prices: Record<string, { now: number; was?: number }>  // courseId → บาท จำนวนเต็ม
+  packs: Record<string, PackInfo>                  // packId → แพ็ก
+  courseDetails: Record<string, CourseDetail>      // courseId → รายละเอียด (ไม่มี = คอร์สไม่มีรายละเอียด)
+}
+
+// --- catalog ---
+type SubjectGroup = { name: string; subjects: CatalogSubject[] }
+type CatalogSubject = { id: string; name: string; color: string; courses: CourseCatalogItem[] }  // courses เรียงตามลำดับเล่ม
+type CourseCatalogItem = { id: string; name: string; short: string; abbr: string; hours: number; cover?: string }
+
+// --- แผนเรียน (สิ่งที่นักเรียนแก้ได้ และสิ่งเดียวที่ SDK ส่งกลับ) ---
+type StudentPlan = { calendar: StudyCalendar; courses: StudentCourse[] }
+type StudyCalendar = {
+  weekdayHours: number
+  weekendHours: number
+  specialDays: { date: ISODate; hours: number }[]
+  breaks: { id: number; start: ISODate; end: ISODate; hours: number }[]
+  subjects: string[]                               // id ของวิชาที่เรียน
+}
+type StudentCourse = {
+  courseId: string
+  startDate?: ISODate
+  followPrevious?: boolean
+  weeklyHours?: number                             // 1–10, ไม่มี = 5
+  followPreviousWeeklyHours?: boolean
+}
+
+// --- วันสอบ ---
+type ExamEvent = { id: string; date: ISODate; label: string; kind: 'exam' | 'mock' }
+
+// --- รายละเอียดคอร์ส ---
+type CourseDetail = { packId?: string; volume?: Volume; examgym?: ExamGymInfo }
+type PackInfo = { name: string; teacher: string }
+type Volume = { chapters: string[] }
+type ExamGymInfo = { slogan: string }
+```
+
+ไม่มี `schemaVersion` ใช้ semver ของ package อย่างเดียว (ดูหัวข้อสุดท้าย)
+
+### การซื้อแยกออกจากแผน
+
+```ts
+type MyPathData = {
+  owned: string[]   // id ของคอร์สและรอบ Mock ที่นักเรียนซื้อแล้ว
+  // …
+}
+```
+
+- `StudentCourse` และ `ExamEvent` ไม่มีฟิลด์ `owned` แล้ว
+- **เหตุผล:** แผนเป็นของที่ SDK ส่งกลับผ่าน `onPlanChange` ถ้าการซื้ออยู่ในแผน SDK จะส่งสถานะการซื้อที่อาจค้างอยู่กลับไปทับค่าใหม่ของ host ทั้งที่นักเรียนแก้สถานะนี้จาก My Path ไม่ได้. id ของคอร์สกับ Mock ใช้รายการเดียวกันเพราะทั้งสองเป็นสินค้า. ยังไม่ใส่วันหมดอายุเพราะยังไม่มี UI ใช้ ดู [ADR-0002](adr/0002-ownership-separate-from-plan.md)
+
+### `onPlanChange` ส่งแผนทั้งก้อน
+
+```ts
+type StudentPlan = { calendar: StudyCalendar; courses: StudentCourse[] }
+
+type MyPathProps = {
+  onPlanChange: (plan: StudentPlan) => void
+  // …
+}
+```
+
+- ส่งแผนทั้งก้อนโดยไม่แนบเหตุผล host แค่บันทึกแล้วส่งกลับเข้ามาใน `data.plan`
+- ยิงเมื่อการแก้แต่ละครั้งจบแล้ว: slider, สวิตช์ และช่องวันที่ยิงทันที, การลากหัวคอร์สในหน้า All ยิงครั้งเดียวตอนปล่อย ระหว่างลาก SDK เก็บแผนชั่วคราวไว้เป็น UI state, ส่วนปฏิทินการเรียนยิงเฉพาะเมื่อค่าผ่านการตรวจแล้ว (เช่น ช่วงปิดเทอมไม่ซ้อนกัน)
+- **เหตุผล:** ตรรกะการแก้แผนมีผลข้างเคียง เช่น ปิด "ตามจังหวะเรียน Course ก่อนหน้า" แล้วต้อง copy ชั่วโมงมาเก็บไว้ ถ้าส่งเฉพาะส่วนที่เปลี่ยน host จะต้องเขียนตรรกะชุดเดียวกันซ้ำ. ถ้าวันหลังต้องการรู้เหตุผลการเปลี่ยน ให้เพิ่มเป็น argument ตัวที่สองได้โดยไม่ทำให้ host เดิมพัง ดู [ADR-0003](adr/0003-plan-change-sends-whole-plan.md)
+
+### วันนี้และรูปแบบวันที่
+
+```ts
+type ISODate = string   // 'YYYY-MM-DD' วันในปฏิทินตามเวลาไทย ไม่มีเวลาและเขตเวลา
+
+type MyPathProps = {
+  today?: ISODate
+  // …
+}
+```
+
+- ทุกวันที่ในสัญญาใช้ `ISODate` (`startDate`, วันสอบ, ช่วงปิดเทอม, วันพิเศษ, `today`)
+- **ส่ง `today`:** SDK ใช้ค่านั้นตายตัวและไม่ดูนาฬิกาเลย host แปลงจากเวลา server เป็นวันตามเวลาไทยเอง ใช้ตอนทดสอบหรือเมื่อต้องการยึดเวลา server
+- **ไม่ส่ง:** SDK ใช้วันตามเวลาไทย (Asia/Bangkok ผ่าน `Intl.DateTimeFormat`) จากนาฬิกาเครื่อง ไม่ว่าเครื่องตั้งเขตเวลาอะไร และคิดวันใหม่เมื่อแท็บกลับมาแสดงผล (`visibilitychange`) และตอนเที่ยงคืนเวลาไทย
+- **เหตุผล:** production ไม่ต้องให้ทุก host แปลงเวลาเอง ส่วนเทสต์และ host จำลองส่งวันตายตัวได้. ใช้เวลาไทยเสมอเพื่อให้ "วันนี้" มีความหมายเดียวกันทั้งสองโหมด. นาฬิกาเครื่องที่ตั้งผิดกระทบแค่การแสดงผล (ข้อความความคืบหน้า, กลุ่มกำลังเรียน) ไม่มีอะไรถูกบันทึก จึงยอมรับได้. ข้อนี้แก้ข้อความเดิมใน ADR-0001 ที่ว่า host เป็นคนส่ง "วันนี้" เสมอ
+
+### ไม่มีขอบเขตเวลาในสัญญา
+
+- ลบ `DAY_START` / `DAY_LAST` ออก ไม่มีค่าเหล่านี้ใน `data` และไม่มีใน SDK
+- คอร์สแรกของวิชาที่ไม่มี `startDate` เริ่มที่ **วันนี้** ส่วน `startDate` ในอดีตยังใช้ได้ตามปกติ (ไม่ถูกดันขึ้นมา)
+- แกนของหน้า All ยังคำนวณจากคอร์สและวันสอบเหมือนเดิม
+- **เหตุผล:** `DAY_START` (2026-08-01) เป็นวันในปีการศึกษาเดียว ถ้าเก็บไว้ ต้องมีคนเปลี่ยนทุกปี ส่วน `DAY_LAST` ไม่เคยมีผลจริงในโค้ด (เป็นแค่ค่าสำรองตอนหาวันไม่เจอ). ข้อเสียคือคอร์สที่ซื้อและเรียนไปแล้วแต่ไม่มี `startDate` จะเลื่อนตามวันนี้ (คุยต่อในหัวข้อความคืบหน้า)
+- ใบ 04 (#8) ต้องเปลี่ยน characterization test ที่อิง `DAY_START` ให้ใช้ fixtures ที่คอร์สแรกทุกวิชามี `startDate` หรือบันทึกผลใหม่
+
+### ความคืบหน้า
+
+```ts
+type MyPathData = {
+  progress: Record<string, number>   // courseId → 0–100
+  // …
+}
+```
+
+- host คิด % เอง SDK ปัดค่าให้อยู่ในช่วง 0–100 และถือว่าคอร์สที่ไม่มีค่าเป็น 0
+- SDK แสดงความคืบหน้าเฉพาะคอร์สที่ซื้อแล้ว ค่าของคอร์สที่ยังไม่ซื้อไม่ถูกใช้
+- `GOALS` 30/70 (ธง/ถ้วย) และกติกาข้อความเป็นของ SDK host ปรับไม่ได้
+- **เหตุผล:** วิธีคิด % (ถ่วงน้ำหนักบทหรือวิดีโอ) เป็นความรู้ของ backend ส่วนเป้า 30/70 ผูกกับไอคอนและข้อความใน Figma ถ้าจะเปลี่ยนก็ต้องออกแบบใหม่อยู่แล้ว
+
+### "เริ่มเรียน" ตรึงวันเริ่ม
+
+- เมื่อกด "เริ่มเรียน" ในคอร์สที่ไม่มี `startDate` และไม่ได้ "ตาม Course ก่อนหน้า" SDK ตั้ง `startDate` เป็นวันเริ่มที่คำนวณได้ตอนนั้น แล้วยิง `onPlanChange(plan)` ก่อน `onStartCourse(courseId)`
+- คอร์สที่มี `startDate` แล้วหรือตาม Course ก่อนหน้า กดแล้วยิงแค่ `onStartCourse`
+- **เหตุผล:** คอร์สแรกที่ไม่มีวันเริ่มต้นจะเลื่อนตามวันนี้ (ดูหัวข้อขอบเขตเวลา) ถ้าเรียนไปแล้วแต่ยังเลื่อนอยู่ เป้าธง/ถ้วยจะไม่มีวันเลยกำหนด. การกด "เริ่มเรียน" เป็นจังหวะเดียวที่รู้แน่ว่าเริ่มจริง และเป็นการกระทำของนักเรียนเอง ตรรกะจึงอยู่ใน SDK ที่เดียว
+- ข้อจำกัด: ถ้าเริ่มเรียนจากหน้าอื่นของ Learn Anywhere วันเริ่มจะยังไม่ถูกตรึง host ตั้ง `startDate` ในแผนเองได้ถ้าต้องการ
+
+### รายละเอียดคอร์สส่งมาตั้งแต่ต้น แยกแพ็กเป็นตาราง
+
+```ts
+type MyPathData = {
+  packs: Record<string, PackInfo>                  // packId → แพ็ก
+  courseDetails: Record<string, CourseDetail>      // courseId → รายละเอียด
+  // …
+}
+type CourseDetail = { packId?: string; volume?: Volume; examgym?: ExamGymInfo }
+```
+
+- คอร์สที่ไม่อยู่ใน `courseDetails` = **คอร์สไม่มีรายละเอียด**
+- วันที่ทุกตัวในรายละเอียดเป็น `ISODate` SDK จัดรูปแบบเอง (mockup เก็บ `eggspaceStart` เป็นข้อความไทย)
+- **เหตุผล:** ข้อมูลรวมแค่ไม่กี่ KB ส่งมาตั้งแต่ต้นแล้ว SDK ไม่ต้องมีสถานะ loading/error และยังเป็น controlled ทั้งก้อนเหมือนส่วนอื่น. แยก `packs` เพราะครู สิทธิพิเศษ และนโยบายเป็นคุณสมบัติระดับแพ็ก (หนึ่งแพ็กมีหลายเล่ม) ถ้าฝังไว้ในแต่ละคอร์ส JSON จะมีแพ็กซ้ำหลายชุด. ถ้าวันหลังข้อมูลโตจนต้องโหลดทีหลัง ค่อยเพิ่ม callback แบบไม่บังคับ
+- ฟิลด์ข้างใน `PackInfo` / `Volume` / `ExamGymInfo` ดูหัวข้อถัดไป
+
+### รายละเอียดคอร์สมีเฉพาะฟิลด์ที่ UI แสดง
+
+```ts
+type PackInfo = { name: string; teacher: string }
+type Volume = { chapters: string[] }
+type ExamGymInfo = { slogan: string }
+```
+
+- ไม่มีข้อความการตลาดที่ใช้ร่วมกัน (`EGGSPACE_*`, `EXAMGYM_*`) ทั้งในสัญญาและใน SDK
+- ตัดฟิลด์ที่ mockup เก็บไว้แต่ไม่มีหน้าจอไหนแสดงออก: `audience`, `books`, `highlights`, `privileges`, `notes`, `bookNo`, `title`, `eggspaceStart`, `painPoint`, `sellingPoints`
+- **เหตุผล:** หน้ารายละเอียดคอร์สใช้แค่ `pack.name`, `pack.teacher`, `volume.chapters`, `examgym.slogan`. ฟิลด์ที่ไม่มีใครแสดงจะเป็นงาน backend ที่เปล่าประโยชน์ และข้อความบางตัวเปลี่ยนทุกปี (เช่น วันหมดอายุ) จึงไม่ควรฝังใน SDK. การเพิ่มฟิลด์ที่ไม่บังคับทีหลังเป็น minor version ไม่ทำให้ host พัง แต่การลบฟิลด์ทำให้พัง
+
+### ราคาและการซื้อ
+
+```ts
+type MyPathData = {
+  prices: Record<string, { now: number; was?: number }>   // courseId → บาท จำนวนเต็ม
+  // …
+}
+type MyPathProps = {
+  onBuyCourse: (courseId: string) => void
+  // …
+}
+```
+
+- คอร์สที่ไม่มีราคาไม่แสดงบรรทัดราคา, `was` แสดงแบบขีดฆ่าเมื่อมีค่า, SDK จัดรูปแบบ `฿3,900` เอง
+- `onBuyCourse` ส่งแค่ `courseId` host แปลงเป็นสินค้าจริงเอง (เล่มเดี่ยวหรือทั้งแพ็ก) และ `ONDEMAND_URL` ออกจาก SDK
+- **เหตุผล:** host รู้ว่าคอร์สไหนขายแบบไหน ถ้า SDK ส่ง `packId` ไปด้วยก็คือ SDK ตัดสินใจเรื่องการขายแทน. ราคาแยกจาก `courseDetails` เพราะคอร์สไม่มีรายละเอียดก็มีราคาได้ (เช่น `PHY.0`). ราคาเป็นข้อมูลที่นักเรียนเห็นบนร้านค้าอยู่แล้ว จึงไม่ใช่ข้อมูลภายใน แต่ host ต้องส่งราคาเดียวกับที่ร้านค้าแสดง
+
+### วันสอบและ Mock
+
+```ts
+type ExamEvent = { id: string; date: ISODate; label: string; kind: 'exam' | 'mock' }
+type MyPathData = {
+  events: ExamEvent[]
+  // …
+}
+```
+
+- host ส่งเฉพาะรายการที่เกี่ยวกับนักเรียนคนนี้ SDK แสดงทุกรายการที่ได้รับโดยไม่กรองเอง
+- การซื้อใช้กับ Mock เท่านั้น (ดูใน `owned`) สอบจริงแสดงสีเข้มเสมอ
+- **เหตุผล:** สอบจริงจัดโดยหน่วยงานภายนอก ไม่มีการซื้อ ถ้าใช้ `owned` แทนคำว่า "สมัครสอบแล้ว" คำว่าการซื้อจะมีสองความหมาย. การเลือกว่าใครเห็นสอบไหนเป็นตรรกะธุรกิจที่ host รู้ดีกว่า (เช่น ผูกกับวิชาที่สมัคร)
+
+### Catalog เป็นโครงเดียวจาก host
+
+```ts
+type CourseCatalogItem = { id: string; name: string; short: string; abbr: string; hours: number; cover?: string /* URL */ }
+type CatalogSubject = { id: string; name: string; color: string; courses: CourseCatalogItem[] }  // courses เรียงตามลำดับเล่ม
+type SubjectGroup = { name: string; subjects: CatalogSubject[] }
+type MyPathData = {
+  catalog: SubjectGroup[]   // ลำดับใน array = ลำดับที่แสดง
+  // …
+}
+type StudyCalendar = { /* … */ subjects: string[] }   // id ของวิชา ไม่ใช่ชื่อ
+```
+
+- รวม `subjectGroups` กับ `courseCatalog` เป็นโครงเดียว วิชาที่ `courses` ว่างได้แถวว่าง
+- ลำดับคอร์สในวิชาคือลำดับเล่ม ใช้ตัดสิน "คอร์สแรก" และ "ตาม Course ก่อนหน้า"
+- `short`, `abbr`, `color` มาจาก host ทั้งหมด
+- รูปปกมาจาก `cover` (URL) อย่างเดียว ลบ `covers` ที่ import รูปใน SDK
+- **เหตุผล:** ชื่อย่อและสีประจำวิชาเป็นเนื้อหาของสินค้าที่คนเขียนเอง SDK สร้างจากชื่อเต็มไม่ได้. mockup ผูกสองชุดด้วยชื่อวิชาภาษาไทย ถ้ารวมเป็นโครงเดียวจะไม่มีวิชาที่หาคู่ไม่เจอ. แผนที่บันทึกแล้วอ้างวิชาด้วย `id` เพื่อให้เปลี่ยนชื่อที่แสดงได้โดยแผนเดิมไม่พัง
+
+### ข้อมูลไม่ครบหรือผิด
+
+- แผนเก็บเฉพาะค่าที่นักเรียนตั้ง ทุกคอร์สของวิชาที่เปิดอยู่ถูกวางแผนเสมอ คอร์สที่ไม่มี `StudentCourse` ใช้ค่าเริ่มต้น (5 ชม./สัปดาห์, ไม่มีวันเริ่มต้น)
+- id ที่ไม่รู้จักใน `plan` / `owned` / `progress` / `prices` / `courseDetails` ถูกข้ามตอนแสดงผล แต่ **`onPlanChange` ส่งทุกรายการในแผนกลับไปครบ** รวมถึง `StudentCourse` และ id วิชาใน `calendar.subjects` ที่ไม่มีใน catalog
+- วันที่ผิดรูปถือว่าไม่มีค่านั้น (เช่น `startDate` ผิด = ไม่ได้ตั้ง)
+- catalog ว่าง = แสดงหน้าว่างพร้อมข้อความ ไม่ throw
+- ระหว่าง dev แจ้งปัญหาผ่าน `console.warn` (มีแค่ id ไม่มีข้อมูลส่วนบุคคล) ไม่มี `onDataError`
+- **เหตุผล:** นักเรียนไม่ควรเห็นจอพังเพราะคอร์สเดียวถูกถอดจาก catalog และ SDK ห้ามทำข้อมูลที่ host เป็นเจ้าของหายระหว่างส่งกลับ. `onDataError` เพิ่มเป็น prop ที่ไม่บังคับภายหลังได้โดยไม่ทำให้ host เดิมพัง
+
+### เวอร์ชันของสัญญา
+
+- ใช้ semver ของ package อย่างเดียว ไม่มี `schemaVersion` ใน `data` หรือ `StudentPlan`
+- เพิ่มฟิลด์ที่ไม่บังคับหรือ prop ที่ไม่บังคับ = minor, ลบหรือเปลี่ยนความหมายของฟิลด์ = major
+- ถ้า major version ไหนเปลี่ยนรูป `StudentPlan` SDK ต้องอ่านแผนรูปเก่าที่ host บันทึกไว้ได้ และเขียนไว้ใน changelog
+- **เหตุผล:** host compile SDK ไปพร้อมโค้ดตัวเองทั้งวิธี npm และ submodule จึงไม่มีทางรันกันคนละเวอร์ชัน และ TypeScript เตือนที่ adapter อยู่แล้ว. ข้อมูลเดียวที่อยู่ข้ามเวอร์ชันคือแผนที่บันทึกไว้ ถ้าฟิลด์ใหม่เป็นแบบไม่บังคับ แผนเก่าที่ไม่มีฟิลด์นั้นก็ยังอ่านได้. ถ้าวันหลังต้องเปลี่ยนแบบอ่านรูปเก่าไม่ได้ ค่อยเพิ่ม `version` ใน `StudentPlan` (ไม่มี = รุ่นแรก)
 
 ## Ticket
 
