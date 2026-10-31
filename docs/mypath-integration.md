@@ -33,13 +33,13 @@ player  ◄───────────────────────
 ### A. npm install จาก registry ⏳ T11
 
 ```bash
-npm install @ondemand/mypath
+npm install @learn/mypath
 ```
 
 ถ้าเป็น private registry (เช่น GitHub Packages) ให้เพิ่ม `.npmrc` ที่ root ของ repo host:
 
 ```
-@ondemand:registry=https://npm.pkg.github.com
+@learn:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${NPM_TOKEN}
 ```
 
@@ -69,7 +69,7 @@ import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
   resolve: {
-    alias: { '@ondemand/mypath': fileURLToPath(new URL('./vendor/mypath/packages/mypath/src/index.ts', import.meta.url)) },
+    alias: { '@learn/mypath': fileURLToPath(new URL('./vendor/mypath/packages/mypath/src/index.ts', import.meta.url)) },
     dedupe: ['react', 'react-dom'],
   },
 })
@@ -77,7 +77,7 @@ export default defineConfig({
 
 ```jsonc
 // tsconfig.json ของ host
-{ "compilerOptions": { "paths": { "@ondemand/mypath": ["./vendor/mypath/packages/mypath/src/index.ts"] } } }
+{ "compilerOptions": { "paths": { "@learn/mypath": ["./vendor/mypath/packages/mypath/src/index.ts"] } } }
 ```
 
 ถ้า host ใช้ Next.js แทน Vite ให้ใช้ `transpilePackages` และตั้ง alias ใน `webpack` / `turbopack` แทน.
@@ -101,8 +101,8 @@ npm จะสร้าง symlink ไปที่โฟลเดอร์ SDK. �
 ## ขั้นที่ 2 — วาง component ในแท็บที่ 3
 
 ```tsx
-import { MyPath } from '@ondemand/mypath'
-import '@ondemand/mypath/style.css'                    // วิธี A เท่านั้น — วิธี B/C ได้ CSS จาก index.ts อัตโนมัติ
+import { MyPath } from '@learn/mypath'
+import '@learn/mypath/style.css'                    // วิธี A เท่านั้น — วิธี B/C ได้ CSS จาก index.ts อัตโนมัติ
 
 export function MyPathTab() {
   const { data, today, isLoading } = useMyPathData()   // host ดึงจาก API ของตัวเอง
@@ -131,7 +131,7 @@ export function MyPathTab() {
 API ของ Learn Anywhere คงไม่ได้ส่งข้อมูลรูปเดียวกับ `MyPathData` พอดี ให้เขียนฟังก์ชันแปลงไว้จุดเดียว:
 
 ```ts
-import type { MyPathData } from '@ondemand/mypath'
+import type { MyPathData } from '@learn/mypath'
 
 export const toMyPathData = (res: LearnAnywhereMyPathResponse): MyPathData => ({
   catalog: /* … */,

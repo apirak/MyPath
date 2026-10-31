@@ -37,7 +37,7 @@ host ใช้หน้า Home, Courses, Profile และ BottomNav ที่�
 ## กติกา
 
 1. **`src/prototype` แก้ไม่ได้** ยกเว้นแก้ path/ลิงก์ตอนย้ายบ้าน. มีโค้ดซ้ำกับ SDK ได้ เพราะเราไม่ได้ดูแล prototype ต่อ
-2. **SDK import จาก `src/prototype` หรือ `react-router` ไม่ได้** และ **host import SDK ได้เฉพาะผ่านชื่อ package** (`@ondemand/mypath`). ทั้งสองข้อตรวจด้วยเทสต์ที่ scan ดู import
+2. **SDK import จาก `src/prototype` หรือ `react-router` ไม่ได้** และ **host import SDK ได้เฉพาะผ่านชื่อ package** (`@learn/mypath`). ทั้งสองข้อตรวจด้วยเทสต์ที่ scan ดู import
    **เหตุผล:** ถ้ามีอะไรรั่วออกนอกขอบเขต package จะเห็นทันทีตอนเทสต์ ไม่ต้องรอไปพังตอน build library
 3. **ฟังก์ชันคำนวณให้ copy ไปทั้งก้อน ไม่เขียนใหม่** (`plan.ts`, `progressStore.ts`) แล้วปรับให้เป็นฟังก์ชันล้วน. มีเทสต์ยืนยันว่าเมื่อได้ข้อมูลชุดเดียวกัน ผลต้องเท่ากับของ prototype
    **เหตุผล:** ในโค้ดมีรายละเอียดเยอะ (snap วันจันทร์, ต่อคอร์ส, ตามจังหวะเรียน) เขียนใหม่มีโอกาสเพี้ยนสูง
@@ -54,7 +54,7 @@ host ใช้หน้า Home, Courses, Profile และ BottomNav ที่�
 | 5. ตัดสินว่าครบแล้ว | เมื่อ SDK ทำได้ครบเท่า prototype ให้ลบ `src/prototype` ออก | เลิกมีโค้ดซ้ำสองชุด |
 | 6. Library build + publish | Vite library mode, ใส่ react เป็น peerDependencies, รวม CSS เป็นไฟล์เดียว, ใช้ npm workspaces, publish ไป private registry | ถึงตอนนี้โค้ดไม่ผูกกับอะไรแล้ว ตั้ง build ครั้งเดียวจบ |
 
-ระหว่างขั้น 2–5 ใช้ path alias `@ondemand/mypath` ไปก่อน.
+ระหว่างขั้น 2–5 ใช้ path alias `@learn/mypath` ไปก่อน.
 
 ## แยก host กับ SDK (ใช้ตอนทำ T3)
 
@@ -78,7 +78,7 @@ src/prototype/              ← ของเดิม ไม่แก้ → /pr
 **กลไกแยก 3 ชั้น**
 
 1. **แยกโฟลเดอร์** ตามโครงข้างบน
-2. **Import ได้ทางเดียว: host → SDK.** ตอนนี้ตั้ง alias `@ondemand/mypath` ใน `vite.config.ts` และ `tsconfig.json` ให้ชี้ไป `packages/mypath/src/index.ts` ไฟล์เดียว path ลึกจึง resolve ไม่ได้. ตอนทำ T11 ย้ายไป npm workspaces + field `exports` ใน `package.json` การ import ไฟล์ภายในจะถูกปิดตั้งแต่ระดับ Node. SDK มีแค่ `react` / `react-dom` เป็น peerDependencies และใช้ `lucide-react` ส่วน `react-router` กับ Tailwind เป็นของ host เท่านั้น
+2. **Import ได้ทางเดียว: host → SDK.** ตอนนี้ตั้ง alias `@learn/mypath` ใน `vite.config.ts` และ `tsconfig.json` ให้ชี้ไป `packages/mypath/src/index.ts` ไฟล์เดียว path ลึกจึง resolve ไม่ได้. ตอนทำ T11 ย้ายไป npm workspaces + field `exports` ใน `package.json` การ import ไฟล์ภายในจะถูกปิดตั้งแต่ระดับ Node. SDK มีแค่ `react` / `react-dom` เป็น peerDependencies และใช้ `lucide-react` ส่วน `react-router` กับ Tailwind เป็นของ host เท่านั้น
 3. **เทสต์ตรวจขอบเขต:** scan `packages/mypath/src` แล้ว fail ถ้าเจอ import ไป `src/`, `react-router` หรือ `/public` และ scan `src/host` แล้ว fail ถ้า import `packages/mypath` ด้วย path ตรงๆ
 
 **จุดที่ตอนนี้ปนกันอยู่**
