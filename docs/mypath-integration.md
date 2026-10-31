@@ -11,6 +11,7 @@ Learn Anywhere (host)                         My Path SDK
 ─────────────────────                         ───────────
 API ของ host ──► toMyPathData() ──► data ───► <MyPath>
                                     today ──►
+URL ของ host ◄────────── view / onViewChange ◄─►   (ไม่บังคับ)
 backend ◄── savePlan ◄──────────── onPlanChange
 shop    ◄────────────────────────── onBuyCourse
 player  ◄────────────────────────── onStartCourse
@@ -175,9 +176,46 @@ SDK รับแผนแบบ controlled เมื่อผู้ใช้แ�
 
 **ความรับผิดชอบเรื่อง PDPA [DP-001]:** ข้อมูลนักเรียนทั้งหมดผ่าน host อย่างเดียว การจัดเก็บ สิทธิ์เข้าถึง และการขอความยินยอมจากผู้ปกครอง (กรณีผู้เยาว์) จึงเป็นหน้าที่ของ Learn Anywhere.
 
-## Deep link / ปุ่ม back ⏳ T7
+## Deep link / ปุ่ม back
 
-ถ้า host ต้องการลิงก์ตรงไปยังคอร์ส หรือให้ปุ่ม back ของ browser ปิดหน้ารายละเอียดได้ host จะส่ง `view` / `onViewChange` เพิ่ม แล้วเก็บค่าไว้ใน URL ของตัวเอง. หน้าตาของ prop นี้รอ grill T7.
+ไม่บังคับ ถ้าไม่ส่ง `view` SDK เก็บเองว่าอยู่ Month หรือ All และเดือนไหน โดยไม่มีอะไรเข้า URL. ถ้าต้องการลิงก์ตรงหรือให้ back พาจาก All กลับ Month ให้ส่ง `view` / `onViewChange` แล้วเก็บค่าไว้ใน URL ของตัวเอง:
+
+```ts
+type MyPathView = { mode: 'month' | 'all'; month: string }   // month = 'YYYY-MM'
+```
+
+ตัวอย่างกับ react-router (route เดียว `/mypath/*` เพื่อไม่ให้ `<MyPath>` remount ตอนสลับ Month/All):
+
+```tsx
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { MyPath, type MyPathView } from '@learn/mypath'
+
+// <Route path="/mypath/*" element={<MyPathTab />} />
+export function MyPathTab() {
+  const { pathname } = useLocation()
+  const [params] = useSearchParams()
+  const navigate = useNavigate()
+
+  const view: MyPathView = {
+    mode: pathname.endsWith('/all') ? 'all' : 'month',
+    month: params.get('month') ?? '',               // ว่างหรือผิด SDK แก้เองแล้วแจ้งกลับ
+  }
+  const onViewChange = (next: MyPathView) => {
+    const path = next.mode === 'all' ? '/mypath/all' : '/mypath'
+    navigate(`${path}?month=${next.month}`, { replace: next.mode === view.mode })
+  }
+
+  return <MyPath data={data} view={view} onViewChange={onViewChange} /* … */ />
+}
+```
+
+- **ลิงก์ตรงได้สองแบบ:** `/mypath?month=YYYY-MM` (Month ของเดือนนั้น) และ `/mypath/all`. หน้ารายละเอียดคอร์สและแผงปฏิทินการเรียนเป็น state ภายใน SDK ลิงก์ตรงไม่ได้
+- **push หรือ replace host เป็นคนตัดสิน:** `mode` เปลี่ยน = push (back จาก All กลับ Month), `mode` เท่าเดิม = replace (เลื่อนเดือนกี่ครั้ง back ครั้งเดียวก็ออกจาก My Path)
+- **ปุ่ม back ไม่ปิดหน้าภายใน:** SDK ไม่แตะ browser history เลย ถ้ากด back ขณะหน้ารายละเอียดคอร์สเปิดอยู่ ผู้ใช้ไปที่ URL ก่อนหน้าของ host. ถ้า back นั้นเปลี่ยน Month ↔ All หน้าภายในจะปิดให้เอง
+- **ค่าผิด:** `month` ว่าง ผิดรูป หรืออยู่นอกแกนของแผน SDK แสดงเดือนที่ถูกต้องทันที แล้วเรียก `onViewChange` ครั้งเดียวเพื่อให้ host แก้ URL (เป็น replace ตามกติกาด้านบน)
+- **controlled:** เมื่อส่ง `view` แล้ว SDK แสดงตาม `view` เท่านั้น ถ้าไม่อัปเดต `view` หลัง `onViewChange` หน้าจอไม่เปลี่ยน. อย่าสลับระหว่างส่งกับไม่ส่ง `view` ระหว่างที่ component ยังอยู่
+
+เหตุผลของแต่ละข้ออยู่ใน [View state และ deep link](mypath-sdk-plan.md#view-state-และ-deep-link).
 
 ## เมื่อ SDK ออกเวอร์ชันใหม่
 
