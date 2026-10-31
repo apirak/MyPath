@@ -1,0 +1,142 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`progressState > 0% 1`] = `
+{
+  "message": {
+    "text": "ยังไม่เริ่มเรียน",
+    "tone": "muted",
+  },
+  "next": 30,
+  "passed": [
+    false,
+    false,
+  ],
+  "value": 0,
+}
+`;
+
+exports[`progressState > 70–99% 1`] = `
+{
+  "message": {
+    "egg": true,
+    "text": "ทำได้ดีมาก! พิชิตทุกเป้าหมายแล้ว",
+    "tone": "success",
+  },
+  "passed": [
+    true,
+    true,
+  ],
+  "value": 85,
+}
+`;
+
+exports[`progressState > 100% 1`] = `
+{
+  "message": {
+    "egg": true,
+    "text": "ยินดีด้วย! เรียนจบแล้ว",
+    "tone": "success",
+  },
+  "passed": [
+    true,
+    true,
+  ],
+  "value": 100,
+}
+`;
+
+exports[`progressState > ต่ำกว่าเป้าแรก ก่อนวันของเป้าแรก 1`] = `
+{
+  "message": {
+    "date": "2027-01-10",
+    "text": "พิชิตเป้าหมายแรกภายใน",
+    "tone": "normal",
+  },
+  "next": 30,
+  "passed": [
+    false,
+    false,
+  ],
+  "value": 10,
+}
+`;
+
+exports[`progressState > ต่ำกว่าเป้าแรก ตรงวันของเป้าแรก 1`] = `
+{
+  "message": {
+    "date": "2027-01-10",
+    "text": "พิชิตเป้าหมายแรกภายใน",
+    "tone": "normal",
+  },
+  "next": 30,
+  "passed": [
+    false,
+    false,
+  ],
+  "value": 10,
+}
+`;
+
+exports[`progressState > ต่ำกว่าเป้าแรก หลังวันของเป้าแรก 1`] = `
+{
+  "message": {
+    "egg": true,
+    "text": "ทำได้ดีแล้ว มาพยายามไปด้วยกันนะ",
+    "tone": "normal",
+  },
+  "next": 30,
+  "passed": [
+    false,
+    false,
+  ],
+  "value": 10,
+}
+`;
+
+exports[`progressState > ระหว่างเป้าแรกกับเป้าสอง ก่อนวันของเป้า… 1`] = `
+{
+  "message": {
+    "date": "2027-01-22",
+    "text": "เก่งมาก! พิชิตเป้าหมายถัดไปภายใน",
+    "tone": "normal",
+  },
+  "next": 70,
+  "passed": [
+    true,
+    false,
+  ],
+  "value": 50,
+}
+`;
+
+exports[`progressState > ระหว่างเป้าแรกกับเป้าสอง ตรงวันของเป้าส… 1`] = `
+{
+  "message": {
+    "date": "2027-01-22",
+    "text": "เก่งมาก! พิชิตเป้าหมายถัดไปภายใน",
+    "tone": "normal",
+  },
+  "next": 70,
+  "passed": [
+    true,
+    false,
+  ],
+  "value": 50,
+}
+`;
+
+exports[`progressState > ระหว่างเป้าแรกกับเป้าสอง หลังวันของเป้า… 1`] = `
+{
+  "message": {
+    "egg": true,
+    "text": "ใกล้สำเร็จแล้ว มาพิชิตเป้าหมายกันเถอะ",
+    "tone": "normal",
+  },
+  "next": 70,
+  "passed": [
+    true,
+    false,
+  ],
+  "value": 50,
+}
+`;
