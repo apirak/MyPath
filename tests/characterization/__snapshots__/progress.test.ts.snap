@@ -45,6 +45,37 @@ exports[`progressState > 100% 1`] = `
 }
 `;
 
+exports[`progressState > ตรงเป้าสองพอดี (70%) 1`] = `
+{
+  "message": {
+    "egg": true,
+    "text": "ทำได้ดีมาก! พิชิตทุกเป้าหมายแล้ว",
+    "tone": "success",
+  },
+  "passed": [
+    true,
+    true,
+  ],
+  "value": 70,
+}
+`;
+
+exports[`progressState > ตรงเป้าแรกพอดี (30%) 1`] = `
+{
+  "message": {
+    "date": "2027-01-22",
+    "text": "เก่งมาก! พิชิตเป้าหมายถัดไปภายใน",
+    "tone": "normal",
+  },
+  "next": 70,
+  "passed": [
+    true,
+    false,
+  ],
+  "value": 30,
+}
+`;
+
 exports[`progressState > ต่ำกว่าเป้าแรก ก่อนวันของเป้าแรก 1`] = `
 {
   "message": {

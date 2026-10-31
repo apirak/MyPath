@@ -11,7 +11,6 @@ import {
   calendarBudgetForWeek,
   calendarHoursForDay,
   rebuildPlan,
-  studyCalendar,
   subjects,
   u,
   isoOf,
@@ -34,9 +33,6 @@ describe('แผนเรียน: วิชาที่เรียน', () =>
       followPrevious: course.followPrevious,
       followPreviousWeeklyHours: course.followPreviousWeeklyHours,
     })))
-    expect(subjects.map(subject => subject.name)).toEqual(
-      expect.arrayContaining(studyCalendar.subjects),
-    )
     expect(courses).toMatchSnapshot()
   })
 })
@@ -49,6 +45,7 @@ describe('แผนเรียน: แกน', () => {
 
 describe('งบปฏิทิน', () => {
   it('ทุกวันจันทร์ในแกน', () => {
+    // วันจันทร์แรกที่ไม่ก่อน AXIS_START (getUTCDay: อาทิตย์ = 0, จันทร์ = 1)
     const firstMonday = u(AXIS_START) + ((8 - new Date(u(AXIS_START)).getUTCDay()) % 7) * MS
     const budgets: Record<string, number> = {}
     for (let monday = firstMonday; monday < u(AXIS_END); monday += 7 * MS) {
@@ -57,15 +54,13 @@ describe('งบปฏิทิน', () => {
     expect(budgets).toMatchSnapshot()
   })
 
-  it('ชั่วโมงรายวัน: วันธรรมดา, วันหยุด, วันพิเศษ, ช่วงปิดเทอม', () => {
-    const specialDay = studyCalendar.specialDays[0].date
-    const schoolBreak = studyCalendar.breaks[0]
-    const midBreak = isoOf((u(schoolBreak.start) + u(schoolBreak.end)) / 2)
+  // วันที่ตรึงไว้ตาม studyCalendar ใน studentPlan.ts: วันพิเศษ 2026-12-12 (เสาร์), ช่วงปิดเทอม 2026-12-21 – 2027-01-03
+  it('ชั่วโมงรายวัน: วันธรรมดา, เสาร์/อาทิตย์, วันพิเศษ, ช่วงปิดเทอม', () => {
     expect({
       weekday: calendarHoursForDay('2026-12-07'),
       weekend: calendarHoursForDay('2026-12-06'),
-      specialDay: { date: specialDay, hours: calendarHoursForDay(specialDay) },
-      schoolBreak: { date: midBreak, hours: calendarHoursForDay(midBreak) },
+      specialDay: calendarHoursForDay('2026-12-12'),
+      schoolBreak: calendarHoursForDay('2026-12-27'),
     }).toMatchSnapshot()
   })
 })

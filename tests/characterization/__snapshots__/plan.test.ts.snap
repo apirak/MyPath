@@ -1,15 +1,9 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`งบปฏิทิน > ชั่วโมงรายวัน: วันธรรมดา, วันหยุด, วันพิเศษ, ช่วงปิดเทอม 1`] = `
+exports[`งบปฏิทิน > ชั่วโมงรายวัน: วันธรรมดา, เสาร์/อาทิตย์, วันพิเศษ, ช่วงปิดเทอม 1`] = `
 {
-  "schoolBreak": {
-    "date": "2026-12-27",
-    "hours": 2,
-  },
-  "specialDay": {
-    "date": "2026-12-12",
-    "hours": 5,
-  },
+  "schoolBreak": 2,
+  "specialDay": 5,
   "weekday": 1,
   "weekend": 3,
 }
