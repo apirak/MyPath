@@ -1,0 +1,12 @@
+pre-commit:
+  jobs:
+    - name: typecheck
+      run: pnpm typecheck
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: typecheck
+      run: pnpm typecheck
+    - name: test
+      run: pnpm test
