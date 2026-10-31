@@ -96,20 +96,24 @@ src/prototype/              ← ของเดิม ไม่แก้ → /pr
 
 ## Ticket
 
-**Grill** = ต้องคุยให้ได้ข้อสรุปก่อนลงมือ เพราะเป็นการตัดสินใจที่แก้ภายหลังยาก (หน้าตาของ API หรือคนนอกทีมต้องใช้).
+Ticket อยู่ใน GitHub Issues ของ `apirak/MyPath` (ชื่อขึ้นต้นด้วย "My Path SDK NN") และผูก blocked-by ด้วยระบบ dependency ของ GitHub. ตารางนี้เป็นภาพรวม รายละเอียดและ acceptance criteria อยู่ใน issue.
 
-| # | Ticket | Grill ก่อน? | ขึ้นกับ | หมายเหตุ |
+**Grill** = ต้องคุยให้ได้ข้อสรุปก่อนลงมือ เพราะเป็นการตัดสินใจที่แก้ภายหลังยาก (หน้าตาของ API หรือคนนอกทีมต้องใช้). ใบ grill แยกจากใบลงมือทำและติด label `ready-for-human`.
+
+| ใบ | Issue | Ticket | Label | Blocked by |
 |---|---|---|---|---|
-| T1 | ตาข่ายกันพลาด: tag + Vitest + characterization tests | ไม่ต้อง | – | ready-for-agent |
-| T2 | สัญญาข้อมูล: type ของ `data` และ callback ทั้งหมด | **Grill** | – | เป็น public API แก้ทีหลังแล้ว host ต้องแก้ตาม. ประเด็น: host ส่ง progress เป็น % หรือเป็นรายบท, ส่ง `courseDetails` มากับ props หรือให้ SDK ดึงเอง, `onPlanChange` ส่งแผนทั้งก้อนหรือเฉพาะส่วนที่เปลี่ยน, ราคาคอร์สมาจากไหน |
-| T3 | แยกบ้าน: ย้ายไป `src/prototype` + host shell + package เปล่า + ไฟล์ JSON ฝั่ง host + เทสต์ตรวจขอบเขต import | ไม่ต้อง | T1, T2 | ทำตามหัวข้อ "แยก host กับ SDK". ต้องแก้ลิงก์ BottomNav ของ prototype ให้ชี้ `/prototype/mypath` |
-| T4 | `buildPlan` เป็นฟังก์ชันล้วน + เทสต์เทียบกับ prototype | ไม่ต้อง | T3 | |
-| T5 | UI: header + หน้า Month | ไม่ต้อง | T4 | ชิ้นแรก เป็นตัวกำหนดแบบแผนของ CSS scope |
-| T6 | UI: หน้า All timeline (รวมการลากและ snap วันจันทร์) | ไม่ต้อง | T5 | |
-| T7 | UI: Course detail + ปุ่มซื้อ/เริ่มเรียน + view state (ไม่ใช้ router) | **Grill** | T5 | ประเด็น: host ต้องการ deep link / ปุ่ม back หรือไม่ ถ้าต้องการ หน้าตาของ `view` / `onViewChange` เป็นอย่างไร |
-| T8 | UI: Study calendar panel | ไม่ต้อง | T5 | |
-| T9 | UI: Course progress (แผงทดสอบอยู่ฝั่ง host) | ไม่ต้อง | T5 | ใช้ข้อสรุปเรื่อง progress จาก T2 |
-| T10 | ตรวจว่าครบเท่า prototype + ลบ `src/prototype` | **Grill** (สั้น) | T6–T9 | ตกลงเกณฑ์ "ครบแล้ว" ก่อน ว่าจะเทียบหน้าไหน สถานะไหน ทั้ง desktop และ mobile. ready-for-human |
-| T11 | Library build + publish | **Grill** | T10 | ต้องรักษาให้ host ใช้ผ่าน git submodule ได้ด้วย (ดู mypath-integration.md). ประเด็น: registry, การนับเวอร์ชัน, lucide-react ใส่ไปใน bundle หรือเป็น peer, ต้องใช้ React เวอร์ชันขั้นต่ำเท่าไร (ตอนนี้ใช้ 19) |
+| 01 | #2 | ตาข่ายกันพลาด: tag + Vitest + characterization tests | ready-for-agent | – |
+| 02 | #3 | [Grill] สัญญาข้อมูลของ `<MyPath>` | ready-for-human | – |
+| 03 | #7 | แยกบ้าน: prototype ที่ /prototype + host จำลอง + package เปล่า | ready-for-agent | #2, #3 |
+| 04 | #8 | ชิ้นแรกที่ใช้ได้จริง: หน้า Month ใน SDK (รวม buildPlan) | ready-for-agent | #7 |
+| 05 | #9 | หน้า All timeline | ready-for-agent | #8 |
+| 06 | #4 | [Grill] view state และ deep link | ready-for-human | – |
+| 07 | #10 | หน้ารายละเอียดคอร์ส + ปุ่มซื้อ/เริ่มเรียน | ready-for-agent | #8, #4 |
+| 08 | #11 | แผงปฏิทินการเรียน | ready-for-agent | #8 |
+| 09 | #12 | ความคืบหน้ารายคอร์ส | ready-for-agent | #8 |
+| 10 | #5 | [Grill] เกณฑ์ "ครบเท่า prototype" | ready-for-human | – |
+| 11 | #13 | ตรวจว่าครบเท่า prototype + ลบ prototype | ready-for-human | #9, #10, #11, #12, #5 |
+| 12 | #6 | [Grill] build และ publish (ต้องรองรับ git submodule ด้วย) | ready-for-human | – |
+| 13 | #14 | Library build + publish `@learn/mypath` | ready-for-agent | #13, #6 |
 
-T6–T9 ทำพร้อมกันได้หลัง T5 เสร็จ.
+เริ่มได้ทันที: #2, #3, #4, #5, #6. หลัง #8 เสร็จ #9, #11, #12 ทำพร้อมกันได้ (#10 ต้องรอ #4 ด้วย).
