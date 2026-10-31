@@ -43,7 +43,7 @@ npm install @learn/mypath
 //npm.pkg.github.com/:_authToken=${NPM_TOKEN}
 ```
 
-`NPM_TOKEN` อ่านจาก environment variable ของเครื่อง dev และ CI ห้าม commit token ลง repo. ชื่อ package และ registry จะชัดหลัง grill T11.
+`NPM_TOKEN` อ่านจาก environment variable ของเครื่อง dev และ CI ห้าม commit token ลง repo. registry จะชัดหลัง grill T11.
 
 ### B. Git submodule (ไม่ใช้ npm registry)
 
