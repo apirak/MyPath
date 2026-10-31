@@ -24,6 +24,7 @@ A **frontend-only as-is mockup** of the current Learn Anywhere website:
 |---|---|---|
 | 1. As-is mockup | Rebuild every existing page 1:1 from Figma (desktop + mobile), document each page & component in `ai-knowledge/PAGES/` | In progress |
 | 2. My Path redesign | Redesign the My Path page on top of the as-is understanding | In progress |
+| 3. My Path SDK | Package My Path as a React SDK that the real Learn Anywhere embeds in tab 3 — see `docs/adr/0001-mypath-as-react-sdk.md` and `docs/mypath-sdk-plan.md` | Planned |
 
 ## How we work
 
