@@ -42,6 +42,8 @@ host ใช้หน้า Home, Courses, Profile และ BottomNav ที่�
 3. **ฟังก์ชันคำนวณให้ copy ไปทั้งก้อน ไม่เขียนใหม่** (`plan.ts`, `progressStore.ts`) แล้วปรับให้เป็นฟังก์ชันล้วน. มีเทสต์ยืนยันว่าเมื่อได้ข้อมูลชุดเดียวกัน ผลต้องเท่ากับของ prototype
    **เหตุผล:** ในโค้ดมีรายละเอียดเยอะ (snap วันจันทร์, ต่อคอร์ส, ตามจังหวะเรียน) เขียนใหม่มีโอกาสเพี้ยนสูง
 4. **ทุกขั้นต้องผ่าน:** `npm test` + `npm run build` และเปิดได้ทั้ง `/` กับ `/prototype/mypath` ก่อน commit
+5. **วิธีทำ ticket:** ใบ implement ใช้ `/mattpocock-skills:implement issue #N` แล้ว review ก่อนเปิด PR ด้วย `/mattpocock-skills:code-review` (มาตรฐานของ repo + ตรงตาม issue) และ `/ponytail:ponytail-review` (ซับซ้อนเกินจำเป็น) ส่วนใบ grill ใช้ `/mattpocock-skills:grill-with-docs issue #N`
+   **เหตุผล:** ทุกใบผ่านกระบวนการเดียวกัน และ review สองมุมจับปัญหาต่างกัน คือทำผิด spec กับทำเกินจำเป็น
 
 ## ลำดับขั้น
 
