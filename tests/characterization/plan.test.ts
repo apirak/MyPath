@@ -37,8 +37,10 @@ describe('แผนเรียน: ชั่วโมงตามแผน, เ
     const weeks: Record<string, number> = {}
     for (const [iso, hours] of scheduledHoursByDay) {
       const day = u(iso), monday = isoOf(day - ((new Date(day).getUTCDay() + 6) % 7) * MS)
-      weeks[monday] = +((weeks[monday] ?? 0) + hours).toFixed(4)
+      weeks[monday] = (weeks[monday] ?? 0) + hours
     }
+    // รวมเต็มความละเอียดแบบ WeeklyLoad ใน AllView แล้วปัดเฉพาะผลรวมของสัปดาห์ (ปัดทุกวันทำให้ error สะสม)
+    for (const monday in weeks) weeks[monday] = +weeks[monday].toFixed(4)
     expect({ totalHours, weeks }).toMatchSnapshot()
   })
 
