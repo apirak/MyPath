@@ -1,13 +1,13 @@
-import { useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import type { ExamEvent } from '../types'
 import { usePlan } from '../MyPathProvider'
 import { agendaFor, type Agenda as AgendaData, type AgendaCourse } from '../plan/agenda'
 import { addMonths, dayOf, fmtDate, fmtMonth, fmtShort, monthShortOf, monthStartOf } from '../plan/dates'
-import PathHeader from './PathHeader'
+import PathHeader, { type ModeProps } from './PathHeader'
 import PlanEmptyState from './PlanEmptyState'
 
 // port จาก src/prototype/pages/MyPath.tsx — agenda คิดจากแผนทั้งหมด (กติกา section ล็อกไว้ใน GLOSSARY.md)
-// ต่างจาก prototype: เดือนที่เลือกเป็น state ภายใน (ไม่มี ?month=), การ์ดยังกดไม่ได้ (ใบ 07) และไม่มีความคืบหน้า (ใบ 09)
+// ต่างจาก prototype: เดือนที่เลือกเป็น state ภายในของ <MyPath> (ไม่มี ?month=), การ์ดยังกดไม่ได้ (ใบ 07) และไม่มีความคืบหน้า (ใบ 09)
 
 // สีชนิดสอบ (encoding เดียวกับ All: น้ำเงิน = สอบจริง, แดง = Mock)
 const KIND_COLOR = { exam: '#2b6cd4', mock: '#ef6268' } as const
@@ -97,19 +97,20 @@ function Agenda({ agenda, today }: { agenda: AgendaData; today: string }) {
   </section>
 }
 
-export default function MonthView() {
+// selected อยู่ที่ <MyPath> เพื่อไม่หายตอนสลับไป All · ไม่มี = เดือนของวันนี้
+export default function MonthView({ selected: picked, onSelect, ...mode }: ModeProps & { selected?: string; onSelect: (month: string) => void }) {
   const { plan } = usePlan()
   const { axis, today } = plan
-  const [selected, setSelected] = useState(() => monthStartOf(today))
+  const selected = picked ?? monthStartOf(today)
   // แกนคิดใหม่ทุกครั้งที่แผนเปลี่ยน → บีบเดือนที่เลือกเข้าขอบแกนที่ใกล้ที่สุด (ไม่กลับไปเดือนของวันนี้แบบ prototype)
   const lastMonth = addMonths(axis.end, -1)
   const month = selected < axis.start ? axis.start : selected > lastMonth ? lastMonth : selected
   const agenda = agendaFor(plan, month)
   // key={month}: เปลี่ยนเดือน = remount scroller → กลับขึ้นบนสุด
   return <>
-    <PathHeader monthLabel={fmtMonth(month)} now={agenda.isCurrent}
+    <PathHeader mode="month" {...mode} period={fmtMonth(month)} now={agenda.isCurrent}
       canPrev={month > axis.start} canNext={month < lastMonth}
-      onPrev={() => setSelected(addMonths(month, -1))} onNext={() => setSelected(addMonths(month, 1))} />
+      onPrev={() => onSelect(addMonths(month, -1))} onNext={() => onSelect(addMonths(month, 1))} />
     <div className="mp-scroll" key={month}>
       <div className="mp-shell">{plan.subjects.length === 0 ? <PlanEmptyState /> : <Agenda agenda={agenda} today={today} />}</div>
     </div>

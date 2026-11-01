@@ -87,6 +87,12 @@ describe('ขอบเขต: CSS ของ SDK', () => {
     const css = readFileSync(join(ROOT, 'packages/mypath/src/mypath.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
     const selectors = [...css.matchAll(/([^{}]+)\{/g)].map(([, s]) => s.trim()).filter(s => !s.startsWith('@')).flatMap(s => s.split(','))
     expect(selectors.length).toBeGreaterThan(0)
-    expect(selectors.map(s => s.trim()).filter(s => !/^(\.mypath-root|:where\(\.mypath-root\))([\s.:[]|$)/.test(s))).toEqual([])
+    // ขั้นของ @keyframes (from/to/0%) ไม่ใช่ selector
+    expect(selectors.map(s => s.trim()).filter(s => !/^(from|to|[\d.]+%)$/.test(s) && !/^(\.mypath-root|:where\(\.mypath-root\))([\s.:[]|$)/.test(s))).toEqual([])
+  })
+
+  it('ชื่อ @keyframes ขึ้นต้นด้วย mp- (ชื่อเป็น global ชนกับ host ได้)', () => {
+    const css = readFileSync(join(ROOT, 'packages/mypath/src/mypath.css'), 'utf8')
+    expect([...css.matchAll(/@keyframes\s+([\w-]+)/g)].map(([, name]) => name).filter(name => !name.startsWith('mp-'))).toEqual([])
   })
 })
