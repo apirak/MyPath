@@ -55,9 +55,9 @@ host ใช้หน้า Home, Courses, Profile และ BottomNav ที่�
 | 3. ย้ายส่วนคำนวณ | `buildPlan(catalog, plan, today)` เป็นฟังก์ชันล้วน + เทสต์เทียบกับ prototype | UI ทุกชิ้นใช้ส่วนนี้ จึงต้องนิ่งก่อน |
 | 4. ปั้น UI ทีละชิ้น | header + Month → All timeline → Course detail → Study calendar → Progress. แต่ละชิ้นเขียน CSS แบบมี scope (`.mypath-root`, prefix `mp-`) ตั้งแต่แรก + smoke test | แต่ละชิ้นเสร็จแล้วใช้ได้ทันทีใน host. CSS ของ My Path เป็น CSS ธรรมดา ไม่ได้ใช้ Tailwind จึงไม่ต้องลากเอา Tailwind ไปด้วย |
 | 5. ตัดสินว่าครบแล้ว | เมื่อ SDK ทำได้ครบเท่า prototype ให้ลบ `src/prototype` ออก — **เสร็จแล้ว (#13)** | เลิกมีโค้ดซ้ำสองชุด |
-| 6. Library build + publish | Vite library mode, ใส่ react เป็น peerDependencies, รวม CSS เป็นไฟล์เดียว, ใช้ pnpm workspaces, publish ตาม [Build และ publish](#build-และ-publish) | ถึงตอนนี้โค้ดไม่ผูกกับอะไรแล้ว ตั้ง build ครั้งเดียวจบ |
+| 6. Library build + publish | Vite library mode, ใส่ react เป็น peerDependencies, รวม CSS เป็นไฟล์เดียว, ใช้ pnpm workspaces, publish ตาม [Build และ publish](#build-และ-publish) — **build เสร็จแล้ว (#14), release ยังไม่ทำ** | ถึงตอนนี้โค้ดไม่ผูกกับอะไรแล้ว ตั้ง build ครั้งเดียวจบ |
 
-ระหว่างขั้น 2–5 ใช้ path alias `@learn/mypath` ไปก่อน.
+ระหว่างขั้น 2–5 ใช้ path alias `@learn/mypath` ไปก่อน. ตั้งแต่ขั้น 6 dev ยังใช้ alias ไป source (HMR) ส่วน `pnpm verify:package` build package แล้วให้ host build จาก `dist` แบบคนนอก (วิธี A).
 
 ## แยก host กับ SDK (ใช้ตอนทำ T3)
 
@@ -542,7 +542,7 @@ type MyPathProps = {
 ### รูปและ CSS
 
 - CSS รวมเป็น `dist/style.css` ไฟล์เดียว
-- รูปที่ SDK ใช้เองฝังเป็น data URI (ค่าเริ่มต้นของ Vite library mode) **รูปทั้งหมดรวมกันไม่เกิน 100 KB** ต้องบีบ `plan-header-bg.png` (229 KB) ก่อน
+- รูปที่ SDK ใช้เองฝังเป็น data URI (ค่าเริ่มต้นของ Vite library mode) **รูปทั้งหมดรวมกันไม่เกิน 100 KB** — บีบ `plan-header-bg.png` (229 KB) เป็น `plan-header-bg.jpg` (25 KB) แล้ว รวมทั้งหมดราว 57 KB หลังฝัง (เทสต์ขอบเขตตรวจเพดาน)
 - host ต้องอนุญาต `img-src data:` ใน CSP
   **เหตุผล:** host ได้ JS + CSS ที่ใช้ได้ทันทีโดยไม่ต้องตั้งค่า asset. ถ้า copy เป็นไฟล์ host ต้องพึ่ง bundler ที่ resolve `new URL(..., import.meta.url)` ได้ ส่วนวิธี B bundler ของ host จัดการรูปเอง
 

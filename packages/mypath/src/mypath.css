@@ -88,7 +88,7 @@
 .mypath-root .mp-pes-hint b{padding-bottom:6px;color:#495057;font-size:16px}
 .mypath-root .mp-pes-hint svg{width:96px;height:72px;flex:none;fill:none;stroke:#495057;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 .mypath-root .mp-pes-banners{display:grid;justify-items:center;gap:16px;margin-top:24px}
-.mypath-root .mp-pes-banner{display:grid;justify-items:center;gap:8px;width:min(768px,100%);border-radius:16px;background:#1d5fae url(./assets/plan-header-bg.png) center/cover;padding:32px 24px;color:#fff;text-align:center}
+.mypath-root .mp-pes-banner{display:grid;justify-items:center;gap:8px;width:min(768px,100%);border-radius:16px;background:#1d5fae url(./assets/plan-header-bg.jpg) center/cover;padding:32px 24px;color:#fff;text-align:center}
 .mypath-root .mp-pes-banner h2,.mypath-root .mp-pes-banner p{text-wrap:balance}
 .mypath-root .mp-pes-banner h2{margin:0;font-size:28px;font-weight:700;line-height:40px}
 .mypath-root .mp-pes-banner p{margin:0;font-size:16px;line-height:24px}

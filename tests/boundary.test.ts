@@ -25,7 +25,7 @@ function violations(file: string, source: string): string[] {
       // SDK ไม่มี dependency นอกจาก react (ไอคอนเป็น SVG ของ SDK เอง)
       if (spec.startsWith('react-router') || spec === 'lucide-react') out.push(`dependency ของ host: ${spec}`)
     } else if (file.startsWith('src/host/')) {
-      if (sdk && spec !== '@learn/mypath') out.push(`ไม่ผ่าน @learn/mypath: ${spec}`)
+      if (sdk && spec !== '@learn/mypath' && spec !== '@learn/mypath/style.css') out.push(`ไม่ผ่าน @learn/mypath: ${spec}`)
     }
   }
   if (file.startsWith('packages/mypath/') && PUBLIC_PATH.test(source)) out.push('อ้างไฟล์ใน public/')
@@ -68,6 +68,7 @@ describe('ขอบเขต: เทสต์จับการ import ข้า
     [sdk, "import type { MyPathProps } from '../types'"],
     [sdk, "import { useState } from 'react'"],
     [host, "import { MyPath } from '@learn/mypath'"],
+    [host, "import '@learn/mypath/style.css'"],
     ['packages/mypath/src/mypath.css', "@import url('./ui/month.css');"],
     ['packages/mypath/src/mypath.css', '@import url(./ui/month.css);'],
   ])('ผ่าน %s: %s', (file, source) => {
@@ -87,5 +88,28 @@ describe('ขอบเขต: CSS ของ SDK', () => {
   it('ชื่อ @keyframes ขึ้นต้นด้วย mp- (ชื่อเป็น global ชนกับ host ได้)', () => {
     const css = readFileSync(join(ROOT, 'packages/mypath/src/mypath.css'), 'utf8')
     expect([...css.matchAll(/@keyframes\s+([\w-]+)/g)].map(([, name]) => name).filter(name => !name.startsWith('mp-'))).toEqual([])
+  })
+})
+
+describe('ขอบเขต: package ของ SDK', () => {
+  const pkg = JSON.parse(readFileSync(join(ROOT, 'packages/mypath/package.json'), 'utf8'))
+
+  it('dependency มีแค่ peer react / react-dom (ไม่มี lucide-react)', () => {
+    expect(pkg.dependencies).toBeUndefined()
+    expect(pkg.peerDependencies).toEqual({ react: '^19.0.0', 'react-dom': '^19.0.0' })
+    expect(JSON.stringify(pkg)).not.toContain('lucide')
+  })
+
+  it('exports เปิดแค่ทางเข้าหลักกับ style.css', () => {
+    expect(Object.keys(pkg.exports)).toEqual(['.', './style.css'])
+  })
+
+  // library mode ฝังทุกรูปเป็น data URI — คิดแบบ base64 (โตขึ้น 4/3) ซึ่งเป็นกรณีใหญ่สุด
+  it('รูปที่ฝังใน bundle รวมกันไม่เกิน 100 KB', () => {
+    const dir = join(ROOT, 'packages/mypath/src/assets')
+    const bytes = (readdirSync(dir, { recursive: true }) as string[])
+      .filter(name => /\.(png|jpe?g|svg|webp|gif)$/.test(name))
+      .reduce((sum, name) => sum + readFileSync(join(dir, name)).length, 0)
+    expect(bytes * 4 / 3).toBeLessThanOrEqual(100 * 1024)
   })
 })

@@ -1,0 +1,17 @@
+{
+  "name": "@learn/mypath",
+  "version": "0.1.0",
+  "type": "module",
+  "files": ["dist", "src"],
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./style.css": "./dist/style.css"
+  },
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.build.json"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
