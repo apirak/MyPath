@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "pnpm -F @learn/mypath build && tsc --noEmit && vite build",
+    "verify:package": "pnpm -F @learn/mypath build && MYPATH_DIST=1 vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

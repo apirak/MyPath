@@ -1,0 +1,23 @@
+{
+  "name": "@learn/mypath",
+  "version": "0.1.0",
+  "type": "module",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.build.json && node -e \"const fs=require('fs'),f='dist/index.d.ts';fs.writeFileSync(f,fs.readFileSync(f,'utf8').replace(/^import '.\\/mypath.css';\\n/m,''))\""
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { MyPath, type StudentPlan } from '@learn/mypath'
+import '@learn/mypath/style.css' // แบบวิธี A: ตอน verify:package ที่ใช้ dist (ตอน dev ซ้ำกับที่ index.ts import อยู่แล้ว)
 import BottomNav from '../components/BottomNav'
 import ProgressTestPanel from '../dev/ProgressTestPanel'
 import { TODAY, mypathData } from '../fixtures'
