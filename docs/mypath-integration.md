@@ -2,7 +2,7 @@
 
 คู่มือสำหรับทีม Learn Anywhere (React web) ที่จะวาง My Path ไว้ในแท็บที่ 3. ที่มาของการตัดสินใจอยู่ใน [ADR-0001](adr/0001-mypath-as-react-sdk.md) แผนการทำ SDK อยู่ใน [mypath-sdk-plan.md](mypath-sdk-plan.md).
 
-> **สถานะ:** SDK ยังไม่ได้ publish. หัวข้อที่มีเครื่องหมาย ⏳ ยังรอผล grill ของ ticket ที่ระบุ
+> **สถานะ:** SDK ยังไม่ได้ release. เวอร์ชันแรกจะเป็น `0.1.0` ช่องทางแจกตัดสินแล้ว (วิธี A ข้างล่าง) แต่ยังไม่เปิดใช้จนกว่าจะตกลงกับทีม Learn Anywhere ว่าจะเชื่อมกันอย่างไร
 
 ## ภาพรวม
 
@@ -19,7 +19,7 @@ player  ◄───────────────────────
 
 - host เป็นเจ้าของข้อมูลทั้งหมด SDK แค่แสดงผลและแจ้งว่าผู้ใช้แก้อะไร
 - SDK ไม่ยิง API, ไม่ใช้ localStorage, ไม่ส่ง analytics
-- ข้อกำหนด: React ต้องเป็นเวอร์ชันที่ตรงกับ peerDependencies ของ SDK (ตอนนี้ใช้ 19) และไม่ต้องติดตั้ง react-router หรือ Tailwind เพิ่มเพื่อ SDK
+- ข้อกำหนด: React และ React DOM `^19.0.0` (peerDependencies ของ SDK) ไม่ต้องติดตั้ง react-router, Tailwind หรือ `lucide-react` เพิ่มเพื่อ SDK (ไอคอนที่ใช้ bundle มากับ SDK แล้ว)
 
 ## ขั้นที่ 1 — ติดตั้ง
 
@@ -27,24 +27,19 @@ player  ◄───────────────────────
 
 | วิธี | เหมาะกับ | ข้อดี | ข้อเสีย |
 |---|---|---|---|
-| **A. npm install จาก registry** (แนะนำ) | ใช้งานจริง | ปักเวอร์ชันได้ชัดตาม semver, CI ง่าย, ได้ไฟล์ที่ build แล้ว | ต้องมี private registry และ token |
+| **A. npm install tarball จาก GitHub Release** (แนะนำ) | ใช้งานจริง | ปักเวอร์ชันชัด, ได้ไฟล์ที่ build แล้ว, ไม่ต้องมี registry หรือ token | ขึ้นเวอร์ชันต้องแก้ URL เอง (`npm update` ใช้ไม่ได้) |
 | **B. Git submodule** | ไม่อยากใช้ registry | ไม่ต้องมี registry, เห็น source ตรงๆ | CI ต้องดึง submodule และต้องมีสิทธิ์อ่าน repo นี้, host ต้อง compile source เอง |
 | **C. `file:` link แบบ local** | dev ทั้งสอง repo พร้อมกัน | แก้ SDK แล้วเห็นผลใน host ทันที | ใช้บนเครื่อง dev เท่านั้น ห้ามใช้ build จริง |
 
-### A. npm install จาก registry ⏳ T11
+### A. npm install tarball จาก GitHub Release
+
+แต่ละเวอร์ชันมี tarball ที่ build แล้วแนบอยู่กับ Release ของ tag `mypath-vX.Y.Z`:
 
 ```bash
-npm install @learn/mypath
+npm install https://github.com/apirak/MyPath/releases/download/mypath-v0.1.0/learn-mypath-0.1.0.tgz
 ```
 
-ถ้าเป็น private registry (เช่น GitHub Packages) ให้เพิ่ม `.npmrc` ที่ root ของ repo host:
-
-```
-@learn:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NPM_TOKEN}
-```
-
-`NPM_TOKEN` อ่านจาก environment variable ของเครื่อง dev และ CI ห้าม commit token ลง repo. registry จะชัดหลัง grill T11.
+ชื่อ package ยังเป็น `@learn/mypath` import ได้ตามปกติ. ไม่ต้องตั้ง `.npmrc` หรือ token เพราะ repo เป็น public. ถ้าวันหลัง repo ย้ายไปเป็น private ของบริษัท วิธีนี้จะเปลี่ยนเป็น registry และคู่มือนี้จะบอกวิธีใหม่.
 
 ### B. Git submodule (ไม่ใช้ npm registry)
 
@@ -55,11 +50,11 @@ git submodule add git@github.com:apirak/MyPath.git vendor/mypath
 ```
 
 ```bash
-git -C vendor/mypath checkout mypath-v1.0.0
+git -C vendor/mypath checkout mypath-v0.1.0
 ```
 
 ```bash
-git add .gitmodules vendor/mypath && git commit -m "chore: add My Path SDK v1.0.0"
+git add .gitmodules vendor/mypath && git commit -m "chore: add My Path SDK v0.1.0"
 ```
 
 ให้ host compile source ของ SDK ไปพร้อมกับโค้ดตัวเอง แบบเดียวกับที่ host จำลองใน repo นี้ทำ คือชี้ชื่อ package ไปที่ `index.ts`:
@@ -125,7 +120,8 @@ export function MyPathTab() {
 ```
 
 - SDK ไม่รู้ว่ามี tab bar หรือ header ของ host. host เป็นคนให้กล่องที่มีความสูงแน่นอน
-- CSS ของ SDK อยู่ใต้ `.mypath-root` ทั้งหมด ไม่แตะ style ของ host
+- CSS ของ SDK อยู่ใต้ `.mypath-root` ทั้งหมด ไม่แตะ style ของ host. **ห้าม host เขียน style ทับ class ของ SDK** (`.mypath-root`, `mp-*`) class เหล่านี้เป็นของภายใน เปลี่ยนได้ทุกเวอร์ชันโดยไม่ถือเป็น breaking change
+- รูปของ SDK ฝังมาเป็น data URI ถ้า host ตั้ง CSP ต้องอนุญาต `img-src data:`
 - `today` ไม่บังคับ ถ้าไม่ส่ง SDK ใช้วันตามเวลาไทยจากนาฬิกาเครื่อง และเปลี่ยนวันเองเมื่อข้ามเที่ยงคืน ถ้าส่ง ให้เป็น `'YYYY-MM-DD'` ตามเวลาไทยที่ host แปลงจากเวลา server เอง SDK จะใช้ค่านั้นตายตัว
 - `onBuyCourse` ส่งแค่ `courseId` host เป็นคนตัดสินว่าจะพาไปซื้อเล่มเดี่ยวหรือทั้งแพ็ก
 
@@ -219,8 +215,9 @@ export function MyPathTab() {
 
 ## เมื่อ SDK ออกเวอร์ชันใหม่
 
-- **minor / patch:** `npm update` (วิธี A) หรือ checkout tag ใหม่ใน submodule (วิธี B) ได้เลย
-- **major:** props หรือรูปข้อมูลเปลี่ยน ต้องอ่าน changelog แล้วแก้ adapter ตาม
+- อ่าน `packages/mypath/CHANGELOG.md` ก่อนทุกครั้ง แล้วแก้ URL ของ tarball (วิธี A) หรือ checkout tag ใหม่ใน submodule (วิธี B)
+- **ระหว่าง `0.x`:** ขึ้น patch (`0.1.0` → `0.1.1`) อัปเดตได้เลย, ขึ้น minor (`0.1` → `0.2`) คือ breaking ต้องแก้ adapter ตาม changelog
+- **ตั้งแต่ `1.0.0`:** minor / patch อัปเดตได้เลย, major คือ props หรือรูปข้อมูลเปลี่ยน ต้องแก้ adapter ตาม changelog. กติกาเต็มอยู่ใน [Build และ publish](mypath-sdk-plan.md#build-และ-publish)
 
 ## ข้อกำหนดที่ SDK ต้องรักษา (สำหรับทีม SDK)
 
