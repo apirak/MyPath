@@ -2,6 +2,8 @@ pre-commit:
   jobs:
     - name: typecheck
       run: pnpm typecheck
+    - name: lint
+      run: pnpm lint
 
 pre-push:
   parallel: true

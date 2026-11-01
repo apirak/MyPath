@@ -1,4 +1,6 @@
-// Characterization: บันทึกข้อความความคืบหน้า (progressState) ทุก branch ไว้เป็นค่าอ้างอิง — snapshot บันทึกไว้ตอนยังเป็น prototype (tag mockup-v1) ตอนนี้คิดด้วย SDK
+// Characterization: บันทึกข้อความความคืบหน้า (progressState) ทุก branch
+// ไว้เป็นค่าอ้างอิง — snapshot บันทึกไว้ตอนยังเป็น prototype (tag mockup-v1)
+// ตอนนี้คิดด้วย SDK
 import { describe, expect, it } from 'vitest'
 import { progressState } from '../../packages/mypath/src/plan/progress'
 
@@ -11,9 +13,21 @@ const cases: { name: string; value: number; today: string }[] = [
   { name: 'ต่ำกว่าเป้าแรก ตรงวันของเป้าแรก', value: 10, today: '2027-01-10' },
   { name: 'ต่ำกว่าเป้าแรก หลังวันของเป้าแรก', value: 10, today: '2027-01-11' },
   { name: 'ตรงเป้าแรกพอดี (30%)', value: 30, today: '2027-01-15' },
-  { name: 'ระหว่างเป้าแรกกับเป้าสอง ก่อนวันของเป้าสอง', value: 50, today: '2027-01-15' },
-  { name: 'ระหว่างเป้าแรกกับเป้าสอง ตรงวันของเป้าสอง', value: 50, today: '2027-01-22' },
-  { name: 'ระหว่างเป้าแรกกับเป้าสอง หลังวันของเป้าสอง', value: 50, today: '2027-01-23' },
+  {
+    name: 'ระหว่างเป้าแรกกับเป้าสอง ก่อนวันของเป้าสอง',
+    value: 50,
+    today: '2027-01-15',
+  },
+  {
+    name: 'ระหว่างเป้าแรกกับเป้าสอง ตรงวันของเป้าสอง',
+    value: 50,
+    today: '2027-01-22',
+  },
+  {
+    name: 'ระหว่างเป้าแรกกับเป้าสอง หลังวันของเป้าสอง',
+    value: 50,
+    today: '2027-01-23',
+  },
   { name: 'ตรงเป้าสองพอดี (70%)', value: 70, today: '2027-01-15' },
   { name: '70–99%', value: 85, today: '2027-01-15' },
   { name: '100%', value: 100, today: '2027-01-15' },

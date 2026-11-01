@@ -9,7 +9,9 @@
     "verify:package": "pnpm -F @learn/mypath build && MYPATH_DIST=1 vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "prettier --check \"**/*.{ts,tsx,css}\" && node scripts/check-line-length.mjs",
+    "format": "prettier --write \"**/*.{ts,tsx,css}\""
   },
   "dependencies": {
     "lucide-react": "^1.61.0",
@@ -27,6 +29,7 @@
     "@vitejs/plugin-react": "^5.0.0",
     "jsdom": "^30.1.3",
     "lefthook": "^2.2.2",
+    "prettier": "^3.9.10",
     "tailwindcss": "^4.1.0",
     "typescript": "~5.9.0",
     "vite": "^7.1.0",

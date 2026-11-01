@@ -1,7 +1,12 @@
-// ฟังก์ชันล้วนของหน้า All: snap วันเริ่มไปวันจันทร์ และแก้วันเริ่มต้นโดยไม่แตะแผนเดิม
+// ฟังก์ชันล้วนของหน้า All: snap วันเริ่มไปวันจันทร์
+// และแก้วันเริ่มต้นโดยไม่แตะแผนเดิม
 import { describe, expect, it } from 'vitest'
 import { MS, u } from '../../packages/mypath/src/plan/dates'
-import { calendarBudgetForWeek, snapToMonday, withCourseStartDate } from '../../packages/mypath/src/plan/timeline'
+import {
+  calendarBudgetForWeek,
+  snapToMonday,
+  withCourseStartDate,
+} from '../../packages/mypath/src/plan/timeline'
 import type { StudentPlan } from '../../packages/mypath/src/types'
 import { mypathData } from '../../src/host/fixtures'
 
@@ -28,19 +33,34 @@ describe('snapToMonday', () => {
 
 describe('withCourseStartDate', () => {
   const plan: StudentPlan = {
-    calendar: { weekdayHours: 1, weekendHours: 2, specialDays: [], breaks: [], subjects: ['MATH'] },
-    courses: [{ courseId: 'MATH.1', startDate: '2026-08-03', weeklyHours: 3 }, { courseId: 'MATH.2', followPrevious: true }],
+    calendar: {
+      weekdayHours: 1,
+      weekendHours: 2,
+      specialDays: [],
+      breaks: [],
+      subjects: ['MATH'],
+    },
+    courses: [
+      { courseId: 'MATH.1', startDate: '2026-08-03', weeklyHours: 3 },
+      { courseId: 'MATH.2', followPrevious: true },
+    ],
   }
   const before = structuredClone(plan)
 
   it('ตั้งวันเริ่มต้นใหม่ให้คอร์สนั้น ค่าอื่นของคอร์สอยู่ครบ', () => {
     const next = withCourseStartDate(plan, 'MATH.1', '2026-09-07')
-    expect(next.courses).toEqual([{ courseId: 'MATH.1', startDate: '2026-09-07', weeklyHours: 3 }, { courseId: 'MATH.2', followPrevious: true }])
+    expect(next.courses).toEqual([
+      { courseId: 'MATH.1', startDate: '2026-09-07', weeklyHours: 3 },
+      { courseId: 'MATH.2', followPrevious: true },
+    ])
     expect(next.calendar).toEqual(plan.calendar)
   })
 
   it('คอร์สที่ไม่มีในแผน: เพิ่มต่อท้าย (host ไม่ต้องส่งทุกคอร์ส)', () => {
-    expect(withCourseStartDate(plan, 'MATH.3', '2027-01-04').courses).toEqual([...plan.courses, { courseId: 'MATH.3', startDate: '2027-01-04' }])
+    expect(withCourseStartDate(plan, 'MATH.3', '2027-01-04').courses).toEqual([
+      ...plan.courses,
+      { courseId: 'MATH.3', startDate: '2027-01-04' },
+    ])
   })
 
   it('ไม่แก้แผนที่ส่งเข้ามา', () => {
@@ -51,8 +71,14 @@ describe('withCourseStartDate', () => {
 })
 
 describe('calendarBudgetForWeek', () => {
-  // สัปดาห์ 7 ธ.ค. มีวันพิเศษ (เสาร์ 12 ธ.ค. = 5 ชม.), สัปดาห์ 21 ธ.ค. อยู่ในช่วงปิดเทอม (2 ชม./วัน)
-  it.each([['2026-12-07', 13], ['2026-12-21', 14]])('สัปดาห์ %s = %i ชม.', (monday, hours) => {
-    expect(calendarBudgetForWeek(mypathData.plan.calendar, u(monday))).toBe(hours)
+  // สัปดาห์ 7 ธ.ค. มีวันพิเศษ (เสาร์ 12 ธ.ค. = 5 ชม.), สัปดาห์ 21 ธ.ค.
+  // อยู่ในช่วงปิดเทอม (2 ชม./วัน)
+  it.each([
+    ['2026-12-07', 13],
+    ['2026-12-21', 14],
+  ])('สัปดาห์ %s = %i ชม.', (monday, hours) => {
+    expect(calendarBudgetForWeek(mypathData.plan.calendar, u(monday))).toBe(
+      hours,
+    )
   })
 })
