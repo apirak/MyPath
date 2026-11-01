@@ -1,6 +1,6 @@
 # Learn Anywhere — My Path
 
-แผนเรียนส่วนตัวของนักเรียน TCAS (mockup) — ทั้งหน้า Month และ All generate จากแผนเดียวกันใน `src/prototype/mypath/plan.ts`
+แผนเรียนส่วนตัวของนักเรียน TCAS (mockup) — ทั้งหน้า Month และ All generate จากแผนเรียนเดียวกัน
 
 ## Language
 
