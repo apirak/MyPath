@@ -7,13 +7,15 @@ const ROOT = resolve(__dirname, '..')
 
 // import x from 'a' · import 'a' · import('a') · export … from 'a' · @import 'a' (CSS)
 const IMPORT = /(?:\bfrom\s*|\bimport\s*\(?\s*|@import\s+)(['"])([^'"]+)\1/g
+// @import url('a') · @import url(a) (CSS)
+const CSS_IMPORT_URL = /@import\s+url\(\s*(['"]?)([^'")\s]+)\1\s*\)/g
 // path ใน public/ ที่ SDK อ้างไม่ได้ — ตรวจทุก string รวม url() ของ CSS ที่มักไม่มี quote
 const PUBLIC_PATH = /(['"`(])\/(?:mypath|cover)\//
 
 // file เป็น path จาก ROOT, คืนเหตุผลของทุกจุดที่ข้ามขอบเขต
 function violations(file: string, source: string): string[] {
   const out: string[] = []
-  for (const [, , spec] of source.matchAll(IMPORT)) {
+  for (const [, , spec] of [...source.matchAll(IMPORT), ...source.matchAll(CSS_IMPORT_URL)]) {
     // relative และ '/…' (Vite resolve จาก root) → path จาก ROOT เพื่อเทียบกับโฟลเดอร์ของแต่ละชั้น
     const local = spec.startsWith('.') || spec.startsWith('/')
     const target = spec.startsWith('.') ? relative(ROOT, resolve(ROOT, dirname(file), spec)) : spec.replace(/^\//, '')
@@ -57,6 +59,8 @@ describe('ขอบเขต: เทสต์จับการ import ข้า
     [sdk, "import { X } from 'lucide-react'"],
     [sdk, "import fixtures from '/src/host/fixtures'"],
     ['packages/mypath/src/mypath.css', '.x{background:url(/mypath/plan-header-bg.png)}'],
+    ['packages/mypath/src/mypath.css', "@import url('../../../src/index.css');"],
+    ['packages/mypath/src/mypath.css', '@import url(../../../src/index.css);'],
     [proto, "import { MyPath } from '../../../packages/mypath/src'"],
     [host, "import { MyPath } from '../../../packages/mypath/src'"],
     [host, "import types from '@learn/mypath/types'"],
@@ -71,6 +75,8 @@ describe('ขอบเขต: เทสต์จับการ import ข้า
     [sdk, "import { useState } from 'react'"],
     [host, "import { MyPath } from '@learn/mypath'"],
     [proto, "import HeaderButton from '../components/HeaderButton'"],
+    ['packages/mypath/src/mypath.css', "@import url('./ui/month.css');"],
+    ['packages/mypath/src/mypath.css', '@import url(./ui/month.css);'],
   ])('ผ่าน %s: %s', (file, source) => {
     expect(violations(file, source)).toEqual([])
   })
