@@ -7,22 +7,25 @@ const ROOT = resolve(__dirname, '..')
 
 // import x from 'a' · import 'a' · import('a') · export … from 'a' · @import 'a' (CSS)
 const IMPORT = /(?:\bfrom\s*|\bimport\s*\(?\s*|@import\s+)(['"])([^'"]+)\1/g
-// path ใน public/ ที่ SDK อ้างไม่ได้ — ตรวจทุก string ไม่ใช่แค่ import
-const PUBLIC_PATH = /(['"`])\/(?:mypath|cover)\//
+// path ใน public/ ที่ SDK อ้างไม่ได้ — ตรวจทุก string รวม url() ของ CSS ที่มักไม่มี quote
+const PUBLIC_PATH = /(['"`(])\/(?:mypath|cover)\//
 
 // file เป็น path จาก ROOT, คืนเหตุผลของทุกจุดที่ข้ามขอบเขต
 function violations(file: string, source: string): string[] {
   const out: string[] = []
   for (const [, , spec] of source.matchAll(IMPORT)) {
-    // relative → path จาก ROOT เพื่อเทียบกับโฟลเดอร์ของแต่ละชั้น
-    const target = spec.startsWith('.') ? relative(ROOT, resolve(ROOT, dirname(file), spec)) : spec
+    // relative และ '/…' (Vite resolve จาก root) → path จาก ROOT เพื่อเทียบกับโฟลเดอร์ของแต่ละชั้น
+    const local = spec.startsWith('.') || spec.startsWith('/')
+    const target = spec.startsWith('.') ? relative(ROOT, resolve(ROOT, dirname(file), spec)) : spec.replace(/^\//, '')
+    const sdk = target.startsWith('packages/mypath') || spec === '@learn/mypath' || spec.startsWith('@learn/mypath/')
     if (file.startsWith('packages/mypath/')) {
-      if (spec.startsWith('.') && !target.startsWith('packages/mypath/')) out.push(`ออกนอก package: ${spec}`)
-      if (spec.startsWith('react-router')) out.push(`react-router: ${spec}`)
+      if (local && !target.startsWith('packages/mypath/')) out.push(`ออกนอก package: ${spec}`)
+      // SDK ไม่มี dependency นอกจาก react (ไอคอนเป็น SVG ของ SDK เอง)
+      if (spec.startsWith('react-router') || spec === 'lucide-react') out.push(`dependency ของ host: ${spec}`)
     } else if (file.startsWith('src/host/')) {
-      if (target.includes('packages/mypath') || spec.startsWith('@learn/mypath/')) out.push(`ไม่ผ่าน @learn/mypath: ${spec}`)
+      if (sdk && spec !== '@learn/mypath') out.push(`ไม่ผ่าน @learn/mypath: ${spec}`)
     } else if (file.startsWith('src/prototype/')) {
-      if (target.startsWith('src/host') || spec === '@learn/mypath' || spec.startsWith('@learn/mypath/')) out.push(`prototype พึ่ง host/SDK: ${spec}`)
+      if (target.startsWith('src/host') || sdk) out.push(`prototype พึ่ง host/SDK: ${spec}`)
     }
   }
   if (file.startsWith('packages/mypath/') && PUBLIC_PATH.test(source)) out.push('อ้างไฟล์ใน public/')
@@ -51,6 +54,10 @@ describe('ขอบเขต: เทสต์จับการ import ข้า
     [sdk, "import { Link } from 'react-router-dom'"],
     [sdk, "const img = '/mypath/graduate-cap.png'"],
     [sdk, 'const cover = `/cover/Math.png`'],
+    [sdk, "import { X } from 'lucide-react'"],
+    [sdk, "import fixtures from '/src/host/fixtures'"],
+    ['packages/mypath/src/mypath.css', '.x{background:url(/mypath/plan-header-bg.png)}'],
+    [proto, "import { MyPath } from '../../../packages/mypath/src'"],
     [host, "import { MyPath } from '../../../packages/mypath/src'"],
     [host, "import types from '@learn/mypath/types'"],
     [proto, "import BottomNav from '../../host/components/BottomNav'"],

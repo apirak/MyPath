@@ -7,7 +7,7 @@ import MyPath from './prototype/pages/MyPath'
 import MyPathAllTimeline from './prototype/pages/MyPathAllTimeline'
 import BottomNav from './prototype/components/BottomNav'
 
-// Tab bar อยู่นอกหน้า My Path — หน้าในแท็บนี้จะถูกย้ายไปวางในแอปจริงที่มี tab bar ของตัวเอง
+// โครงของ prototype ที่แช่แข็งไว้ (/prototype/mypath) — tab bar อยู่นอกหน้า My Path
 function MyPathLayout() {
   return <div className="mypath-layout"><Outlet /><BottomNav active="mypath" /></div>
 }

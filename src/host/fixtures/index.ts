@@ -11,11 +11,11 @@ export const TODAY = '2026-12-05'
 const importedCovers: Record<string, string> = { 'PHY.0': physics3, 'CHEM.1': physics2 }
 
 // JSON ขยาย kind เป็น string — cast แค่ events ที่เหลือให้ TS ตรวจตามสัญญาจริง
-const data: MyPathData = { ...json, events: json.events as ExamEvent[] }
+const fromJson: MyPathData = { ...json, events: json.events as ExamEvent[] }
 
 export const mypathData: MyPathData = {
-  ...data,
-  catalog: data.catalog.map(group => ({ ...group, subjects: group.subjects.map(subject => ({
+  ...fromJson,
+  catalog: fromJson.catalog.map(group => ({ ...group, subjects: group.subjects.map(subject => ({
     ...subject,
     courses: subject.courses.map(course => ({ ...course, cover: course.cover ?? importedCovers[course.id] })),
   })) })),

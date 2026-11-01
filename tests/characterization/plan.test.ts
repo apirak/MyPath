@@ -1,4 +1,4 @@
-// Characterization: บันทึกผลของแผนเรียน mock (src/mypath/plan.ts) ไว้เป็นค่าอ้างอิงก่อนย้ายโค้ดไป SDK
+// Characterization: บันทึกผลของแผนเรียน mock (src/prototype/mypath/plan.ts) ไว้เป็นค่าอ้างอิงก่อนย้ายโค้ดไป SDK
 // state ของ plan.ts อยู่ระดับ module → rebuildPlan() เองก่อนอ่านค่า
 import { beforeAll, describe, expect, it } from 'vitest'
 import {

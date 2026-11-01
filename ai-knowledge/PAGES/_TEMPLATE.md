@@ -5,7 +5,7 @@
 - **Route:** `/…`
 - **Figma (desktop):** _link_
 - **Figma (mobile):** _link_
-- **Mockup:** `src/pages/<Page>.tsx`
+- **Mockup:** `src/host/pages/<Page>.tsx` (My Path prototype: `src/prototype/`)
 
 ## Purpose
 

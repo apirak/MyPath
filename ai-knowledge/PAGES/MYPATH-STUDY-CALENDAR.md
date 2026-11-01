@@ -26,7 +26,7 @@ Lets a learner choose which subjects are enabled, set their usual available stud
 | Component | File | Purpose | Behavior / states |
 |---|---|---|---|
 | StudyCalendarPanel | `src/prototype/mypath/StudyCalendarPanel.tsx` | The overlay and calendar controls | Opens from `PathHeader`; closes with × or backdrop and animates down before unmounting |
-| PathHeader | `src/components/PathHeader.tsx` | My Path shared header | Owns open/closed panel state for Month and All |
+| PathHeader | `src/prototype/components/PathHeader.tsx` | My Path shared header | Owns open/closed panel state for Month and All |
 | studyCalendar | `src/prototype/mypath/studentPlan.ts` | Learner calendar source data | Enabled subjects, regular hours, special-day overrides, and break periods |
 | setStudyCalendar | `src/prototype/mypath/plan.ts` | In-memory update entry point | Rebuilds the plan, then notifies Month / All |
 | subjectGroups | `src/prototype/mypath/courseCatalog.ts` | The 17 selectable subjects in 3 groups | Its order is the All row order |
