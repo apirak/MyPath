@@ -5,8 +5,8 @@ export const MS = 86_400_000
 export const u = (iso: string) => { const [y, m, d] = iso.split('-').map(Number); return Date.UTC(y, m - 1, d) }
 export const isoOf = (ms: number) => new Date(ms).toISOString().slice(0, 10)
 export const addDays = (iso: string, n: number) => isoOf(u(iso) + n * MS)
-// วันที่ผิดรูปถือว่าไม่มีค่านั้น (สัญญาข้อมูล "ข้อมูลไม่ครบหรือผิด")
-export const isISODate = (iso?: string): iso is ISODate => !!iso && /^\d{4}-\d{2}-\d{2}$/.test(iso) && !Number.isNaN(u(iso))
+// วันที่ผิดรูปถือว่าไม่มีค่านั้น (สัญญาข้อมูล "ข้อมูลไม่ครบหรือผิด") — ต้องแปลงกลับได้ค่าเดิม เพราะ Date.UTC เลื่อน 2026-02-31 ไปเป็น 3 มี.ค.
+export const isISODate = (iso?: string): iso is ISODate => !!iso && /^\d{4}-\d{2}-\d{2}$/.test(iso) && isoOf(u(iso)) === iso
 // "วันนี้" ตามเวลาไทยจากนาฬิกาเครื่อง เมื่อ host ไม่ส่ง today (en-CA = YYYY-MM-DD)
 export const thaiToday = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok' }).format(new Date())
 

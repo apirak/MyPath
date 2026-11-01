@@ -33,7 +33,8 @@ function CourseCard({ course, done = false }: { course: AgendaCourse; done?: boo
 
 function EventCard({ event, done = false }: { event: ExamEvent; done?: boolean }) {
   // สอบจริงไม่มีการซื้อ จึงสีเข้มเสมอ; Mock ดูจาก owned
-  const owned = event.kind === 'exam' || usePlan().data.owned.includes(event.id)
+  const { owned: ownedIds } = usePlan().data
+  const owned = event.kind === 'exam' || ownedIds.includes(event.id)
   const color = KIND_COLOR[event.kind]
   const kindLabel = event.kind === 'exam' ? 'สอบจริง' : 'Mock'
   return <article className={`mp-course${done ? ' mp-done' : ''}`}>

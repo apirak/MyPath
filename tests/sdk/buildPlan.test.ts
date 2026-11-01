@@ -42,6 +42,7 @@ describe('buildPlan: วันนี้และข้อมูลไม่ค�
   it('วันเริ่มต้นในอดีตไม่ถูกดันขึ้นมา และวันที่ผิดรูป = ไม่ได้ตั้ง', () => {
     expect(buildPlan({ ...base, plan: { calendar, courses: [{ courseId: 'TGAT.1', startDate: '2026-01-05' }] } }).subjects[0].courses[0].start).toBe('2026-01-05')
     expect(buildPlan({ ...base, plan: { calendar, courses: [{ courseId: 'TGAT.1', startDate: 'oops' }] } }).subjects[0].courses[0].start).toBe('2027-03-10')
+    expect(buildPlan({ ...base, plan: { calendar, courses: [{ courseId: 'TGAT.1', startDate: '2026-02-31' }] } }).subjects[0].courses[0].start).toBe('2027-03-10') // วันที่ไม่มีจริง ไม่ถูกเลื่อนไป 3 มี.ค.
   })
 
   it('catalog ว่างไม่ throw และแกนครอบวันนี้', () => {
