@@ -80,8 +80,8 @@ src/prototype/              ← ของเดิม ไม่แก้ → /pr
 **กลไกแยก 3 ชั้น**
 
 1. **แยกโฟลเดอร์** ตามโครงข้างบน
-2. **Import ได้ทางเดียว: host → SDK.** ตอนนี้ตั้ง alias `@learn/mypath` ใน `vite.config.ts` และ `tsconfig.json` ให้ชี้ไป `packages/mypath/src/index.ts` ไฟล์เดียว path ลึกจึง resolve ไม่ได้. ตอนทำ #14 ย้ายไป pnpm workspaces + field `exports` ใน `package.json` การ import ไฟล์ภายในจะถูกปิดตั้งแต่ระดับ Node. SDK มีแค่ `react` / `react-dom` เป็น peerDependencies และใช้ `lucide-react` (bundle ไว้ใน SDK ดู [Build และ publish](#build-และ-publish)) ส่วน `react-router` กับ Tailwind เป็นของ host เท่านั้น
-3. **เทสต์ตรวจขอบเขต:** scan `packages/mypath/src` แล้ว fail ถ้าเจอ import ไป `src/`, `react-router` หรือ `/public` และ scan `src/host` แล้ว fail ถ้า import `packages/mypath` ด้วย path ตรงๆ
+2. **Import ได้ทางเดียว: host → SDK.** ตอนนี้ตั้ง alias `@learn/mypath` ใน `vite.config.ts` และ `tsconfig.json` ให้ชี้ไป `packages/mypath/src/index.ts` ไฟล์เดียว path ลึกจึง resolve ไม่ได้. ตอนทำ #14 ย้ายไป pnpm workspaces + field `exports` ใน `package.json` การ import ไฟล์ภายในจะถูกปิดตั้งแต่ระดับ Node. SDK มีแค่ `react` / `react-dom` เป็น peerDependencies และไม่มี dependency อื่น (ไอคอนเป็น SVG ของ SDK เอง ดู [Build และ publish](#build-และ-publish)) ส่วน `react-router` กับ Tailwind เป็นของ host เท่านั้น
+3. **เทสต์ตรวจขอบเขต:** scan `packages/mypath/src` แล้ว fail ถ้าเจอ import ไป `src/`, `react-router`, `lucide-react` หรือ `/public` และ scan `src/host` แล้ว fail ถ้า import `packages/mypath` ด้วย path ตรงๆ
 
 **จุดที่ตอนนี้ปนกันอยู่**
 
@@ -531,8 +531,8 @@ type MyPathProps = {
 
 - ใช้ **pnpm workspaces** (`packages: ['packages/*']` ใน `pnpm-workspace.yaml`) เพราะ repo ใช้ pnpm อยู่แล้ว ส่วน host ติดตั้งด้วย npm ได้ตามปกติ
 - `peerDependencies`: `react`, `react-dom` เท่านั้น ช่วง `^19.0.0` ทั้งคู่ (Learn Anywhere ใช้ React ล่าสุด) ถ้าวันหลังต้องรองรับ 18 การขยายช่วงลงเป็น minor
-- **`lucide-react` bundle ไว้ใน SDK** (อยู่ใน `devDependencies` ไม่ใส่ใน `external`)
-  **เหตุผล:** lucide tree-shake ได้ จึงติดไปแค่ไอคอนที่ใช้ไม่กี่ KB host ไม่ต้องติดตั้งเพิ่ม และไม่ชนกันถ้า host ใช้ lucide คนละ major
+- **ไอคอนเป็น SVG ของ SDK เอง ไม่ใช้ `lucide-react`:** copy path ของไอคอนที่ใช้ (ประมาณ 8–9 ตัว) จาก lucide มาเป็น component ใน `packages/mypath/src/ui/icons.tsx` รับ props `size` / `fill` / `className` แบบเดียวกับ lucide และเก็บข้อความ license ISC ของ lucide ไว้บนไฟล์. host ใช้ lucide ของตัวเองต่อได้ตามปกติ
+  **เหตุผล:** SDK ไม่มี dependency นอกจาก React ทั้งวิธี A และ B host ไม่ต้องติดตั้งอะไรเพิ่ม (ถ้า bundle lucide วิธี B ซึ่ง compile source ตรงๆ จะบังคับให้ host ติดตั้ง lucide เอง) และไม่ชนกันถ้า host ใช้ lucide คนละ major. ข้อเสียคือไอคอนใหม่ต้อง copy เอง ซึ่งรับได้เพราะใช้ไม่ถึงสิบตัว
 
 ### รูปและ CSS
 
