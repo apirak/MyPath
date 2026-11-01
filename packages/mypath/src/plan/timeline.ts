@@ -17,7 +17,7 @@ export const withStudyCalendar = (plan: StudentPlan, calendar: StudyCalendar): S
   return { ...plan, calendar }
 }
 
-export const withCourseStartDate =(plan: StudentPlan, courseId: string, startDate: ISODate) => withCourse(plan, courseId, { startDate })
+export const withCourseStartDate = (plan: StudentPlan, courseId: string, startDate: ISODate) => withCourse(plan, courseId, { startDate })
 
 // วันจันทร์ที่ใกล้ที่สุด (ขอบที่ 3.5 วัน) ให้ตรงกับแท่งชั่วโมงเรียน/สัปดาห์
 export const snapToMonday = (ms: number): ISODate => {
@@ -26,7 +26,7 @@ export const snapToMonday = (ms: number): ISODate => {
 }
 
 // งบปฏิทิน: วันพิเศษ > ช่วงปิดเทอม > วันธรรมดา/เสาร์-อาทิตย์
-const calendarHoursForDay = (calendar: StudyCalendar, iso: ISODate) => {
+export const calendarHoursForDay = (calendar: StudyCalendar, iso: ISODate) => {
   const specialDay = calendar.specialDays.find(day => day.date === iso)
   if (specialDay) return specialDay.hours
   const schoolBreak = calendar.breaks.find(period => period.start <= iso && iso <= period.end)

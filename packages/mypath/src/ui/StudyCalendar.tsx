@@ -2,7 +2,7 @@ import { useState, type CSSProperties } from 'react'
 import type { StudyCalendar as Calendar } from '../types'
 import { usePlan } from '../MyPathProvider'
 import { addDays } from '../plan/dates'
-import { withStudyCalendar } from '../plan/timeline'
+import { calendarHoursForDay, withStudyCalendar } from '../plan/timeline'
 import HeaderButton from './HeaderButton'
 import { CalendarDays, Plus, Trash2, X } from './icons'
 import { useModal } from './useModal'
@@ -12,14 +12,6 @@ import { useModal } from './useModal'
 
 const days = ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา']
 const dateLabel = (date: string) => new Intl.DateTimeFormat('th-TH', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'UTC' }).format(new Date(`${date}T00:00:00Z`))
-
-function capacityFor(date: string, settings: Calendar) {
-  const special = settings.specialDays.find(day => day.date === date)
-  if (special) return special.hours
-  const schoolBreak = settings.breaks.find(period => period.start <= date && date <= period.end)
-  if (schoolBreak) return schoolBreak.hours
-  return [0, 6].includes(new Date(`${date}T00:00:00Z`).getUTCDay()) ? settings.weekendHours : settings.weekdayHours
-}
 
 type Props = { selected: string; onSelect: (date: string) => void; settings: Calendar; setSettings: (next: Calendar) => void }
 
@@ -33,7 +25,7 @@ function StepSlider({ label, value, min = 0, onChange }: { label: string; value:
   </div></label>
 }
 
-// shortcut: ปฏิทินวันพิเศษแสดง ธ.ค. 2569 เดือนเดียวเหมือน prototype (ไม่ตามวันนี้) — เปลี่ยนเมื่อ #13 ตรวจครบเท่า prototype แล้วมีแบบเลื่อนเดือน
+// shortcut: ปฏิทินวันพิเศษ (ธ.ค. 2569), วันที่เลือกตอนเปิด และช่วงปิดเทอมใหม่ (10–17 ม.ค. 70) ผูกปีการศึกษาเดียวเหมือน prototype (ไม่ตามวันนี้) — เปลี่ยนเมื่อ #13 ตรวจครบเท่า prototype แล้วมีแบบเลื่อนเดือน
 function MonthGrid({ selected, settings, onSelect }: Omit<Props, 'setSettings'>) {
   const start = '2026-11-30'
   return <div className="mp-scp-calendar" aria-label="ปฏิทินเดือนธันวาคม 2569"><header><b>ธันวาคม 2569</b><span>เลือกวันเพื่อปรับเวลา</span></header><div className="mp-scp-weekdays">{days.map(day => <i key={day}>{day}</i>)}</div><div className="mp-scp-dates">{Array.from({ length: 35 }, (_, index) => {
@@ -64,7 +56,7 @@ function BreakEditor({ settings, setSettings }: Props) {
 }
 
 function SpecialPicker({ selected, settings, setSettings }: Props) {
-  const existing = settings.specialDays.find(day => day.date === selected), hours = existing?.hours ?? capacityFor(selected, settings)
+  const existing = settings.specialDays.find(day => day.date === selected), hours = existing?.hours ?? calendarHoursForDay(settings, selected)
   const setSpecial = (nextHours: number) => setSettings({ ...settings, specialDays: [...settings.specialDays.filter(day => day.date !== selected), { date: selected, hours: nextHours }].sort((a, b) => a.date.localeCompare(b.date)) })
   return <section className="mp-scp-special-editor"><header><span>วันที่เลือก</span><b>{dateLabel(selected)}</b></header><StepSlider label="เรียนได้" value={hours} min={0} onChange={setSpecial} />{existing && <button type="button" className="mp-scp-text-button" onClick={() => setSettings({ ...settings, specialDays: settings.specialDays.filter(day => day.date !== selected) })}>ลบข้อยกเว้น</button>}</section>
 }

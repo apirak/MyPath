@@ -71,6 +71,15 @@ describe('เปิด/ปิดแผง', () => {
     act(() => { vi.advanceTimersByTime(280) })
     expect(panel()).toBeNull()
   })
+
+  it('สลับ Month/All แล้วแผงปิด แต่เลื่อนเดือนไม่ปิด', () => {
+    renderMyPath()
+    openPanel()
+    fireEvent.click(screen.getByLabelText('Next month'))
+    expect(panel()).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'All' }))
+    expect(panel()).toBeNull()
+  })
 })
 
 describe('การแก้ส่งแผนผ่าน onPlanChange', () => {
@@ -96,6 +105,17 @@ describe('การแก้ส่งแผนผ่าน onPlanChange', () => 
     fireEvent.click(screen.getByRole('button', { name: 'ตั้งค่าวันพิเศษ' }))
     fireEvent.click(screen.getByRole('button', { name: 'ลบข้อยกเว้น' })) // วันที่เลือกตอนเปิดคือ 12 ธ.ค. ซึ่งเป็นวันพิเศษอยู่แล้ว
     expect(onPlanChange.mock.calls[0][0].calendar.specialDays).toEqual([])
+  })
+
+  it('เพิ่ม/ลบช่วงปิดเทอม และแก้ชั่วโมงต่อวันของช่วง', () => {
+    const onPlanChange = renderMyPath()
+    openPanel()
+    fireEvent.click(screen.getByLabelText('เพิ่มช่วงปิดเทอม'))
+    expect(onPlanChange.mock.calls[0][0].calendar.breaks).toEqual([calendar.breaks[0], expect.objectContaining({ start: '2027-01-10', end: '2027-01-17', hours: 2 })])
+    fireEvent.change(screen.getAllByLabelText('เรียนได้ต่อวัน')[2], { target: { value: '0' } }) // [วันธรรมดา, วันหยุด, ช่วงแรก]
+    expect(onPlanChange.mock.calls[1][0].calendar.breaks).toEqual([{ ...calendar.breaks[0], hours: 0 }])
+    fireEvent.click(screen.getByLabelText('ลบช่วงปิดเทอม'))
+    expect(onPlanChange.mock.calls[2][0].calendar.breaks).toEqual([])
   })
 
   it('ช่วงปิดเทอมที่ซ้อนกันไม่ส่งให้ host', () => {
