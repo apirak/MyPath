@@ -1,14 +1,15 @@
-import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
+import { useContext, useId, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
 import type { ExamEvent, StudentPlan } from '../types'
 import { MyPathProvider, usePlan } from '../MyPathProvider'
 import type { Axis, PlannedCourse, PlannedSubject } from '../plan/buildPlan'
 import { MS, addDays, fmtDate, fmtShort, isoOf, u } from '../plan/dates'
 import { calendarBudgetForWeek, snapToMonday, withCourseStartDate } from '../plan/timeline'
 import PathHeader, { type ModeProps } from './PathHeader'
+import { OpenCourseContext, courseButton } from './CourseDetail'
 import PlanEmptyState from './PlanEmptyState'
 
 // port จาก src/prototype/pages/MyPathAllTimeline.tsx — อ่านทุกอย่างจาก usePlan() (ไม่มีตัวแปร module จึงวางหลายตัวพร้อมกันได้)
-// ต่างจาก prototype: คลิกคอร์สยังไม่เปิดรายละเอียด (ใบ 07) และไม่จำตำแหน่ง scroll ข้ามการสลับ Month/All (เปิดทุกครั้งเลื่อนไปวันนี้)
+// ต่างจาก prototype: คลิกคอร์สเปิดรายละเอียดผ่าน OpenCourseContext (ไม่มี ?course=) และไม่จำตำแหน่ง scroll ข้ามการสลับ Month/All (เปิดทุกครั้งเลื่อนไปวันนี้)
 
 type Month = { start: string; end: string; days: number; label: string }
 type Timeline = { start: string; end: string; days: number; months: Month[] }
@@ -68,11 +69,11 @@ function EventRow({ t, dayWidth }: { t: Timeline; dayWidth: number }) {
 type DragStart = (event: PointerEvent<HTMLElement>, course: PlannedCourse) => void
 
 function SubjectRow({ subject, t, dayWidth, onDragStart }: { subject: PlannedSubject; t: Timeline; dayWidth: number; onDragStart: DragStart }) {
-  const owned = useOwned()
+  const owned = useOwned(), open = useContext(OpenCourseContext)
   const style = { '--subject': subject.color } as CSSProperties
   return <><b className="mp-tp-label mp-tp-subject" style={style}><i />{subject.name}</b><AxisRow t={t} dayWidth={dayWidth} style={style}>{subject.courses.length === 0 && <span className="mp-tp-no-course">ยังไม่มีคอร์ส</span>}{subject.courses.filter(course => visible(course, t)).map(course => {
     const left = Math.max(0, position(course.start, t)), right = Math.min(100, position(addDays(course.end, 1), t)), own = owned.course(course.id)
-    return <span key={course.id} className={`mp-tp-course${own ? ' own' : ''}${course.followPrevious ? ' no-lead' : ''}`} style={{ left: `calc(${left}% + 3px)`, width: `calc(${right - left}% - 6px)`, color: own ? barText(subject.color) : undefined }} title={`${course.name} · ${fmtDate(course.start)} – ${fmtDate(course.end)}`}>{!course.followPrevious && <i className="mp-tp-grip" aria-hidden="true" onPointerDown={event => onDragStart(event, course)} />}{course.short}</span>
+    return <span key={course.id} className={`mp-tp-course${own ? ' own' : ''}${course.followPrevious ? ' no-lead' : ''}`} {...courseButton(open, course.id)} style={{ left: `calc(${left}% + 3px)`, width: `calc(${right - left}% - 6px)`, color: own ? barText(subject.color) : undefined }} title={`${course.name} · ${fmtDate(course.start)} – ${fmtDate(course.end)}`}>{!course.followPrevious && <i className="mp-tp-grip" aria-hidden="true" onPointerDown={event => onDragStart(event, course)} onClick={event => event.stopPropagation()} />}{course.short}</span>
   })}</AxisRow></>
 }
 
@@ -114,7 +115,7 @@ function MobileHead({ subjects }: { subjects: PlannedSubject[] }) {
 }
 
 function MobileTimeline({ t }: { t: Timeline }) {
-  const { plan: { subjects, events, today } } = usePlan(), owned = useOwned()
+  const { plan: { subjects, events, today } } = usePlan(), owned = useOwned(), open = useContext(OpenCourseContext)
   // เกิน 6 วิชา → คอลัมน์กว้างคงที่ เห็น ~5.5 คอลัมน์ (โผล่ครึ่งให้รู้ว่าเลื่อนต่อได้)
   const col = subjects.length > 6 ? 'calc((100vw - 78px - 30px) / 5.5)' : '0px'
   return <section className="mp-tp-mobile" style={{ '--n': subjects.length, '--col': col } as CSSProperties}><MobileHead subjects={subjects} /><div className="mp-tp-mobile-months">{t.months.map(month => {
@@ -124,7 +125,7 @@ function MobileTimeline({ t }: { t: Timeline }) {
       const full = courses.some(course => u(course.start) <= u(month.start) && u(addDays(course.end, 1)) >= u(month.end))
       return <div key={subject.id} className={`mp-tp-mobile-cell${full ? ' full-month' : ''}`} style={{ '--subject': subject.color } as CSSProperties}>{courses.map(course => {
         const own = owned.course(course.id)
-        return <span key={course.id} className={`mp-tp-mobile-course ${own ? 'own' : 'own-no'}${course.followPrevious || u(course.start) < u(month.start) ? ' no-lead' : ''}`} style={{ color: own ? barText(subject.color) : undefined }}>{course.short}</span>
+        return <span key={course.id} className={`mp-tp-mobile-course ${own ? 'own' : 'own-no'}${course.followPrevious || u(course.start) < u(month.start) ? ' no-lead' : ''}`} {...courseButton(open, course.id)} style={{ color: own ? barText(subject.color) : undefined }}>{course.short}</span>
       })}</div>
     })}</div></div></section>
   })}</div></section>

@@ -7,3 +7,4 @@ const Icon = ({ size = 24, children, ...props }: SVGProps<SVGSVGElement> & { siz
 export const ChevronLeft = () => <Icon><path d="m15 18-6-6 6-6" /></Icon>
 export const ChevronRight = () => <Icon><path d="m9 18 6-6-6-6" /></Icon>
 export const ArrowRight = ({ size }: { size?: number }) => <Icon size={size}><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></Icon>
+export const X = ({ size }: { size?: number }) => <Icon size={size} strokeWidth={2.5}><path d="M18 6 6 18" /><path d="m6 6 12 12" /></Icon>
