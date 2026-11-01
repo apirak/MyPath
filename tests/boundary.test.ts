@@ -26,8 +26,6 @@ function violations(file: string, source: string): string[] {
       if (spec.startsWith('react-router') || spec === 'lucide-react') out.push(`dependency ของ host: ${spec}`)
     } else if (file.startsWith('src/host/')) {
       if (sdk && spec !== '@learn/mypath') out.push(`ไม่ผ่าน @learn/mypath: ${spec}`)
-    } else if (file.startsWith('src/prototype/')) {
-      if (target.startsWith('src/host') || sdk) out.push(`prototype พึ่ง host/SDK: ${spec}`)
     }
   }
   if (file.startsWith('packages/mypath/') && PUBLIC_PATH.test(source)) out.push('อ้างไฟล์ใน public/')
@@ -39,7 +37,7 @@ const sourceFiles = (dir: string) => (readdirSync(join(ROOT, dir), { recursive: 
   .map(name => join(dir, name))
 
 describe('ขอบเขต: โค้ดจริง', () => {
-  it.each(['packages/mypath/src', 'src/host', 'src/prototype'])('%s ไม่ import ข้ามขอบเขต', dir => {
+  it.each(['packages/mypath/src', 'src/host'])('%s ไม่ import ข้ามขอบเขต', dir => {
     const files = sourceFiles(dir)
     expect(files.length).toBeGreaterThan(0)
     const found = files.flatMap(file => violations(file, readFileSync(join(ROOT, file), 'utf8')).map(reason => `${file}: ${reason}`))
@@ -50,9 +48,8 @@ describe('ขอบเขต: โค้ดจริง', () => {
 describe('ขอบเขต: เทสต์จับการ import ข้ามได้จริง', () => {
   const sdk = 'packages/mypath/src/ui/Month.tsx'
   const host = 'src/host/pages/MyPathTab.tsx'
-  const proto = 'src/prototype/pages/MyPath.tsx'
   it.each([
-    [sdk, "import plan from '../../../../src/prototype/mypath/plan'"],
+    [sdk, "import plan from '../../../../src/host/fixtures'"],
     [sdk, "import { Link } from 'react-router-dom'"],
     [sdk, "const img = '/mypath/graduate-cap.png'"],
     [sdk, 'const cover = `/cover/Math.png`'],
@@ -61,11 +58,8 @@ describe('ขอบเขต: เทสต์จับการ import ข้า
     ['packages/mypath/src/mypath.css', '.x{background:url(/mypath/plan-header-bg.png)}'],
     ['packages/mypath/src/mypath.css', "@import url('../../../src/index.css');"],
     ['packages/mypath/src/mypath.css', '@import url(../../../src/index.css);'],
-    [proto, "import { MyPath } from '../../../packages/mypath/src'"],
     [host, "import { MyPath } from '../../../packages/mypath/src'"],
     [host, "import types from '@learn/mypath/types'"],
-    [proto, "import BottomNav from '../../host/components/BottomNav'"],
-    [proto, "import { MyPath } from '@learn/mypath'"],
   ])('%s: %s', (file, source) => {
     expect(violations(file, source)).not.toEqual([])
   })
@@ -74,7 +68,6 @@ describe('ขอบเขต: เทสต์จับการ import ข้า
     [sdk, "import type { MyPathProps } from '../types'"],
     [sdk, "import { useState } from 'react'"],
     [host, "import { MyPath } from '@learn/mypath'"],
-    [proto, "import HeaderButton from '../components/HeaderButton'"],
     ['packages/mypath/src/mypath.css', "@import url('./ui/month.css');"],
     ['packages/mypath/src/mypath.css', '@import url(./ui/month.css);'],
   ])('ผ่าน %s: %s', (file, source) => {

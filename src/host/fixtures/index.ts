@@ -4,7 +4,7 @@
 import type { ExamEvent, MyPathData } from '@learn/mypath'
 import json from './mypath.json'
 
-// วันอ้างอิงของ host จำลอง (GLOSSARY.md: "วันนี้") ตรงกับ TODAY ของ prototype
+// วันอ้างอิงของ host จำลอง (GLOSSARY.md: "วันนี้") — ตรึงไว้เพราะวันที่ใน mock data ผูกกับ ธ.ค. 2569 (แผงทดสอบเปลี่ยนได้)
 export const TODAY = '2026-12-05'
 
 // JSON ขยาย kind เป็น string — cast แค่ events ที่เหลือให้ TS ตรวจตามสัญญาจริง

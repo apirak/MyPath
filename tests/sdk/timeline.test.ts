@@ -51,7 +51,7 @@ describe('withCourseStartDate', () => {
 })
 
 describe('calendarBudgetForWeek', () => {
-  // ค่าเดียวกับที่ prototype ตรวจตัวเองใน plan.ts (สัปดาห์ 21 ธ.ค. มีวันหยุดพิเศษ)
+  // สัปดาห์ 7 ธ.ค. มีวันพิเศษ (เสาร์ 12 ธ.ค. = 5 ชม.), สัปดาห์ 21 ธ.ค. อยู่ในช่วงปิดเทอม (2 ชม./วัน)
   it.each([['2026-12-07', 13], ['2026-12-21', 14]])('สัปดาห์ %s = %i ชม.', (monday, hours) => {
     expect(calendarBudgetForWeek(mypathData.plan.calendar, u(monday))).toBe(hours)
   })
