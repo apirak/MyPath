@@ -169,7 +169,7 @@ function Timeline({ axis, onDragStart }: { axis: Axis; onDragStart: DragStart })
 }
 
 export default function AllView(mode: ModeProps) {
-  const { plan, data, onPlanChange } = usePlan()
+  const { plan, data, onPlanChange, onStartCourse } = usePlan()
   // ระหว่างลาก: แผนชั่วคราว (UI state) + แกนตอนเริ่มลาก (คอลัมน์ไม่กระโดดใต้เมาส์) — ปล่อยแล้วกลับไปใช้แผนของ host
   const [drag, setDrag] = useState<{ axis: Axis; plan: StudentPlan } | null>(null)
   const axis = drag?.axis ?? plan.axis
@@ -201,7 +201,7 @@ export default function AllView(mode: ModeProps) {
   const header = <PathHeader mode="all" {...mode} period={axis.label} showNavigation={false} />
   if (plan.subjects.length === 0) return <>{header}<div className="mp-scroll"><PlanEmptyState /></div></>
   // provider ซ้อนอยู่ตลอด (ไม่ remount ตอนเริ่มลาก ไม่งั้น grip หลุด pointer capture) — ทุกแถว มือถือ และกราฟชั่วโมงคิดจากแผนชั่วคราวเอง
-  return <>{header}<MyPathProvider data={drag ? { ...data, plan: drag.plan } : data} today={plan.today} onPlanChange={onPlanChange}>
+  return <>{header}<MyPathProvider data={drag ? { ...data, plan: drag.plan } : data} today={plan.today} onPlanChange={onPlanChange} onStartCourse={onStartCourse}>
     <Timeline axis={axis} onDragStart={dragStart} />
   </MyPathProvider></>
 }

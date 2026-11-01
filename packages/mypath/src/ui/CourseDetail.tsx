@@ -1,8 +1,7 @@
 import { createContext, type CSSProperties, type KeyboardEvent } from 'react'
 import type { MyPathProps, StudentCourse } from '../types'
-import { usePlan } from '../MyPathProvider'
+import { usePlan, useStartCourse } from '../MyPathProvider'
 import type { PlannedCourse } from '../plan/buildPlan'
-import { isISODate } from '../plan/dates'
 import { withCourse } from '../plan/timeline'
 import HeaderButton from './HeaderButton'
 import { X } from './icons'
@@ -21,7 +20,7 @@ export const courseButton = (open: (courseId: string) => void, courseId: string)
   onKeyDown: (event: KeyboardEvent) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(courseId) } },
 })
 
-type Props = Pick<MyPathProps, 'onBuyCourse' | 'onStartCourse'> & { courseId: string; onClose: () => void }
+type Props = Pick<MyPathProps, 'onBuyCourse'> & { courseId: string; onClose: () => void }
 
 const fmtBaht = (n: number) => `฿${n.toLocaleString('th-TH')}`
 
@@ -34,8 +33,9 @@ function StepSlider({ course, disabled, onChange }: { course: PlannedCourse; dis
   </div>
 }
 
-export default function CourseDetail({ courseId, onClose, onBuyCourse, onStartCourse }: Props) {
+export default function CourseDetail({ courseId, onClose, onBuyCourse }: Props) {
   const { plan, data, onPlanChange } = usePlan()
+  const startCourse = useStartCourse()
   // ชีทเป็น modal: โฟกัสอยู่ในชีท คืนโฟกัสให้การ์ด/แถบที่เปิดตอนปิด
   const { ref: sheet, closing, close } = useModal<HTMLElement>(onClose)
   const subject = plan.subjects.find(s => s.courses.some(c => c.id === courseId))
@@ -43,11 +43,6 @@ export default function CourseDetail({ courseId, onClose, onBuyCourse, onStartCo
   if (!subject || !course) return null // host เอาวิชาออกจากแผนระหว่างเปิดอยู่
 
   const change = (patch: Partial<StudentCourse>) => onPlanChange(withCourse(data.plan, course.id, patch))
-  // เริ่มเรียนคอร์สที่ยังเลื่อนตามวันนี้/เล่มก่อน (ไม่มีวันเริ่มต้น หรือวันผิดรูปที่แผนไม่สนใจ): ตรึงวันเริ่มที่คิดได้ตอนนี้ก่อน (docs/mypath-sdk-plan.md "เริ่มเรียน" ตรึงวันเริ่ม)
-  const start = () => {
-    if (!isISODate(course.startDate) && !course.followPrevious) change({ startDate: course.start })
-    onStartCourse(course.id)
-  }
   const firstCourse = subject.courses[0].id === course.id
   const noPrevious = firstCourse ? 'ไม่มี Course ก่อนหน้า' : undefined
   const owned = data.owned.includes(course.id)
@@ -69,7 +64,7 @@ export default function CourseDetail({ courseId, onClose, onBuyCourse, onStartCo
           <div className="mp-cdp-course">
             <div className="mp-cdp-course-title">{course.cover && <img src={course.cover} alt="" />}<strong>{course.name}</strong></div>
             {owned
-              ? <HeaderButton variant="primary" className="mp-cdp-wide" onClick={start}>เริ่มเรียน</HeaderButton>
+              ? <HeaderButton variant="primary" className="mp-cdp-wide" onClick={() => startCourse(course.id)}>เริ่มเรียน</HeaderButton>
               : <div className="mp-cdp-buy">
                 <HeaderButton className="mp-cdp-wide" onClick={() => onBuyCourse(course.id)}>หาซื้อบน OnDemand</HeaderButton>
                 {price && <p>{fmtBaht(price.now)}{price.was !== undefined && <s>{fmtBaht(price.was)}</s>}</p>}

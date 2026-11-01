@@ -14,13 +14,13 @@ export default function MyPath({ data, today, onPlanChange, onBuyCourse, onStart
   const [slide, setSlide] = useState(false)
   // เปลี่ยนโหมดแล้วหน้ารายละเอียดคอร์สปิด (View state และ deep link)
   const onModeChange = (next: MyPathView['mode']) => { setMode(next); setSlide(true); setCourse(undefined) }
-  return <MyPathProvider data={data} today={today} onPlanChange={onPlanChange}>
+  return <MyPathProvider data={data} today={today} onPlanChange={onPlanChange} onStartCourse={onStartCourse}>
     <OpenCourseContext.Provider value={setCourse}>
       <div className="mypath-root">{mode === 'month'
         ? <MonthView selected={month} onSelect={setMonth} onModeChange={onModeChange} slide={slide} />
         : <AllView onModeChange={onModeChange} slide={slide} />}
         {/* key: เปิดคอร์สใหม่ = เริ่ม animation เปิดใหม่ */}
-        {course && <CourseDetail key={course} courseId={course} onClose={() => setCourse(undefined)} onBuyCourse={onBuyCourse} onStartCourse={onStartCourse} />}
+        {course && <CourseDetail key={course} courseId={course} onClose={() => setCourse(undefined)} onBuyCourse={onBuyCourse} />}
       </div>
     </OpenCourseContext.Provider>
   </MyPathProvider>
