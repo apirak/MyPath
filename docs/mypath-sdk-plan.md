@@ -57,7 +57,7 @@ host ใช้หน้า Home, Courses, Profile และ BottomNav ที่�
 | 5. ตัดสินว่าครบแล้ว | เมื่อ SDK ทำได้ครบเท่า prototype ให้ลบ `src/prototype` ออก — **เสร็จแล้ว (#13)** | เลิกมีโค้ดซ้ำสองชุด |
 | 6. Library build + publish | Vite library mode, ใส่ react เป็น peerDependencies, รวม CSS เป็นไฟล์เดียว, ใช้ pnpm workspaces, publish ตาม [Build และ publish](#build-และ-publish) — **build เสร็จแล้ว (#14), release ยังไม่ทำ** | ถึงตอนนี้โค้ดไม่ผูกกับอะไรแล้ว ตั้ง build ครั้งเดียวจบ |
 
-ระหว่างขั้น 2–5 ใช้ path alias `@learn/mypath` ไปก่อน. ตั้งแต่ขั้น 6 dev ยังใช้ alias ไป source (HMR) ส่วน `pnpm verify:package` build package แล้วให้ host build จาก `dist` แบบคนนอก (วิธี A).
+ระหว่างขั้น 2–5 ใช้ path alias `@learn/mypath` ไปก่อน. ตั้งแต่ขั้น 6 dev ยังใช้ alias ไป source (HMR) ส่วน `pnpm verify:package` build package แล้วให้ host build จาก `dist` ผ่าน alias (ตรวจ bundle ที่ build แล้ว ส่วนการติดตั้งแบบคนนอกจริงทดสอบด้วย `pnpm pack` นอก repo).
 
 ## แยก host กับ SDK (ใช้ตอนทำ T3)
 
@@ -82,7 +82,7 @@ src/host/                   ← Learn Anywhere จำลอง
 **กลไกแยก 3 ชั้น**
 
 1. **แยกโฟลเดอร์** ตามโครงข้างบน
-2. **Import ได้ทางเดียว: host → SDK.** ตอนนี้ตั้ง alias `@learn/mypath` ใน `vite.config.ts` และ `tsconfig.json` ให้ชี้ไป `packages/mypath/src/index.ts` ไฟล์เดียว path ลึกจึง resolve ไม่ได้. ตอนทำ #14 ย้ายไป pnpm workspaces + field `exports` ใน `package.json` การ import ไฟล์ภายในจะถูกปิดตั้งแต่ระดับ Node. SDK มีแค่ `react` / `react-dom` เป็น peerDependencies และไม่มี dependency อื่น (ไอคอนเป็น SVG ของ SDK เอง ดู [Build และ publish](#build-และ-publish)) ส่วน `react-router` กับ Tailwind เป็นของ host เท่านั้น
+2. **Import ได้ทางเดียว: host → SDK.** host จำลองตั้ง alias ใน `vite.config.ts` (และ `tsconfig.json`) ชี้ทีละไฟล์: `@learn/mypath` → `src/index.ts` กับ `@learn/mypath/style.css` → `src/mypath.css` (โหมด `verify:package` ชี้ไป `dist/` แทน) path ลึกจึง resolve ไม่ได้. ฝั่งคนนอกที่ติดตั้ง package (#14) field `exports` ใน `package.json` เปิดแค่ `.` กับ `./style.css` การ import ไฟล์ภายในจึงถูกปิดตั้งแต่ระดับ Node. SDK มีแค่ `react` / `react-dom` เป็น peerDependencies และไม่มี dependency อื่น (ไอคอนเป็น SVG ของ SDK เอง ดู [Build และ publish](#build-และ-publish)) ส่วน `react-router` กับ Tailwind เป็นของ host เท่านั้น
 3. **เทสต์ตรวจขอบเขต:** scan `packages/mypath/src` แล้ว fail ถ้าเจอ import ไป `src/`, `react-router`, `lucide-react` หรือ `/public` และ scan `src/host` แล้ว fail ถ้า import `packages/mypath` ด้วย path ตรงๆ
 
 **จุดที่ตอนนี้ปนกันอยู่**

@@ -2,8 +2,6 @@
 
 การเปลี่ยนแปลงของ `@learn/mypath` ทั้งหมดบันทึกไว้ที่นี่ รูปแบบตาม [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) และเลขเวอร์ชันตาม [Semantic Versioning](https://semver.org/) (กติกาช่วง `0.x` ดู `docs/mypath-sdk-plan.md` หัวข้อ "เวอร์ชัน")
 
-## [Unreleased]
-
 ## [0.1.0] - ยังไม่ release
 
 ### Added
