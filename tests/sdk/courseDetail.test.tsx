@@ -132,6 +132,14 @@ describe('การตั้งค่าส่งแผนผ่าน onPlanCha
     }
   })
 
+  it('คอร์สที่ host ไม่ได้ส่งมาในแผน: ตั้งค่าแล้วเพิ่มคอร์สนั้นในแผน', () => {
+    const plan = { ...mypathData.plan, courses: mypathData.plan.courses.filter(c => c.courseId !== 'MATH.1') }
+    const { onPlanChange } = renderMyPath({ ...mypathData, plan })
+    openFromAll(MATH1)
+    fireEvent.change(screen.getByLabelText('ชั่วโมงต่อสัปดาห์'), { target: { value: '7' } })
+    expect(courseIn(onPlanChange.mock.calls[0][0], 'MATH.1')).toEqual({ courseId: 'MATH.1', weeklyHours: 7 })
+  })
+
   it('host ส่งแผนกลับมาแล้วหน้าจอเปลี่ยนทันที', () => {
     function Host() {
       const [plan, setPlan] = useState(mypathData.plan)

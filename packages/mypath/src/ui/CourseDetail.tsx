@@ -67,10 +67,7 @@ export default function CourseDetail({ courseId, onClose, onBuyCourse, onStartCo
   const course = subject?.courses.find(c => c.id === courseId)
   if (!subject || !course) return null // host เอาวิชาออกจากแผนระหว่างเปิดอยู่
 
-  const change = (patch: Partial<StudentCourse>) => {
-    const next = withCourse(data.plan, course.id, patch)
-    if (next !== data.plan) onPlanChange(next)
-  }
+  const change = (patch: Partial<StudentCourse>) => onPlanChange(withCourse(data.plan, course.id, patch))
   // เริ่มเรียนคอร์สที่ยังเลื่อนตามวันนี้/เล่มก่อน (ไม่มีวันเริ่มต้น หรือวันผิดรูปที่แผนไม่สนใจ): ตรึงวันเริ่มที่คิดได้ตอนนี้ก่อน (docs/mypath-sdk-plan.md "เริ่มเรียน" ตรึงวันเริ่ม)
   const start = () => {
     if (!isISODate(course.startDate) && !course.followPrevious) change({ startDate: course.start })

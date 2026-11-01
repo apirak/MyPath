@@ -39,8 +39,8 @@ describe('withCourseStartDate', () => {
     expect(next.calendar).toEqual(plan.calendar)
   })
 
-  it('คอร์สที่ไม่มีในแผน: แผนไม่เปลี่ยน (เหมือน setCourseStartDate ของ prototype)', () => {
-    expect(withCourseStartDate(plan, 'MATH.3', '2027-01-04')).toBe(plan) // object เดิม: ผู้เรียกเทียบ !== เพื่อรู้ว่าเปลี่ยนจริง
+  it('คอร์สที่ไม่มีในแผน: เพิ่มต่อท้าย (host ไม่ต้องส่งทุกคอร์ส)', () => {
+    expect(withCourseStartDate(plan, 'MATH.3', '2027-01-04').courses).toEqual([...plan.courses, { courseId: 'MATH.3', startDate: '2027-01-04' }])
   })
 
   it('ไม่แก้แผนที่ส่งเข้ามา', () => {

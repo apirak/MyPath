@@ -22,7 +22,7 @@
 port ไว้ที่ `packages/mypath/src/ui/CourseDetail.tsx` (CSS ใน `mypath.css` class `mp-cdp-*` ใต้ `.mypath-root` เฉพาะ rule ที่ใช้จริง) หน้าตาเหมือน prototype ทุกขนาดจอ ต่างกันตรงนี้:
 
 - **คอร์สที่เปิดเป็น state ภายใน `<MyPath>`** ไม่มี `?course=` และไม่แตะ history: ปุ่ม back ของ browser ออกจาก My Path ไม่ได้ปิดชีท. ปิดด้วย ✕ / คลิกฉากหลัง / Esc (animation ปิด 280ms) และ**สลับ Month/All แล้วชีทปิด** (ข้อสรุป #4) · ชีทเป็น modal (`aria-modal`): เปิดแล้วโฟกัสย้ายเข้าชีท Tab วนอยู่ในชีท ปิดแล้วโฟกัสกลับการ์ด/แถบที่เปิด
-- **การตั้งค่าส่งแผนทั้งก้อนผ่าน `onPlanChange`** (helper ล้วน `withCourse` ใน `plan/timeline.ts`) หน้าจอเปลี่ยนเมื่อ host ส่งแผนกลับ. คอร์สที่ไม่มีใน `plan.courses` แก้ไม่ได้ (no-op เหมือน prototype)
+- **การตั้งค่าส่งแผนทั้งก้อนผ่าน `onPlanChange`** (helper ล้วน `withCourse` ใน `plan/timeline.ts`) หน้าจอเปลี่ยนเมื่อ host ส่งแผนกลับ. คอร์สที่ไม่มีใน `plan.courses` (host ไม่ต้องส่งทุกคอร์ส) ตั้งค่าแล้วจะเพิ่มคอร์สนั้นต่อท้ายแผน — ต่างจาก prototype ที่ no-op; ลากใน All ก็เหมือนกัน
 - **ปุ่มไปผ่าน callback:** "หาซื้อบน OnDemand" → `onBuyCourse(courseId)`, "เริ่มเรียน" → `onStartCourse(courseId)`; SDK ไม่ `window.open` (ลิงก์ร้านค้าอยู่ที่ host). กดเริ่มเรียนคอร์สที่ไม่มีวันเริ่มต้นและไม่ได้ตาม Course ก่อนหน้า = ตรึง `startDate` ที่วันเริ่มที่คิดได้ด้วย `onPlanChange` ก่อน
 - ราคาเดิม (`was`) เป็นตัวขีดฆ่าจริง (prototype แสดง `<s>` เป็นข้อความ) · ข้อมูลแพ็ก/เล่ม/ExamGym/ราคา/cover มาจาก `data` ของ host
 - เทสต์: `tests/sdk/courseDetail.test.tsx`

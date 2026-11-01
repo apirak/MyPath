@@ -3,11 +3,11 @@ import type { ISODate, StudentCourse, StudentPlan, StudyCalendar } from '../type
 import { MS, isoOf, u } from './dates'
 
 // แผนใหม่ที่คอร์สนั้นแก้ตาม patch (แทน setCourse* ของ prototype ที่แก้ของเดิม)
-// คอร์สที่ไม่มีในแผน: คืน object เดิม เหมือน prototype (ผู้เรียกเทียบ !== เพื่อรู้ว่าเปลี่ยนจริง)
+// คอร์สที่ไม่มีในแผน: เพิ่มต่อท้าย — host ไม่ต้องส่งทุกคอร์ส (docs/mypath-integration.md "แผนเก็บเฉพาะค่าที่นักเรียนตั้ง")
 export const withCourse = (plan: StudentPlan, courseId: string, patch: Partial<StudentCourse>): StudentPlan =>
   plan.courses.some(c => c.courseId === courseId)
     ? { ...plan, courses: plan.courses.map(c => c.courseId === courseId ? { ...c, ...patch } : c) }
-    : plan
+    : { ...plan, courses: [...plan.courses, { courseId, ...patch }] }
 
 export const withCourseStartDate = (plan: StudentPlan, courseId: string, startDate: ISODate) => withCourse(plan, courseId, { startDate })
 

@@ -119,13 +119,14 @@ describe('ลากหัวคอร์ส (controlled)', () => {
     expect(screen.getByText('ส.ค. 69 – มิ.ย. 71')).toBeTruthy()
   })
 
-  it('คอร์สที่ไม่มีในแผน: ลากแล้วไม่ยิง', () => {
+  it('คอร์สที่ไม่มีในแผน: ลากแล้วยิงพร้อมเพิ่มคอร์สนั้นในแผน', () => {
     const onPlanChange = vi.fn()
     const plan = { ...mypathData.plan, courses: mypathData.plan.courses.filter(c => c.courseId !== 'MATH.1') }
     render(<MyPath data={{ ...mypathData, plan }} today={TODAY} onPlanChange={onPlanChange} onBuyCourse={noop} onStartCourse={noop} />)
     openAll()
     press(/^Applied Math Admissions TCAS เล่ม 1 /, 21)()
-    expect(onPlanChange).not.toHaveBeenCalled()
+    expect(onPlanChange).toHaveBeenCalledTimes(1)
+    expect(onPlanChange.mock.calls[0][0].courses.at(-1)).toEqual({ courseId: 'MATH.1', startDate: expect.any(String) })
   })
 
   it('pointercancel: ทิ้งแผนชั่วคราว ไม่ยิง', () => {
