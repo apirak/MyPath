@@ -34,7 +34,7 @@ export default function PathHeader({ mode, onModeChange, slide, period, now = fa
       <b className={now ? 'mp-now' : ''}>{period}</b>
       {showNavigation && <button type="button" aria-label="Next month" onClick={onNext} disabled={!canNext}><ChevronRight /></button>}
     </div>
-    <HeaderButton className="mp-study-calendar" onClick={() => setCalendarOpen(true)}><CalendarDays size={20} /><span>ปฏิทินการเรียน</span></HeaderButton>
+    <HeaderButton className="mp-study-calendar" aria-label="ปฏิทินการเรียน" onClick={() => setCalendarOpen(true)}><CalendarDays size={20} /><span>ปฏิทินการเรียน</span></HeaderButton>
     {calendarOpen && <StudyCalendar onClose={() => setCalendarOpen(false)} />}
   </header>
 }

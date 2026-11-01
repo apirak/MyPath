@@ -37,7 +37,7 @@ function StepSlider({ course, disabled, onChange }: { course: PlannedCourse; dis
 export default function CourseDetail({ courseId, onClose, onBuyCourse, onStartCourse }: Props) {
   const { plan, data, onPlanChange } = usePlan()
   // ชีทเป็น modal: โฟกัสอยู่ในชีท คืนโฟกัสให้การ์ด/แถบที่เปิดตอนปิด
-  const { ref: sheet, closing, close, trapTab } = useModal<HTMLElement>(onClose)
+  const { ref: sheet, closing, close } = useModal<HTMLElement>(onClose)
   const subject = plan.subjects.find(s => s.courses.some(c => c.id === courseId))
   const course = subject?.courses.find(c => c.id === courseId)
   if (!subject || !course) return null // host เอาวิชาออกจากแผนระหว่างเปิดอยู่
@@ -58,7 +58,7 @@ export default function CourseDetail({ courseId, onClose, onBuyCourse, onStartCo
   return (
     <div className={`mp-cdp-a${closing ? ' closing' : ''}`}>
       <div className="mp-cdp-backdrop" onClick={close} />
-      <section ref={sheet} className="mp-cdp-sheet" role="dialog" aria-modal="true" aria-label={course.name} tabIndex={-1} onKeyDown={trapTab} style={{ '--subject': subject.color } as CSSProperties}>
+      <section ref={sheet} className="mp-cdp-sheet" role="dialog" aria-modal="true" aria-label={course.name} tabIndex={-1} style={{ '--subject': subject.color } as CSSProperties}>
         <header>
           <div className="mp-cdp-sheet-top">
             <b><i className="mp-cdp-dot" />{subject.name}</b>

@@ -72,6 +72,17 @@ describe('เปิด/ปิดแผง', () => {
     expect(panel()).toBeNull()
   })
 
+  it('ปุ่มที่โฟกัสอยู่หายไป (เปิดตั้งค่าวันพิเศษ) แล้ว Tab ดึงโฟกัสกลับเข้าแผง', () => {
+    renderMyPath()
+    openPanel()
+    const toggle = screen.getByRole('button', { name: 'ตั้งค่าวันพิเศษ' })
+    toggle.focus()
+    fireEvent.click(toggle)
+    expect(document.activeElement).toBe(document.body)
+    fireEvent.keyDown(document.body, { key: 'Tab' })
+    expect(screen.getByRole('dialog', { name: 'ปฏิทินการเรียน' }).contains(document.activeElement)).toBe(true)
+  })
+
   it('สลับ Month/All แล้วแผงปิด แต่เลื่อนเดือนไม่ปิด', () => {
     renderMyPath()
     openPanel()

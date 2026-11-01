@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 // พฤติกรรม modal ที่หน้ารายละเอียดคอร์สและแผงปฏิทินการเรียนใช้ร่วมกัน:
 // ย้ายโฟกัสเข้าตอนเปิด/คืนตอนปิด, วน Tab อยู่ข้างใน, Esc ปิด, และปิดหลัง animation 280ms
@@ -10,24 +10,25 @@ export function useModal<T extends HTMLElement>(onClose: () => void) {
     ref.current?.focus()
     return () => opener?.focus()
   }, [])
-  const trapTab = (event: KeyboardEvent) => {
-    if (event.key !== 'Tab') return
-    const items = ref.current!.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled])')
-    const first = items[0], last = items[items.length - 1], active = document.activeElement
-    if (event.shiftKey ? active === first || active === ref.current : active === last) {
-      event.preventDefault()
-      ;(event.shiftKey ? last : first).focus()
-    }
-  }
   const close = () => {
     if (closing) return
     setClosing(true)
     window.setTimeout(onClose, 280)
   }
+  // ฟังที่ window: ปุ่มที่โฟกัสอยู่หายไป (เช่น ลบช่วงปิดเทอม) โฟกัสตกไปที่ body แต่ Tab ถัดไปยังดึงกลับเข้ามา
   useEffect(() => {
-    const esc = (event: globalThis.KeyboardEvent) => { if (event.key === 'Escape') close() }
-    window.addEventListener('keydown', esc)
-    return () => window.removeEventListener('keydown', esc)
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') return close()
+      if (event.key !== 'Tab' || !ref.current) return
+      const items = ref.current.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled])')
+      const first = items[0], last = items[items.length - 1], active = document.activeElement
+      if (!ref.current.contains(active) || (event.shiftKey ? active === first || active === ref.current : active === last)) {
+        event.preventDefault()
+        ;(event.shiftKey ? last : first).focus()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
   })
-  return { ref, closing, close, trapTab }
+  return { ref, closing, close }
 }

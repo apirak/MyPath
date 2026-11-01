@@ -69,8 +69,8 @@ function Layout(props: Props) {
 export default function StudyCalendar({ onClose }: { onClose: () => void }) {
   const { data, onPlanChange } = usePlan()
   const [selected, setSelected] = useState('2026-12-12')
-  const { ref, closing, close, trapTab } = useModal<HTMLElement>(onClose)
+  const { ref, closing, close } = useModal<HTMLElement>(onClose)
   // ส่งเฉพาะปฏิทินที่ผ่านการตรวจ (ช่วงปิดเทอมไม่ซ้อนกัน) — ไม่ผ่าน = ช่องกลับเป็นค่าเดิมเพราะค่ามาจาก data.plan
   const setSettings = (calendar: Calendar) => { const next = withStudyCalendar(data.plan, calendar); if (next) onPlanChange(next) }
-  return <div className={`mp-scp-overlay${closing ? ' closing' : ''}`}><div className="mp-scp-backdrop" onClick={close} /><section ref={ref} className="mp-scp-page mp-scp-panel" role="dialog" aria-modal="true" aria-label="ปฏิทินการเรียน" tabIndex={-1} onKeyDown={trapTab}><header className="mp-scp-header"><div><h1><CalendarDays size={24} />ปฏิทินการเรียน</h1></div><HeaderButton className="mp-scp-icon-button" aria-label="ปิดปฏิทินการเรียน" onClick={close}><X size={18} strokeWidth={2} /></HeaderButton></header><div className="mp-scp-content"><Layout selected={selected} onSelect={setSelected} settings={data.plan.calendar} setSettings={setSettings} /></div></section></div>
+  return <div className={`mp-scp-overlay${closing ? ' closing' : ''}`}><div className="mp-scp-backdrop" onClick={close} /><section ref={ref} className="mp-scp-page mp-scp-panel" role="dialog" aria-modal="true" aria-label="ปฏิทินการเรียน" tabIndex={-1}><header className="mp-scp-header"><div><h1><CalendarDays size={24} />ปฏิทินการเรียน</h1></div><HeaderButton className="mp-scp-icon-button" aria-label="ปิดปฏิทินการเรียน" onClick={close}><X size={18} strokeWidth={2} /></HeaderButton></header><div className="mp-scp-content"><Layout selected={selected} onSelect={setSelected} settings={data.plan.calendar} setSettings={setSettings} /></div></section></div>
 }
