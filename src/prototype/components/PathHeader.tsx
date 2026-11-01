@@ -26,8 +26,8 @@ export default function PathHeader({ active, period, now = false, showNavigation
   useEffect(() => { lastTab = active }, [active])
   return <header className="monthly-header path-header">
     <div className={slide ? 'monthly-tabs slide' : 'monthly-tabs'} data-active={active}>
-      {active === 'month' ? <button className="active">Month</button> : <Link to={{ pathname: '/mypath', search }}>Month</Link>}
-      {active === 'all' ? <button className="active">All</button> : <Link to={{ pathname: '/mypath/all', search }}>All</Link>}
+      {active === 'month' ? <button className="active">Month</button> : <Link to={{ pathname: '/prototype/mypath', search }}>Month</Link>}
+      {active === 'all' ? <button className="active">All</button> : <Link to={{ pathname: '/prototype/mypath/all', search }}>All</Link>}
     </div>
     <div className="month-picker">{showNavigation && <button aria-label="Previous period" onClick={onPrev} disabled={onPrev ? !canPrev : undefined}><ChevronLeft /></button>}<b className={now ? 'now' : ''}>{period}</b>{showNavigation && <button aria-label="Next period" onClick={onNext} disabled={onNext ? !canNext : undefined}><ChevronRight /></button>}</div>
     <HeaderButton className="study-calendar" onClick={() => setCalendarOpen(true)}><CalendarDays size={20} /><span>ปฏิทินการเรียน</span></HeaderButton>

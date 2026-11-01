@@ -14,7 +14,7 @@ import {
   subjects,
   u,
   isoOf,
-} from '../../src/mypath/plan'
+} from '../../src/prototype/mypath/plan'
 
 beforeAll(() => {
   rebuildPlan()

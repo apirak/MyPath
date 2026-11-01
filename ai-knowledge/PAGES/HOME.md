@@ -5,7 +5,7 @@
 - **Route:** `/`
 - **Figma (desktop):** https://www.figma.com/design/iFHH2DGrbFd8cIOPVNHT1D/Tung-Kai?node-id=3-31092&t=EJUDVJteWvhtznaT-4
 - **Figma (mobile):** https://www.figma.com/design/iFHH2DGrbFd8cIOPVNHT1D/Tung-Kai?node-id=3-31096&t=EJUDVJteWvhtznaT-4
-- **Mockup:** `src/pages/Home.tsx`
+- **Mockup:** `src/host/pages/Home.tsx`
 
 ## Purpose
 
@@ -25,11 +25,11 @@ The signed-in learner's dashboard. It brings recently used courses, course progr
 
 | Component | File | Purpose | Behavior / states |
 |---|---|---|---|
-| Home | `src/pages/Home.tsx` | Composes the Home dashboard | Static logged-in mock data; Home is active |
-| CourseCard | `src/pages/Home.tsx` | Shows one recent course and its progress | Course list is horizontally scrollable on narrow screens |
-| WeeklyHours | `src/pages/Home.tsx` | Shows current-week learning plan | Static empty-progress/planned-hours state |
-| HeaderButton | `src/components/HeaderButton.tsx` | All push buttons here (coin/bag/notification, carousel ‹ ›, extension links) | Pushable button (solid edge + floating front, Comeau-style press animation — no blurred shadow, hover does not change colour); secondary has two flavours: `header-button--plain` (borderless) on the coloured banner, otherwise 3-side edge-coloured border on white; keyboard `:focus-visible` ring, honors `prefers-reduced-motion` |
-| Bottom navigation | `src/pages/Home.tsx` | Persistent primary navigation | Visual mock only; links do not navigate yet |
+| Home | `src/host/pages/Home.tsx` | Composes the Home dashboard | Static logged-in mock data; Home is active |
+| CourseCard | `src/host/pages/Home.tsx` | Shows one recent course and its progress | Course list is horizontally scrollable on narrow screens |
+| WeeklyHours | `src/host/pages/Home.tsx` | Shows current-week learning plan | Static empty-progress/planned-hours state |
+| HeaderButton | `src/host/components/HeaderButton.tsx` | All push buttons here (coin/bag/notification, carousel ‹ ›, extension links) | Pushable button (solid edge + floating front, Comeau-style press animation — no blurred shadow, hover does not change colour); secondary has two flavours: `header-button--plain` (borderless) on the coloured banner, otherwise 3-side edge-coloured border on white; keyboard `:focus-visible` ring, honors `prefers-reduced-motion` |
+| Bottom navigation | `src/host/pages/Home.tsx` | Persistent primary navigation | Visual mock only; links do not navigate yet |
 
 ## States & variants
 

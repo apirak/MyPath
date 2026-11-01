@@ -6,12 +6,12 @@ import {
   GOALS, progressState, progressOf, setProgress, resetProgress, getSimToday, setSimToday, ownedCourses,
   useProgressVersion,
 } from './progressStore'
-import flagIcon from '../assets/mypath/progress/flag.svg'
-import trophyIcon from '../assets/mypath/progress/trophy.svg'
-import checkedIcon from '../assets/mypath/progress/checked.svg'
-import walkerIcon from '../assets/mypath/progress/walker.svg'
-import confettiIcon from '../assets/mypath/progress/confetti.svg'
-import eggIcon from '../assets/mypath/progress/egg-speak.svg'
+import flagIcon from '../../assets/mypath/progress/flag.svg'
+import trophyIcon from '../../assets/mypath/progress/trophy.svg'
+import checkedIcon from '../../assets/mypath/progress/checked.svg'
+import walkerIcon from '../../assets/mypath/progress/walker.svg'
+import confettiIcon from '../../assets/mypath/progress/confetti.svg'
+import eggIcon from '../../assets/mypath/progress/egg-speak.svg'
 import HeaderButton from '../components/HeaderButton'
 import './CourseProgress.css'
 

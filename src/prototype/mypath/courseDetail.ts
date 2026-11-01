@@ -8,10 +8,10 @@ export const ONDEMAND_URL = 'https://shoponline.ondemand.in.th'
 
 // รูปปกที่แอปมีอยู่จริง (ชื่อไฟล์ physics-* แต่ถูกใช้หลายวิชา) — ผูกตามที่หน้า Courses/Month ใช้:
 // PHY.1–4 ตามหน้า Courses · MATH.1/PHY.0/CHEM.1 ตามการ์ดหน้า Month · คอร์สอื่นไม่มี cover ไม่ต้องแสดง
-import physics1 from '../assets/home/physics-1.png'
-import physics2 from '../assets/home/physics-2.png'
-import physics3 from '../assets/home/physics-3.png'
-import physics4 from '../assets/home/physics-4.png'
+import physics1 from '../../assets/home/physics-1.png'
+import physics2 from '../../assets/home/physics-2.png'
+import physics3 from '../../assets/home/physics-3.png'
+import physics4 from '../../assets/home/physics-4.png'
 export const covers: Record<string, string> = {
   'MATH.1': physics1,
   'CHEM.1': physics2,

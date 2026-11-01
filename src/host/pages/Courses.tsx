@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { ArrowDownUp, Check, CheckCircle2, ChevronUp, FileText, Lock, Search, Video, Wrench } from 'lucide-react'
-import physicsOne from '../assets/home/physics-3.png'
-import physicsTwo from '../assets/home/physics-1.png'
-import physicsThree from '../assets/home/physics-2.png'
-import physicsFour from '../assets/home/physics-4.png'
+import physicsOne from '../../assets/home/physics-3.png'
+import physicsTwo from '../../assets/home/physics-1.png'
+import physicsThree from '../../assets/home/physics-2.png'
+import physicsFour from '../../assets/home/physics-4.png'
 import BottomNav from '../components/BottomNav'
 
 const cards = [

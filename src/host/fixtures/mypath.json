@@ -1,0 +1,732 @@
+{
+  "catalog": [
+    {
+      "name": "TGAT / TPAT",
+      "subjects": [
+        {
+          "id": "TGAT",
+          "name": "TGAT",
+          "color": "#ff6b17",
+          "courses": [
+            {
+              "id": "TGAT.1",
+              "name": "ล่าแข่ง TGAT",
+              "short": "ล่าแข่ง TGAT",
+              "abbr": "ล่าแข่ง",
+              "hours": 15
+            }
+          ]
+        },
+        {
+          "id": "TPAT1",
+          "name": "TPAT1",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "TPAT2",
+          "name": "TPAT2",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "TPAT3",
+          "name": "TPAT3",
+          "color": "#a51d1d",
+          "courses": [
+            {
+              "id": "TPAT3.1",
+              "name": "ติวเข้มความถนัด วิศวะ (TPAT3)",
+              "short": "ติวเข้ม TPAT3",
+              "abbr": "ติวเข้ม",
+              "hours": 30
+            },
+            {
+              "id": "TPAT3.2",
+              "name": "ตะลุยโจทย์ TPAT3 · ทำข้อสอบเก่า",
+              "short": "ทำข้อสอบเก่า",
+              "abbr": "ทำข้อสอบ",
+              "hours": 18
+            }
+          ]
+        },
+        {
+          "id": "TPAT4",
+          "name": "TPAT4",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "TPAT5",
+          "name": "TPAT5",
+          "color": "#adb5bd",
+          "courses": []
+        }
+      ]
+    },
+    {
+      "name": "กลุ่มคณิตศาสตร์และวิทยาศาสตร์",
+      "subjects": [
+        {
+          "id": "MATH1",
+          "name": "คณิต 1",
+          "color": "#0078c4",
+          "courses": [
+            {
+              "id": "MATH.1",
+              "name": "Applied Math Admissions TCAS เล่ม 1 (For Dek70)",
+              "short": "เล่ม 1",
+              "abbr": "ล. 1",
+              "hours": 24,
+              "cover": "/cover/Math_TCAS70_1.png"
+            },
+            {
+              "id": "MATH.2",
+              "name": "Applied Math Admissions TCAS เล่ม 2 (For Dek70)",
+              "short": "เล่ม 2",
+              "abbr": "ล. 2",
+              "hours": 24,
+              "cover": "/cover/Math_TCAS70_2.png"
+            },
+            {
+              "id": "MATH.3",
+              "name": "Applied Math Admissions TCAS เล่ม 3",
+              "short": "เล่ม 3",
+              "abbr": "ล. 3",
+              "hours": 18,
+              "cover": "/cover/Math_TCAS70_3.png"
+            },
+            {
+              "id": "MATH.4",
+              "name": "Applied Math Admissions TCAS เล่ม 4",
+              "short": "เล่ม 4",
+              "abbr": "ล. 4",
+              "hours": 21,
+              "cover": "/cover/Math_TCAS70_4.png"
+            },
+            {
+              "id": "MATH.5",
+              "name": "Applied Math Admissions TCAS เล่ม 5",
+              "short": "เล่ม 5",
+              "abbr": "ล. 5",
+              "hours": 24,
+              "cover": "/cover/Math_TCAS70_5.png"
+            },
+            {
+              "id": "MATH.UP",
+              "name": "Upskill คณิตศาสตร์ประยุกต์ 1 A-Level",
+              "short": "Upskill คณิต",
+              "abbr": "UP",
+              "hours": 64.5
+            },
+            {
+              "id": "MATH.EX",
+              "name": "MATH TCAS ตะลุยโจทย์ข้อสอบ ครบทุกแนว (UPDATE Version 2026 · TCAS70)",
+              "short": "ตะลุยโจทย์ MATH",
+              "abbr": "ตะลุย",
+              "hours": 30,
+              "cover": "/cover/Exam_Gym_Math.png"
+            }
+          ]
+        },
+        {
+          "id": "MATH2",
+          "name": "คณิต 2",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "SCI",
+          "name": "วิทยาศาสตร์",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "PHY",
+          "name": "ฟิสิกส์",
+          "color": "#d72630",
+          "courses": [
+            {
+              "id": "PHY.0",
+              "name": "ปรับพื้นฐานฟิสิกส์ TCAS (ปูพื้น ครบทุกทักษะ ครบทุกแนว)",
+              "short": "ปรับพื้นฐาน",
+              "abbr": "ปูพื้น",
+              "hours": 18
+            },
+            {
+              "id": "PHY.1",
+              "name": "ฟิสิกส์ TCAS ล. 1",
+              "short": "ล. 1",
+              "abbr": "ล.1",
+              "hours": 24,
+              "cover": "/cover/Physics_TCAS70_1.png"
+            },
+            {
+              "id": "PHY.2",
+              "name": "ฟิสิกส์ TCAS ล. 2 · กลศาสตร์วิเคราะห์ 2",
+              "short": "ล. 2 · กลศาสตร์ 2",
+              "abbr": "ล.2",
+              "hours": 21,
+              "cover": "/cover/Physics_TCAS70_2.png"
+            },
+            {
+              "id": "PHY.3",
+              "name": "ฟิสิกส์ TCAS ล. 3",
+              "short": "ล. 3",
+              "abbr": "ล.3",
+              "hours": 15,
+              "cover": "/cover/Physics_TCAS70_3.png"
+            },
+            {
+              "id": "PHY.4",
+              "name": "ฟิสิกส์ TCAS ล. 4",
+              "short": "ล. 4",
+              "abbr": "ล.4",
+              "hours": 18,
+              "cover": "/cover/Physics_TCAS70_4.png"
+            },
+            {
+              "id": "PHY.5",
+              "name": "ฟิสิกส์ TCAS ล. 5",
+              "short": "ล. 5",
+              "abbr": "ล.5",
+              "hours": 12,
+              "cover": "/cover/Physics_TCAS70_5.png"
+            },
+            {
+              "id": "PHY.6",
+              "name": "ฟิสิกส์ TCAS ล. 6",
+              "short": "ล. 6",
+              "abbr": "ล.6",
+              "hours": 15,
+              "cover": "/cover/Physics_TCAS70_6.png"
+            },
+            {
+              "id": "PHY.7",
+              "name": "ฟิสิกส์ TCAS ล. 7",
+              "short": "ล. 7",
+              "abbr": "ล.7",
+              "hours": 15,
+              "cover": "/cover/Physics_TCAS70_7.png"
+            },
+            {
+              "id": "PHY.EX",
+              "name": "PHYSICS TCAS Dek'70 ตะลุยโจทย์ข้อสอบ ครบทุกแนว (TCAS70)",
+              "short": "ตะลุยโจทย์ฟิสิกส์",
+              "abbr": "ตะลุย",
+              "hours": 24,
+              "cover": "/cover/Exam_Gym_Physic.png"
+            }
+          ]
+        },
+        {
+          "id": "CHEM",
+          "name": "เคมี",
+          "color": "#f5bd3d",
+          "courses": [
+            {
+              "id": "CHEM.1",
+              "name": "เคมี TCAS เล่ม 1 · กลุ่มอะตอมและตารางธาตุ",
+              "short": "เล่ม 1",
+              "abbr": "ล. 1",
+              "hours": 20
+            },
+            {
+              "id": "CHEM.2",
+              "name": "เคมี TCAS เล่ม 2 · ปริมาณสัมพันธ์",
+              "short": "เล่ม 2",
+              "abbr": "ล. 2",
+              "hours": 20
+            },
+            {
+              "id": "CHEM.3",
+              "name": "เคมี TCAS เล่ม 3 · พันธะเคมี",
+              "short": "เล่ม 3",
+              "abbr": "ล. 3",
+              "hours": 20
+            },
+            {
+              "id": "CHEM.4",
+              "name": "เคมี TCAS เล่ม 4",
+              "short": "เล่ม 4",
+              "abbr": "ล. 4",
+              "hours": 20
+            },
+            {
+              "id": "CHEM.5",
+              "name": "เคมี TCAS เล่ม 5",
+              "short": "เล่ม 5",
+              "abbr": "ล. 5",
+              "hours": 20
+            },
+            {
+              "id": "CHEM.EX",
+              "name": "ตะลุยโจทย์ Upskill เคมี A-Level",
+              "short": "ตะลุยโจทย์",
+              "abbr": "ตะลุย",
+              "hours": 24,
+              "cover": "/cover/Exam_Gym_Chemistry.png"
+            }
+          ]
+        },
+        {
+          "id": "BIO",
+          "name": "ชีววิทยา",
+          "color": "#adb5bd",
+          "courses": []
+        }
+      ]
+    },
+    {
+      "name": "กลุ่มภาษาและสังคม",
+      "subjects": [
+        {
+          "id": "THAI",
+          "name": "ภาษาไทย",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "SOC",
+          "name": "สังคม",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "ENG",
+          "name": "อังกฤษ",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "FRE",
+          "name": "ฝรั่งเศส",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "GER",
+          "name": "เยอรมัน",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "JPN",
+          "name": "ญี่ปุ่น",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "KOR",
+          "name": "เกาหลี",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "CHN",
+          "name": "จีน",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "SPA",
+          "name": "สเปน",
+          "color": "#adb5bd",
+          "courses": []
+        },
+        {
+          "id": "PALI",
+          "name": "บาลี",
+          "color": "#adb5bd",
+          "courses": []
+        }
+      ]
+    }
+  ],
+  "plan": {
+    "calendar": {
+      "weekdayHours": 1,
+      "weekendHours": 3,
+      "specialDays": [
+        {
+          "date": "2026-12-12",
+          "hours": 5
+        }
+      ],
+      "breaks": [
+        {
+          "id": 1,
+          "start": "2026-12-21",
+          "end": "2027-01-03",
+          "hours": 2
+        }
+      ],
+      "subjects": [
+        "TPAT3",
+        "TGAT",
+        "MATH1",
+        "PHY",
+        "CHEM"
+      ]
+    },
+    "courses": [
+      {
+        "courseId": "TPAT3.1",
+        "startDate": "2026-10-01"
+      },
+      {
+        "courseId": "TPAT3.2",
+        "startDate": "2027-12-01"
+      },
+      {
+        "courseId": "MATH.1",
+        "startDate": "2026-10-01",
+        "weeklyHours": 3
+      },
+      {
+        "courseId": "MATH.2",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "MATH.3",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "MATH.4",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "MATH.5",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "MATH.EX"
+      },
+      {
+        "courseId": "MATH.UP",
+        "startDate": "2027-12-01"
+      },
+      {
+        "courseId": "PHY.0",
+        "startDate": "2026-11-10",
+        "weeklyHours": 3
+      },
+      {
+        "courseId": "PHY.1",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "PHY.2",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "PHY.3",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "PHY.4",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "PHY.5",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "PHY.6",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "PHY.7",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "PHY.EX",
+        "startDate": "2027-12-01",
+        "weeklyHours": 3
+      },
+      {
+        "courseId": "TGAT.1",
+        "startDate": "2026-08-01",
+        "weeklyHours": 3
+      },
+      {
+        "courseId": "CHEM.1",
+        "startDate": "2026-12-01",
+        "weeklyHours": 2
+      },
+      {
+        "courseId": "CHEM.2",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "CHEM.3",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "CHEM.4",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "CHEM.5",
+        "followPrevious": true,
+        "followPreviousWeeklyHours": true
+      },
+      {
+        "courseId": "CHEM.EX",
+        "startDate": "2027-12-01"
+      }
+    ]
+  },
+  "events": [
+    {
+      "id": "M1",
+      "date": "2026-12-20",
+      "label": "Mock ลองสนาม",
+      "kind": "mock"
+    },
+    {
+      "id": "M2",
+      "date": "2027-08-16",
+      "label": "Mock TGAT/TPAT",
+      "kind": "mock"
+    },
+    {
+      "id": "M3",
+      "date": "2027-08-30",
+      "label": "Mock A-Level",
+      "kind": "mock"
+    },
+    {
+      "id": "M4",
+      "date": "2027-09-13",
+      "label": "Mock CBT",
+      "kind": "mock"
+    },
+    {
+      "id": "M5",
+      "date": "2027-12-18",
+      "label": "Mock 2 TGAT/TPAT",
+      "kind": "mock"
+    },
+    {
+      "id": "X1",
+      "date": "2028-01-16",
+      "label": "สอบ TGAT/TPAT",
+      "kind": "exam"
+    },
+    {
+      "id": "M6",
+      "date": "2028-01-23",
+      "label": "Mock 2 A-Level",
+      "kind": "mock"
+    },
+    {
+      "id": "X2",
+      "date": "2028-02-06",
+      "label": "สอบ A-Level",
+      "kind": "exam"
+    }
+  ],
+  "owned": [
+    "TPAT3.1",
+    "MATH.1",
+    "PHY.0",
+    "PHY.1",
+    "PHY.2",
+    "PHY.3",
+    "PHY.4",
+    "M1",
+    "M2",
+    "M3",
+    "M5",
+    "M6"
+  ],
+  "progress": {
+    "TPAT3.1": 70,
+    "MATH.1": 0,
+    "PHY.0": 20,
+    "PHY.1": 10,
+    "PHY.2": 0,
+    "PHY.3": 30,
+    "PHY.4": 50
+  },
+  "prices": {
+    "MATH.1": {
+      "now": 3900,
+      "was": 4900
+    },
+    "MATH.EX": {
+      "now": 4900,
+      "was": 6900
+    },
+    "PHY.0": {
+      "now": 3900
+    },
+    "PHY.EX": {
+      "now": 5900,
+      "was": 7900
+    }
+  },
+  "packs": {
+    "MATH-V": {
+      "name": "Math Admissions TCAS (V-Series)",
+      "teacher": "พี่แท็ป"
+    },
+    "PHY-V": {
+      "name": "Pack V-Series Physics TCAS",
+      "teacher": "พี่เต้ย · พี่เกรท · พี่เฟรนด์ ออนดีมานด์"
+    }
+  },
+  "courseDetails": {
+    "MATH.1": {
+      "packId": "MATH-V",
+      "volume": {
+        "chapters": [
+          "เซต",
+          "ตรรกศาสตร์",
+          "จำนวนจริง",
+          "เรขาคณิตวิเคราะห์และภาคตัดกรวย"
+        ]
+      }
+    },
+    "MATH.2": {
+      "packId": "MATH-V",
+      "volume": {
+        "chapters": [
+          "ความสัมพันธ์และฟังก์ชัน",
+          "Exponential & Logarithm",
+          "ฟังก์ชันตรีโกณมิติ"
+        ]
+      }
+    },
+    "MATH.3": {
+      "packId": "MATH-V",
+      "volume": {
+        "chapters": [
+          "เมทริกซ์",
+          "เวกเตอร์",
+          "จำนวนเชิงซ้อน"
+        ]
+      }
+    },
+    "MATH.4": {
+      "packId": "MATH-V",
+      "volume": {
+        "chapters": [
+          "ลำดับและอนุกรม",
+          "แคลคูลัส"
+        ]
+      }
+    },
+    "MATH.5": {
+      "packId": "MATH-V",
+      "volume": {
+        "chapters": [
+          "สถิติ",
+          "ความน่าจะเป็น",
+          "ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น"
+        ]
+      }
+    },
+    "MATH.EX": {
+      "examgym": {
+        "slogan": "คณิต A-Level โจทย์ยาว ถึก และซับซ้อนจนทำไม่ทัน!"
+      }
+    },
+    "PHY.1": {
+      "packId": "PHY-V",
+      "volume": {
+        "chapters": [
+          "บทนำและการวัด",
+          "การเคลื่อนที่แนวตรง",
+          "การเคลื่อนที่วิถีโค้ง"
+        ]
+      }
+    },
+    "PHY.2": {
+      "packId": "PHY-V",
+      "volume": {
+        "chapters": [
+          "กฎการเคลื่อนที่ของนิวตัน",
+          "สมดุลกล",
+          "งานและพลังงาน",
+          "โมเมนตัม"
+        ]
+      }
+    },
+    "PHY.3": {
+      "packId": "PHY-V",
+      "volume": {
+        "chapters": [
+          "การเคลื่อนที่วงกลมและดวงดาว",
+          "การเคลื่อนที่แบบ SHM"
+        ]
+      }
+    },
+    "PHY.4": {
+      "packId": "PHY-V",
+      "volume": {
+        "chapters": [
+          "แก๊สและทฤษฎีจลน์",
+          "ของเหลวและของไหล",
+          "ของแข็ง"
+        ]
+      }
+    },
+    "PHY.5": {
+      "packId": "PHY-V",
+      "volume": {
+        "chapters": [
+          "ไฟฟ้าสถิต",
+          "กระแสตรง",
+          "แม่เหล็กไฟฟ้า",
+          "กระแสสลับ"
+        ]
+      }
+    },
+    "PHY.6": {
+      "packId": "PHY-V",
+      "volume": {
+        "chapters": [
+          "คลื่น",
+          "เสียง",
+          "แสง"
+        ]
+      }
+    },
+    "PHY.7": {
+      "packId": "PHY-V",
+      "volume": {
+        "chapters": [
+          "คลื่นแม่เหล็กไฟฟ้า",
+          "ฟิสิกส์อะตอม",
+          "ฟิสิกส์นิวเคลียร์"
+        ]
+      }
+    },
+    "PHY.EX": {
+      "examgym": {
+        "slogan": "มิติใหม่ของการซ้อม! โจทย์ที่ถามกลับได้ ซ่อมจุดอ่อนได้ตรงจุด"
+      }
+    },
+    "CHEM.EX": {
+      "examgym": {
+        "slogan": "โจทย์เคมีผสมทั้งจำและคำนวณ ทำไม่ทัน แถมชอบคิดเลขผิด!"
+      }
+    }
+  }
+}
