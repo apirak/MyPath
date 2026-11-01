@@ -40,7 +40,7 @@ describe('withCourseStartDate', () => {
   })
 
   it('คอร์สที่ไม่มีในแผน: แผนไม่เปลี่ยน (เหมือน setCourseStartDate ของ prototype)', () => {
-    expect(withCourseStartDate(plan, 'MATH.3', '2027-01-04')).toEqual(plan)
+    expect(withCourseStartDate(plan, 'MATH.3', '2027-01-04')).toBe(plan) // object เดิม: ผู้เรียกเทียบ !== เพื่อรู้ว่าเปลี่ยนจริง
   })
 
   it('ไม่แก้แผนที่ส่งเข้ามา', () => {

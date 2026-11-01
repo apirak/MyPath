@@ -21,8 +21,8 @@ type PathHeaderProps = ModeProps & {
 // ปุ่มปฏิทินการเรียนยังไม่ render (ใบ 08)
 export default function PathHeader({ mode, onModeChange, slide, period, now = false, showNavigation = true, canPrev = false, canNext = false, onPrev, onNext }: PathHeaderProps) {
   const tab = (to: MyPathView['mode'], label: string) => mode === to
-    ? <button type="button" className="mp-active">{label}</button>
-    : <button type="button" onClick={() => onModeChange(to)}>{label}</button>
+    ? <button type="button" className="mp-active" aria-pressed="true">{label}</button>
+    : <button type="button" aria-pressed="false" onClick={() => onModeChange(to)}>{label}</button>
   return <header className="mp-header">
     <div className={slide ? 'mp-tabs mp-slide' : 'mp-tabs'} data-active={mode}>{tab('month', 'Month')}{tab('all', 'All')}</div>
     <div className="mp-month-picker">

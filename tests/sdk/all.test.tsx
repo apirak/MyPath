@@ -53,11 +53,13 @@ const AXIS_DAYS = (Date.UTC(2028, 4, 1) - Date.UTC(2026, 7, 1)) / 86_400_000
 const MATH1 = /^Applied Math Admissions TCAS เล่ม 1 .* · 1 ต.ค. 69 – 25 พ.ย. 69$/
 const MATH1_MOVED = /เล่ม 1 .* · 5 ต.ค. 69 – 29 พ.ย. 69$/ // ลาก 7 วัน: 8 ต.ค. (พฤ.) → snap จ. 5 ต.ค.
 // ลากผ่านทุกระยะใน days (หน่วยวัน) แล้วค้างไว้ — คืนฟังก์ชันปล่อย
+// move/up ส่งไปที่แถวแกนของวิชา = ตัวที่ถือ pointer capture (grip อาจถูก unmount เมื่อแท่งหลุดแกน)
 const press = (title: RegExp, ...days: number[]) => {
   const grip = screen.getByTitle(title).querySelector('.mp-tp-grip')!
+  const row = grip.closest('.mp-tp-axis')!
   fireEvent.pointerDown(grip, { pointerId: 1, clientX: 0 })
-  for (const d of days) fireEvent.pointerMove(grip, { pointerId: 1, clientX: d * PX_PER_DAY })
-  return () => fireEvent.pointerUp(grip, { pointerId: 1 })
+  for (const d of days) fireEvent.pointerMove(row, { pointerId: 1, clientX: d * PX_PER_DAY })
+  return Object.assign(() => fireEvent.pointerUp(row, { pointerId: 1 }), { cancel: () => fireEvent.pointerCancel(row, { pointerId: 1 }) })
 }
 function EchoHost() {
   const [plan, setPlan] = useState(mypathData.plan)
@@ -115,5 +117,44 @@ describe('ลากหัวคอร์ส (controlled)', () => {
     expect(screen.getByText('ส.ค. 69 – เม.ย. 71')).toBeTruthy()
     release()
     expect(screen.getByText('ส.ค. 69 – มิ.ย. 71')).toBeTruthy()
+  })
+
+  it('คอร์สที่ไม่มีในแผน: ลากแล้วไม่ยิง', () => {
+    const onPlanChange = vi.fn()
+    const plan = { ...mypathData.plan, courses: mypathData.plan.courses.filter(c => c.courseId !== 'MATH.1') }
+    render(<MyPath data={{ ...mypathData, plan }} today={TODAY} onPlanChange={onPlanChange} onBuyCourse={noop} onStartCourse={noop} />)
+    openAll()
+    press(/^Applied Math Admissions TCAS เล่ม 1 /, 21)()
+    expect(onPlanChange).not.toHaveBeenCalled()
+  })
+
+  it('pointercancel: ทิ้งแผนชั่วคราว ไม่ยิง', () => {
+    const onPlanChange = vi.fn()
+    render(<MyPath data={mypathData} today={TODAY} onPlanChange={onPlanChange} onBuyCourse={noop} onStartCourse={noop} />)
+    openAll()
+    press(MATH1, 7).cancel()
+    expect(onPlanChange).not.toHaveBeenCalled()
+    expect(screen.getByTitle(MATH1)).toBeTruthy()
+  })
+
+  it('ลากจนแท่งหลุดแกน: ปล่อยแล้วยังยิง และแกนคิดใหม่', () => {
+    const onPlanChange = vi.fn()
+    render(<MyPath data={mypathData} today={TODAY} onPlanChange={onPlanChange} onBuyCourse={noop} onStartCourse={noop} />)
+    openAll()
+    const release = press(/^.* · 1 มี.ค. 71 – 11 เม.ย. 71$/, 120) // MATH.EX เริ่มเลยสิ้นแกน (1 พ.ค. 71) → แท่งหายจากแกนที่ถือไว้
+    expect(screen.queryByTitle(/ · 1 มี.ค. 71 – 11 เม.ย. 71$/)).toBeNull()
+    release()
+    expect(onPlanChange).toHaveBeenCalledTimes(1)
+    expect(onPlanChange.mock.calls[0][0].courses.find((c: { courseId: string }) => c.courseId === 'MATH.EX')?.startDate).toBe('2028-06-26')
+  })
+})
+
+describe('แท็บ Month / All', () => {
+  it('บอกแท็บที่เลือกด้วย aria-pressed', () => {
+    renderMyPath()
+    const pressed = () => ['Month', 'All'].map(name => screen.getByRole('button', { name }).getAttribute('aria-pressed'))
+    expect(pressed()).toEqual(['true', 'false'])
+    openAll()
+    expect(pressed()).toEqual(['false', 'true'])
   })
 })

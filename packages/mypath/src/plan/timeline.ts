@@ -2,9 +2,12 @@
 import type { ISODate, StudentPlan, StudyCalendar } from '../types'
 import { MS, isoOf, u } from './dates'
 
-// แผนใหม่ที่คอร์สนั้นมีวันเริ่มต้นใหม่ (แทน setCourseStartDate ที่แก้ของเดิม) — คอร์สที่ไม่มีในแผน: ไม่เปลี่ยน เหมือน prototype
+// แผนใหม่ที่คอร์สนั้นมีวันเริ่มต้นใหม่ (แทน setCourseStartDate ที่แก้ของเดิม)
+// คอร์สที่ไม่มีในแผน: คืน object เดิม เหมือน prototype (ผู้เรียกเทียบ !== เพื่อรู้ว่าเปลี่ยนจริง)
 export const withCourseStartDate = (plan: StudentPlan, courseId: string, startDate: ISODate): StudentPlan =>
-  ({ ...plan, courses: plan.courses.map(c => c.courseId === courseId ? { ...c, startDate } : c) })
+  plan.courses.some(c => c.courseId === courseId)
+    ? { ...plan, courses: plan.courses.map(c => c.courseId === courseId ? { ...c, startDate } : c) }
+    : plan
 
 // วันจันทร์ที่ใกล้ที่สุด (ขอบที่ 3.5 วัน) ให้ตรงกับแท่งชั่วโมงเรียน/สัปดาห์
 export const snapToMonday = (ms: number): ISODate => {

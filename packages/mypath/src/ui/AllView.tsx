@@ -177,20 +177,24 @@ export default function AllView(mode: ModeProps) {
   // ยิง onPlanChange ครั้งเดียวตอนปล่อย (ADR-0003) หน้าจอหลังปล่อยแสดงแผนที่ host ส่งกลับมาเท่านั้น
   const dragStart: DragStart = (event, course) => {
     event.stopPropagation()
-    const grip = event.currentTarget, startX = event.clientX, base = course.start, start = { axis, plan: data.plan }
-    const pxPerDay = grip.closest('.mp-tp-axis')!.getBoundingClientRect().width / axis.totalDays
+    // capture ที่แถวแกนของวิชา ไม่ใช่ grip — แท่งที่ลากหลุดแกนถูก unmount พร้อม grip แล้ว pointerup จะไม่มาถึง
+    const row = event.currentTarget.closest<HTMLElement>('.mp-tp-axis')!, startX = event.clientX, base = course.start, start = { axis, plan: data.plan }
+    const pxPerDay = row.getBoundingClientRect().width / axis.totalDays
     let last = base, draft = start.plan
-    grip.setPointerCapture(event.pointerId)
+    row.setPointerCapture(event.pointerId)
     setDrag(start)
-    grip.onpointermove = move => {
+    row.onpointermove = move => {
       const next = snapToMonday(u(base) + (move.clientX - startX) / pxPerDay * MS)
       if (next !== last) { last = next; draft = withCourseStartDate(start.plan, course.id, next); setDrag({ ...start, plan: draft }) }
     }
-    grip.onpointerup = grip.onpointercancel = () => {
-      grip.onpointermove = grip.onpointerup = grip.onpointercancel = null
+    // cancel (browser/OS ยกเลิก gesture) = ทิ้งแผนชั่วคราว ยิงเฉพาะตอนปล่อยจริง
+    const end = (commit: boolean) => {
+      row.onpointermove = row.onpointerup = row.onpointercancel = null
       setDrag(null)
-      if (draft !== start.plan) onPlanChange(draft)
+      if (commit && draft !== start.plan) onPlanChange(draft)
     }
+    row.onpointerup = () => end(true)
+    row.onpointercancel = () => end(false)
   }
 
   const header = <PathHeader mode="all" {...mode} period={axis.label} showNavigation={false} />
