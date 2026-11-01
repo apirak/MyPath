@@ -4,7 +4,7 @@
       "name": "TGAT / TPAT",
       "subjects": [
         {
-          "id": "TGAT",
+          "id": "tgat",
           "name": "TGAT",
           "color": "#ff6b17",
           "courses": [
@@ -18,19 +18,19 @@
           ]
         },
         {
-          "id": "TPAT1",
+          "id": "tpat1",
           "name": "TPAT1",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "TPAT2",
+          "id": "tpat2",
           "name": "TPAT2",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "TPAT3",
+          "id": "tpat3",
           "name": "TPAT3",
           "color": "#a51d1d",
           "courses": [
@@ -51,13 +51,13 @@
           ]
         },
         {
-          "id": "TPAT4",
+          "id": "tpat4",
           "name": "TPAT4",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "TPAT5",
+          "id": "tpat5",
           "name": "TPAT5",
           "color": "#adb5bd",
           "courses": []
@@ -68,7 +68,7 @@
       "name": "กลุ่มคณิตศาสตร์และวิทยาศาสตร์",
       "subjects": [
         {
-          "id": "MATH1",
+          "id": "a_lv_61",
           "name": "คณิต 1",
           "color": "#0078c4",
           "courses": [
@@ -130,19 +130,19 @@
           ]
         },
         {
-          "id": "MATH2",
+          "id": "a_lv_62",
           "name": "คณิต 2",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "SCI",
+          "id": "a_lv_63",
           "name": "วิทยาศาสตร์",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "PHY",
+          "id": "a_lv_64",
           "name": "ฟิสิกส์",
           "color": "#d72630",
           "courses": [
@@ -220,7 +220,7 @@
           ]
         },
         {
-          "id": "CHEM",
+          "id": "a_lv_65",
           "name": "เคมี",
           "color": "#f5bd3d",
           "courses": [
@@ -270,7 +270,7 @@
           ]
         },
         {
-          "id": "BIO",
+          "id": "a_lv_66",
           "name": "ชีววิทยา",
           "color": "#adb5bd",
           "courses": []
@@ -281,61 +281,61 @@
       "name": "กลุ่มภาษาและสังคม",
       "subjects": [
         {
-          "id": "THAI",
+          "id": "a_lv_81",
           "name": "ภาษาไทย",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "SOC",
+          "id": "a_lv_70",
           "name": "สังคม",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "ENG",
+          "id": "a_lv_82",
           "name": "อังกฤษ",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "FRE",
+          "id": "a_lv_83",
           "name": "ฝรั่งเศส",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "GER",
+          "id": "a_lv_84",
           "name": "เยอรมัน",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "JPN",
+          "id": "a_lv_85",
           "name": "ญี่ปุ่น",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "KOR",
+          "id": "a_lv_86",
           "name": "เกาหลี",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "CHN",
+          "id": "a_lv_87",
           "name": "จีน",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "SPA",
+          "id": "a_lv_89",
           "name": "สเปน",
           "color": "#adb5bd",
           "courses": []
         },
         {
-          "id": "PALI",
+          "id": "a_lv_88",
           "name": "บาลี",
           "color": "#adb5bd",
           "courses": []
@@ -362,11 +362,11 @@
         }
       ],
       "subjects": [
-        "TPAT3",
-        "TGAT",
-        "MATH1",
-        "PHY",
-        "CHEM"
+        "tpat3",
+        "tgat",
+        "a_lv_61",
+        "a_lv_64",
+        "a_lv_65"
       ]
     },
     "courses": [
