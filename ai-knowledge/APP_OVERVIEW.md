@@ -30,7 +30,7 @@ A **frontend-only as-is mockup** of the current Learn Anywhere website:
 
 1. The owner sends Figma links page by page (desktop + mobile) — see `FIGMA-LINKS.md`.
 2. Design details are read through the **Figma MCP** (server "Figma Desktop", `https://mcp.figma.com/mcp`, workspace-scoped in `.zcode/config.json`).
-3. The app is split in two (see `docs/mypath-sdk-plan.md`, "แยก host กับ SDK"): `src/host/` = simulated Learn Anywhere (pages, BottomNav, HeaderButton, fixtures), `packages/mypath/` = the My Path SDK, imported by the host only as `@learn/mypath`. `tests/boundary.test.ts` enforces the import rules. The original My Path mockup (`src/prototype/`, `/prototype/mypath`) was removed once the SDK reached parity (#13); it is still available at git tag `mockup-v1`.
+3. The app is split in two (see `docs/mypath-sdk-plan.md`, "แยก host กับ SDK"): `src/host/` = simulated Learn Anywhere (pages, BottomNav, HeaderButton, fixtures), `packages/mypath/` = the My Path SDK, imported by the host only as `@learn/mypath`. `tests/boundary.test.ts` enforces the import rules. The original My Path mockup (`src/prototype/`, `/prototype/mypath`) was removed once the SDK reached parity (#13); its code is still at git tag `mockup-v1` (`src/pages/MyPath*.tsx`, `src/mypath/`; the last `src/prototype/` version is the parent of the removal commit).
 4. Every finished page gets a doc in `ai-knowledge/PAGES/<PAGE>.md` following `_TEMPLATE.md` — purpose, layout, every component, states.
 
 ## Page inventory

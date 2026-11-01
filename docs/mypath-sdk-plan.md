@@ -26,22 +26,23 @@ Learn Anywhere ตัวจริง (React web) ติดตั้ง package �
 ยังเป็น Vite app เดียว รัน dev server ตัวเดียว:
 
 ```
-src/prototype/      ← mockup เดิมทั้งหมด ถูกแช่แข็งไว้ ไม่แก้   → /prototype/mypath, /prototype/mypath/all
 src/host/           ← Learn Anywhere จำลอง                     → /, /courses, /mypath, /profile
 packages/mypath/    ← SDK (index.ts = ทางเข้าทางเดียว)
 ```
+
+> `src/prototype/` (mockup เดิม ที่ `/prototype/mypath`, `/prototype/mypath/all`) ถูกลบแล้วใน #13 — โค้ดต้นฉบับดูได้ที่ tag `mockup-v1`
 
 host ใช้หน้า Home, Courses, Profile และ BottomNav ที่มีอยู่แล้ว เพราะหน้าเหล่านี้คือส่วน "Learn Anywhere เดิม" อยู่แล้ว.
 **เหตุผล:** host จำลองใช้ SDK แบบเดียวกับแอปจริง ถ้า props ออกแบบมาใช้ยาก จะรู้ตั้งแต่ตอนนี้ ส่วน prototype ที่เปิดดูได้ตลอดใช้เทียบหน้าตา และใช้เป็นคำตอบอ้างอิงให้เทสต์
 
 ## กติกา
 
-1. **`src/prototype` แก้ไม่ได้** ยกเว้นแก้ path/ลิงก์ตอนย้ายบ้าน. มีโค้ดซ้ำกับ SDK ได้ เพราะเราไม่ได้ดูแล prototype ต่อ
-2. **SDK import จาก `src/prototype` หรือ `react-router` ไม่ได้** และ **host import SDK ได้เฉพาะผ่านชื่อ package** (`@learn/mypath`). ทั้งสองข้อตรวจด้วยเทสต์ที่ scan ดู import
+1. ~~`src/prototype` แก้ไม่ได้~~ — ใช้ระหว่างขั้น 2–5 เท่านั้น prototype ถูกลบแล้วใน #13 (ต้นฉบับอยู่ที่ tag `mockup-v1`)
+2. **SDK import จาก `src/` หรือ `react-router` ไม่ได้** และ **host import SDK ได้เฉพาะผ่านชื่อ package** (`@learn/mypath`). ทั้งสองข้อตรวจด้วยเทสต์ที่ scan ดู import
    **เหตุผล:** ถ้ามีอะไรรั่วออกนอกขอบเขต package จะเห็นทันทีตอนเทสต์ ไม่ต้องรอไปพังตอน build library
-3. **ฟังก์ชันคำนวณให้ copy ไปทั้งก้อน ไม่เขียนใหม่** (`plan.ts`, `progressStore.ts`) แล้วปรับให้เป็นฟังก์ชันล้วน. มีเทสต์ยืนยันว่าเมื่อได้ข้อมูลชุดเดียวกัน ผลต้องเท่ากับของ prototype
+3. **ฟังก์ชันคำนวณให้ copy ไปทั้งก้อน ไม่เขียนใหม่** (`plan.ts`, `progressStore.ts`) แล้วปรับให้เป็นฟังก์ชันล้วน. มีเทสต์ยืนยันว่าเมื่อได้ข้อมูลชุดเดียวกัน ผลต้องเท่ากับของ prototype (ตอนนี้คือ snapshot ใน `tests/characterization/` ที่บันทึกไว้ตอนยังเป็น prototype และคิดด้วย SDK แล้ว)
    **เหตุผล:** ในโค้ดมีรายละเอียดเยอะ (snap วันจันทร์, ต่อคอร์ส, ตามจังหวะเรียน) เขียนใหม่มีโอกาสเพี้ยนสูง
-4. **ทุกขั้นต้องผ่าน:** `npm test` + `npm run build` และเปิดได้ทั้ง `/` กับ `/prototype/mypath` ก่อน commit
+4. **ทุกขั้นต้องผ่าน:** `npm test` + `npm run build` และเปิด `/` กับ `/mypath` ได้ก่อน commit
 5. **วิธีทำ ticket:** ใบ implement ใช้ `/mattpocock-skills:implement issue #N` แล้ว review ก่อนเปิด PR ด้วย `/mattpocock-skills:code-review` (มาตรฐานของ repo + ตรงตาม issue) และ `/ponytail:ponytail-review` (ซับซ้อนเกินจำเป็น) ส่วนใบ grill ใช้ `/mattpocock-skills:grill-with-docs issue #N`
    **เหตุผล:** ทุกใบผ่านกระบวนการเดียวกัน และ review สองมุมจับปัญหาต่างกัน คือทำผิด spec กับทำเกินจำเป็น
 
@@ -53,7 +54,7 @@ host ใช้หน้า Home, Courses, Profile และ BottomNav ที่�
 | 2. แยกบ้าน | ย้ายโค้ดไป `src/prototype`, ทำ host shell ที่แท็บ 3 ว่าง, สร้าง package ที่มี type ตามสัญญาข้อมูล + `<MyPath>` เปล่าๆ, แยกข้อมูล mock เป็นไฟล์ JSON ฝั่ง host | ได้ขอบเขต package ตั้งแต่วันแรก และ prototype ยังเปิดได้ |
 | 3. ย้ายส่วนคำนวณ | `buildPlan(catalog, plan, today)` เป็นฟังก์ชันล้วน + เทสต์เทียบกับ prototype | UI ทุกชิ้นใช้ส่วนนี้ จึงต้องนิ่งก่อน |
 | 4. ปั้น UI ทีละชิ้น | header + Month → All timeline → Course detail → Study calendar → Progress. แต่ละชิ้นเขียน CSS แบบมี scope (`.mypath-root`, prefix `mp-`) ตั้งแต่แรก + smoke test | แต่ละชิ้นเสร็จแล้วใช้ได้ทันทีใน host. CSS ของ My Path เป็น CSS ธรรมดา ไม่ได้ใช้ Tailwind จึงไม่ต้องลากเอา Tailwind ไปด้วย |
-| 5. ตัดสินว่าครบแล้ว | เมื่อ SDK ทำได้ครบเท่า prototype ให้ลบ `src/prototype` ออก | เลิกมีโค้ดซ้ำสองชุด |
+| 5. ตัดสินว่าครบแล้ว | เมื่อ SDK ทำได้ครบเท่า prototype ให้ลบ `src/prototype` ออก — **เสร็จแล้ว (#13)** | เลิกมีโค้ดซ้ำสองชุด |
 | 6. Library build + publish | Vite library mode, ใส่ react เป็น peerDependencies, รวม CSS เป็นไฟล์เดียว, ใช้ pnpm workspaces, publish ตาม [Build และ publish](#build-และ-publish) | ถึงตอนนี้โค้ดไม่ผูกกับอะไรแล้ว ตั้ง build ครั้งเดียวจบ |
 
 ระหว่างขั้น 2–5 ใช้ path alias `@learn/mypath` ไปก่อน.
@@ -74,8 +75,9 @@ src/host/                   ← Learn Anywhere จำลอง
   components/               ← BottomNav, HeaderButton
   fixtures/*.json           ← ข้อมูล mock ที่ host ส่งเข้า SDK
   index.css                 ← Tailwind + CSS ของหน้า host
-src/prototype/              ← ของเดิม ไม่แก้ → /prototype/*
 ```
+
+(`src/prototype/` ที่เคยอยู่ในโครงนี้ถูกลบแล้วใน #13 — ดูต้นฉบับที่ tag `mockup-v1`)
 
 **กลไกแยก 3 ชั้น**
 
@@ -404,6 +406,8 @@ type MyPathProps = {
 
 ข้อสรุปจาก grill #5. ใบ 11 (#13) ตรวจตามหัวข้อนี้ก่อนลบ `src/prototype`
 
+> ตรวจครบแล้ว และ prototype ถูกลบใน #13 — โค้ดต้นฉบับอยู่ที่ tag `mockup-v1` (`src/pages/MyPath*.tsx`, `src/mypath/*`)
+
 ### ต้นแบบ วิธีเทียบ และคนเซ็น
 
 - **ต้นแบบคือ prototype ที่รันอยู่** (`/prototype/mypath*` = tag `mockup-v1`) ไม่ใช่ Figma. ถ้า prototype ต่างจาก Figma อยู่แล้ว ไม่อยู่ในขอบเขตของ #13
@@ -445,6 +449,7 @@ type MyPathProps = {
 9. สถานะความคืบหน้าที่ต้องเลื่อน**วันนี้** (หลังเส้นตาย): แผงทดสอบของ prototype เปลี่ยนวันนี้เฉพาะข้อความความคืบหน้า แต่ `today` ของ SDK เปลี่ยนทั้งแผน จึงเทียบเฉพาะการ์ด
 10. ราคาเดิม (`was`): prototype แสดงเป็นข้อความ `<s>฿4,900</s>` ตรงๆ (bug จาก template string) ส่วน SDK แสดงเป็นตัวขีดฆ่าจริงตาม[สัญญาราคา](#ราคาและการซื้อ)
 11. แผงปฏิทินการเรียนของ SDK ปิดด้วย Esc ได้ ([ปุ่ม back](#ปุ่ม-back-ไม่ปิดหน้าภายใน)) ส่วน prototype ปิดได้แค่ X และฉากหลัง. ตรวจเฉพาะฝั่ง SDK
+12. รูปปกในหน้ารายละเอียดคอร์สมาจาก `cover` ใน catalog (รูปเดียวกับการ์ด Month) ส่วน prototype ใช้ map `covers` แยก เป็นรูป placeholder `physics-1..4.png` (MATH.1, CHEM.1, PHY.0–4) และคอร์สอื่นไม่มีปก — เจ้าของ repo ตัดสินใน PR #27
 
 ### Checklist หน้าตา
 
