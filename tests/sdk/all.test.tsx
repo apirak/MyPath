@@ -51,12 +51,13 @@ describe('All', () => {
 const PX_PER_DAY = 10
 const AXIS_DAYS = (Date.UTC(2028, 4, 1) - Date.UTC(2026, 7, 1)) / 86_400_000
 const MATH1 = /^Applied Math Admissions TCAS เล่ม 1 .* · 1 ต.ค. 69 – 25 พ.ย. 69$/
-const dragByDays = (title: RegExp, days: number, { release = true } = {}) => {
+const MATH1_MOVED = /เล่ม 1 .* · 5 ต.ค. 69 – 29 พ.ย. 69$/ // ลาก 7 วัน: 8 ต.ค. (พฤ.) → snap จ. 5 ต.ค.
+// ลากผ่านทุกระยะใน days (หน่วยวัน) แล้วค้างไว้ — คืนฟังก์ชันปล่อย
+const press = (title: RegExp, ...days: number[]) => {
   const grip = screen.getByTitle(title).querySelector('.mp-tp-grip')!
   fireEvent.pointerDown(grip, { pointerId: 1, clientX: 0 })
-  fireEvent.pointerMove(grip, { pointerId: 1, clientX: days * PX_PER_DAY })
-  if (release) fireEvent.pointerUp(grip, { pointerId: 1 })
-  return grip
+  for (const d of days) fireEvent.pointerMove(grip, { pointerId: 1, clientX: d * PX_PER_DAY })
+  return () => fireEvent.pointerUp(grip, { pointerId: 1 })
 }
 function EchoHost() {
   const [plan, setPlan] = useState(mypathData.plan)
@@ -69,33 +70,50 @@ describe('ลากหัวคอร์ส (controlled)', () => {
     HTMLElement.prototype.setPointerCapture ??= () => {}
   })
 
-  it('host ไม่ส่งแผนกลับ: ได้แผนที่มีวันเริ่มต้นใหม่ แต่หน้าจอยังแสดงแผนเดิม', () => {
+  it('ระหว่างลากแสดงแผนชั่วคราว ยิง onPlanChange ครั้งเดียวตอนปล่อย', () => {
     const onPlanChange = vi.fn()
     render(<MyPath data={mypathData} today={TODAY} onPlanChange={onPlanChange} onBuyCourse={noop} onStartCourse={noop} />)
     openAll()
-    dragByDays(MATH1, 7) // 8 ต.ค. (พฤ.) → snap จ. 5 ต.ค.
+    const release = press(MATH1, 14, 21, 7) // ผ่านหลายวันจันทร์ แล้วกลับมาที่ 5 ต.ค.
+    expect(screen.getByTitle(MATH1_MOVED)).toBeTruthy()
+    expect(onPlanChange).not.toHaveBeenCalled()
+    release()
     expect(onPlanChange).toHaveBeenCalledTimes(1)
     const sent: StudentPlan = onPlanChange.mock.calls[0][0]
     expect(sent.courses.find(c => c.courseId === 'MATH.1')?.startDate).toBe('2026-10-05')
+  })
+
+  it('host ไม่ส่งแผนกลับ: ปล่อยแล้วหน้าจอกลับไปแผนเดิม', () => {
+    render(<MyPath data={mypathData} today={TODAY} onPlanChange={noop} onBuyCourse={noop} onStartCourse={noop} />)
+    openAll()
+    press(MATH1, 7)()
     expect(screen.getByTitle(MATH1)).toBeTruthy()
   })
 
   it('host ส่งแผนกลับ: คอร์สขยับ และคอร์สที่ตาม Course ก่อนหน้าขยับตาม', () => {
     render(<EchoHost />)
     openAll()
-    dragByDays(MATH1, 7)
-    expect(screen.getByTitle(/เล่ม 1 .* · 5 ต.ค. 69 – 29 พ.ย. 69$/)).toBeTruthy()
+    press(MATH1, 7)()
+    expect(screen.getByTitle(MATH1_MOVED)).toBeTruthy()
     expect(screen.getByTitle(/เล่ม 2 .* · 30 พ.ย. 69 – 24 ม.ค. 70$/)).toBeTruthy()
+  })
+
+  it('ไม่ได้ขยับถึงวันจันทร์ใหม่: ไม่ยิง', () => {
+    const onPlanChange = vi.fn()
+    render(<MyPath data={mypathData} today={TODAY} onPlanChange={onPlanChange} onBuyCourse={noop} onStartCourse={noop} />)
+    openAll()
+    press(MATH1)()
+    expect(onPlanChange).not.toHaveBeenCalled()
   })
 
   it('แกนไม่ขยับระหว่างลาก แล้วคิดใหม่ตอนปล่อย', () => {
     render(<EchoHost />)
     openAll()
     // MATH.EX จบ 11 เม.ย. 71 — ดันไป 8 สัปดาห์ แผนจบ มิ.ย. 71
-    const grip = dragByDays(/^.* · 1 มี.ค. 71 – 11 เม.ย. 71$/, 56, { release: false })
-    expect(screen.getByTitle(/ · 24 เม.ย. 71 – 4 มิ.ย. 71$/)).toBeTruthy() // host ได้แผนใหม่แล้ว
+    const release = press(/^.* · 1 มี.ค. 71 – 11 เม.ย. 71$/, 56)
+    expect(screen.getByTitle(/ · 24 เม.ย. 71 – 4 มิ.ย. 71$/)).toBeTruthy() // แผนชั่วคราว
     expect(screen.getByText('ส.ค. 69 – เม.ย. 71')).toBeTruthy()
-    fireEvent.pointerUp(grip, { pointerId: 1 })
+    release()
     expect(screen.getByText('ส.ค. 69 – มิ.ย. 71')).toBeTruthy()
   })
 })

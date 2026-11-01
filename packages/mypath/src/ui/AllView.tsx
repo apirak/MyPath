@@ -1,6 +1,6 @@
 import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
-import type { ExamEvent } from '../types'
-import { usePlan } from '../MyPathProvider'
+import type { ExamEvent, StudentPlan } from '../types'
+import { MyPathProvider, usePlan } from '../MyPathProvider'
 import type { Axis, PlannedCourse, PlannedSubject } from '../plan/buildPlan'
 import { MS, addDays, fmtDate, fmtShort, isoOf, u } from '../plan/dates'
 import { calendarBudgetForWeek, snapToMonday, withCourseStartDate } from '../plan/timeline'
@@ -148,42 +148,55 @@ function useScrollToToday(t: Timeline, today: string) {
   return ref
 }
 
-export default function AllView(mode: ModeProps) {
-  const { plan, data, onPlanChange } = usePlan()
-  // ระหว่างลากหัวคอร์ส แกนคงที่ (คอลัมน์ไม่กระโดดใต้เมาส์) — เป็น state ไม่ใช่ ref เพื่อให้ปล่อยแล้ว render ใหม่ด้วยแกนจริง
-  const [heldAxis, setHeldAxis] = useState<Axis | null>(null)
-  const t = timelineOf(heldAxis ?? plan.axis)
+function Timeline({ axis, onDragStart }: { axis: Axis; onDragStart: DragStart }) {
+  const { plan } = usePlan()
+  const t = timelineOf(axis)
   const scrollRef = useScrollToToday(t, plan.today)
-
-  // ลากเส้นหัวคอร์สซ้าย/ขวาเพื่อเลื่อนวันเริ่มทีละสัปดาห์ (เฉพาะคอร์สที่ไม่ได้ต่อจากคอร์สก่อน) — แปลง px เป็นวันจากความกว้าง axis
-  // แผนเป็น controlled: ทุก snap ส่งแผนใหม่ให้ host หน้าจอขยับเมื่อ host ส่งแผนกลับมาเท่านั้น
-  const dragStart: DragStart = (event, course) => {
-    event.stopPropagation()
-    const grip = event.currentTarget, startX = event.clientX, base = course.start, studentPlan = data.plan
-    const pxPerDay = grip.closest('.mp-tp-axis')!.getBoundingClientRect().width / t.days
-    let last = base
-    grip.setPointerCapture(event.pointerId)
-    setHeldAxis(plan.axis)
-    grip.onpointermove = move => {
-      const next = snapToMonday(u(base) + (move.clientX - startX) / pxPerDay * MS)
-      if (next !== last) { last = next; onPlanChange(withCourseStartDate(studentPlan, course.id, next)) }
-    }
-    grip.onpointerup = grip.onpointercancel = () => { grip.onpointermove = grip.onpointerup = grip.onpointercancel = null; setHeldAxis(null) }
-  }
-
-  const header = <PathHeader mode="all" {...mode} period={(heldAxis ?? plan.axis).label} showNavigation={false} />
-  if (plan.subjects.length === 0) return <>{header}<div className="mp-scroll"><PlanEmptyState /></div></>
   const columns = `176px ${monthColumns(t)}`
-  return <>{header}<div className="mp-scroll mp-tp-full" ref={scrollRef}>
+  return <div className="mp-scroll mp-tp-full" ref={scrollRef}>
     <div className="mp-tp-scroll" onScroll={e => e.currentTarget.style.setProperty('--sx', String(e.currentTarget.scrollLeft))}>
       <div className="mp-tp-sky"><Sky /><section className="mp-tp-grid mp-tp-events-strip" style={{ gridTemplateColumns: columns }}><EventRow t={t} dayWidth={MONTH_DAY_WIDTH} /><Grass /></section></div>
       <section className="mp-tp-grid" style={{ gridTemplateColumns: columns, '--rows': plan.subjects.length } as CSSProperties}>
         <MonthHeader t={t} today={plan.today} />
-        {plan.subjects.map(subject => <SubjectRow key={subject.id} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} onDragStart={dragStart} />)}
+        {plan.subjects.map(subject => <SubjectRow key={subject.id} subject={subject} t={t} dayWidth={MONTH_DAY_WIDTH} onDragStart={onDragStart} />)}
         <b className="mp-tp-label mp-tp-spacer" /><AxisRow t={t} dayWidth={MONTH_DAY_WIDTH} className="mp-tp-spacer">{null}</AxisRow>
         <WeeklyLoad t={t} dayWidth={MONTH_DAY_WIDTH} />
       </section>
     </div>
     <MobileTimeline t={t} />
-  </div></>
+  </div>
+}
+
+export default function AllView(mode: ModeProps) {
+  const { plan, data, onPlanChange } = usePlan()
+  // ระหว่างลาก: แผนชั่วคราว (UI state) + แกนตอนเริ่มลาก (คอลัมน์ไม่กระโดดใต้เมาส์) — ปล่อยแล้วกลับไปใช้แผนของ host
+  const [drag, setDrag] = useState<{ axis: Axis; plan: StudentPlan } | null>(null)
+  const axis = drag?.axis ?? plan.axis
+
+  // ลากเส้นหัวคอร์สซ้าย/ขวาเพื่อเลื่อนวันเริ่มทีละสัปดาห์ (เฉพาะคอร์สที่ไม่ได้ต่อจากคอร์สก่อน) — แปลง px เป็นวันจากความกว้าง axis
+  // ยิง onPlanChange ครั้งเดียวตอนปล่อย (ADR-0003) หน้าจอหลังปล่อยแสดงแผนที่ host ส่งกลับมาเท่านั้น
+  const dragStart: DragStart = (event, course) => {
+    event.stopPropagation()
+    const grip = event.currentTarget, startX = event.clientX, base = course.start, start = { axis, plan: data.plan }
+    const pxPerDay = grip.closest('.mp-tp-axis')!.getBoundingClientRect().width / axis.totalDays
+    let last = base, draft = start.plan
+    grip.setPointerCapture(event.pointerId)
+    setDrag(start)
+    grip.onpointermove = move => {
+      const next = snapToMonday(u(base) + (move.clientX - startX) / pxPerDay * MS)
+      if (next !== last) { last = next; draft = withCourseStartDate(start.plan, course.id, next); setDrag({ ...start, plan: draft }) }
+    }
+    grip.onpointerup = grip.onpointercancel = () => {
+      grip.onpointermove = grip.onpointerup = grip.onpointercancel = null
+      setDrag(null)
+      if (draft !== start.plan) onPlanChange(draft)
+    }
+  }
+
+  const header = <PathHeader mode="all" {...mode} period={axis.label} showNavigation={false} />
+  if (plan.subjects.length === 0) return <>{header}<div className="mp-scroll"><PlanEmptyState /></div></>
+  // provider ซ้อนอยู่ตลอด (ไม่ remount ตอนเริ่มลาก ไม่งั้น grip หลุด pointer capture) — ทุกแถว มือถือ และกราฟชั่วโมงคิดจากแผนชั่วคราวเอง
+  return <>{header}<MyPathProvider data={drag ? { ...data, plan: drag.plan } : data} today={plan.today} onPlanChange={onPlanChange}>
+    <Timeline axis={axis} onDragStart={dragStart} />
+  </MyPathProvider></>
 }
