@@ -1,5 +1,5 @@
-// buildPlan ของ SDK: วันนี้และข้อมูลที่ไม่ครบ (ผลของแผน mock ทั้งก้อนคุมด้วย
-// tests/characterization/plan.test.ts)
+// buildPlan edge cases: Today and incomplete input. The full mock plan
+// output is guarded by tests/characterization/plan.test.ts.
 import { describe, expect, it } from 'vitest'
 import { buildPlan } from '../../packages/mypath/src/plan/buildPlan'
 import { mypathData } from '../../src/host/fixtures'
@@ -40,7 +40,7 @@ describe('buildPlan: วันนี้และข้อมูลไม่ค�
           courses: [{ courseId: 'TGAT.1', startDate: '2026-02-31' }],
         },
       }).subjects[0].courses[0].start,
-    ).toBe('2027-03-10') // วันที่ไม่มีจริง ไม่ถูกเลื่อนไป 3 มี.ค.
+    ).toBe('2027-03-10') // An impossible date must not roll over to 3 Mar.
   })
 
   it('catalog ว่างไม่ throw และแกนครอบวันนี้', () => {
@@ -59,7 +59,7 @@ describe('buildPlan: วันนี้และข้อมูลไม่ค�
         ...base,
         plan: { calendar, courses: [{ courseId: 'TGAT.1', weeklyHours }] },
       }).subjects[0].courses[0]
-    // TGAT.1 = 15 ชม.
+    // TGAT.1 = 15 h
     expect(course(0)).toMatchObject({ weeklyHours: 1, estimatedWeeks: 15 })
     expect(course(40).weeklyHours).toBe(10)
   })

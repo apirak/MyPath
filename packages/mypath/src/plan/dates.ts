@@ -1,5 +1,4 @@
-// helper วันที่ day-exact (copy จาก src/prototype/mypath/plan.ts) — ทำงานบน UTC
-// กันเรื่อง DST
+// Day-exact date helpers. Everything runs in UTC so DST never shifts a day.
 import type { ISODate } from '../types'
 
 export const MS = 86_400_000
@@ -9,12 +8,12 @@ export const u = (iso: string) => {
 }
 export const isoOf = (ms: number) => new Date(ms).toISOString().slice(0, 10)
 export const addDays = (iso: string, n: number) => isoOf(u(iso) + n * MS)
-// วันที่ผิดรูปถือว่าไม่มีค่านั้น (สัญญาข้อมูล "ข้อมูลไม่ครบหรือผิด") —
-// ต้องแปลงกลับได้ค่าเดิม เพราะ Date.UTC เลื่อน 2026-02-31 ไปเป็น 3 มี.ค.
+// Malformed dates count as absent (data contract). The round-trip check is
+// needed because Date.UTC silently rolls 2026-02-31 over to 3 March.
 export const isISODate = (iso?: string): iso is ISODate =>
   !!iso && /^\d{4}-\d{2}-\d{2}$/.test(iso) && isoOf(u(iso)) === iso
-// "วันนี้" ตามเวลาไทยจากนาฬิกาเครื่อง เมื่อ host ไม่ส่ง today (en-CA =
-// YYYY-MM-DD)
+// Today in Thai time from the device clock, used when the host omits today.
+// en-CA formats as YYYY-MM-DD.
 export const thaiToday = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok' }).format(
     new Date(),

@@ -14,10 +14,8 @@ type Props = {
 const addDays = (iso: string, n: number) =>
   new Date(Date.parse(iso) + n * 86_400_000).toISOString().slice(0, 10)
 
-// ดัดแปลงจาก ProgressTestPanel ใน src/prototype/mypath/CourseProgress.tsx — แก้
-// state ของ host (progress และวันนี้) ที่ส่งเข้า <MyPath>
-// เพื่อพิสูจน์ว่าหน้าจอใน SDK เปลี่ยนตามข้อมูลจาก host · ปุ่มเฟืองมุมขวาล่าง
-// อยู่นอกกล่องของ SDK
+// Edits host state (progress and Today) fed into <MyPath>, to prove SDK
+// screens react to host data. The gear button lives outside the SDK box.
 export default function ProgressTestPanel({
   data,
   today,

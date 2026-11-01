@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-// หน้ารายละเอียดคอร์สของ SDK: เปิดจาก Month/All, การตั้งค่าส่งแผนผ่าน
-// onPlanChange, ปุ่มไปผ่าน callback
+// Course detail sheet: opens from Month/All, settings emit a plan through
+// onPlanChange, and buy/start buttons go through host callbacks.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
@@ -29,10 +29,10 @@ describe('เปิด/ปิดหน้ารายละเอียดคอ
     vi.useFakeTimers()
     renderMyPath()
     fireEvent.click(screen.getByText(MATH2))
-    // บทของเล่ม 2
+    // a chapter of book 2
     expect(sheet()?.textContent).toContain('ความสัมพันธ์และฟังก์ชัน')
     fireEvent.keyDown(window, { key: 'Escape' })
-    expect(sheet()).toBeTruthy() // ยังเล่น animation ปิด
+    expect(sheet()).toBeTruthy() // still playing the close animation
     act(() => {
       vi.advanceTimersByTime(280)
     })
@@ -49,7 +49,7 @@ const openFromAll = (title: RegExp) => {
   fireEvent.click(screen.getByTitle(title))
 }
 const follows = () =>
-  // [ชั่วโมง, วันเริ่มต้น]
+  // [weekly hours, start date]
   screen.getAllByLabelText('ตาม Course ก่อนหน้า') as HTMLInputElement[]
 const courseIn = (plan: { courses: { courseId: string }[] }, id: string) =>
   plan.courses.find(c => c.courseId === id)
@@ -93,9 +93,9 @@ describe('เปิดจาก All', () => {
     const close = screen.getByLabelText('ปิด'),
       date = screen.getByLabelText('วันเริ่มต้น')
     fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true })
-    expect(document.activeElement).toBe(date) // ย้อนจากชีท = ช่องสุดท้าย
+    expect(document.activeElement).toBe(date) // Shift+Tab wraps to last
     fireEvent.keyDown(date, { key: 'Tab' })
-    expect(document.activeElement).toBe(close) // เลยช่องสุดท้าย = วนกลับปุ่มแรก
+    expect(document.activeElement).toBe(close) // Tab past last wraps to first
     fireEvent.click(close)
     act(() => {
       vi.advanceTimersByTime(280)
@@ -215,7 +215,7 @@ describe('การตั้งค่าส่งแผนผ่าน onPlanCha
     }
     render(<Host />)
     openFromAll(MATH1)
-    // 24 ชม. / 3 ชม.
+    // 24 h / 3 h per week
     expect(screen.getByText(/ใช้เวลาประมาณ 8 สัปดาห์/)).toBeTruthy()
     fireEvent.change(screen.getByLabelText('ชั่วโมงต่อสัปดาห์'), {
       target: { value: '6' },
@@ -225,7 +225,7 @@ describe('การตั้งค่าส่งแผนผ่าน onPlanCha
       screen.getByTitle(
         /^Applied Math Admissions TCAS เล่ม 1 .* · 1 ต.ค. 69 – 28 ต.ค. 69$/,
       ),
-    ).toBeTruthy() // แถบใน All ตาม
+    ).toBeTruthy() // the All bar follows
   })
 })
 
@@ -270,7 +270,7 @@ describe('ปุ่มซื้อ/เริ่มเรียนไปผ่า
         courseId: 'MATH.1',
         weeklyHours: 3,
         startDate: TODAY,
-      }) // คอร์สแรกไม่มีวันเริ่ม = วันนี้
+      }) // first course with no start date starts Today
       expect(onPlanChange.mock.invocationCallOrder[0]).toBeLessThan(
         onStartCourse.mock.invocationCallOrder[0],
       )

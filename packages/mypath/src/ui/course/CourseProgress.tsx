@@ -1,20 +1,18 @@
-import { usePlan, useStartCourse } from '../MyPathProvider'
-import { fmtDate } from '../plan/dates'
-import { GOALS, progressState } from '../plan/progress'
-import flagIcon from '../assets/progress/flag.svg'
-import trophyIcon from '../assets/progress/trophy.svg'
-import checkedIcon from '../assets/progress/checked.svg'
-import walkerIcon from '../assets/progress/walker.svg'
-import confettiIcon from '../assets/progress/confetti.svg'
-import eggIcon from '../assets/progress/egg-speak.svg'
-import HeaderButton from './HeaderButton'
-import { Play } from './icons'
+import { usePlan, useStartCourse } from '../../MyPathProvider'
+import { fmtDate } from '../../plan/dates'
+import { GOALS, progressState } from '../../plan/progress'
+import flagIcon from '../../assets/progress/flag.svg'
+import trophyIcon from '../../assets/progress/trophy.svg'
+import checkedIcon from '../../assets/progress/checked.svg'
+import walkerIcon from '../../assets/progress/walker.svg'
+import confettiIcon from '../../assets/progress/confetti.svg'
+import eggIcon from '../../assets/progress/egg-speak.svg'
+import HeaderButton from '../components/HeaderButton'
+import { Play } from '../components/icons'
 
-// port จาก src/prototype/mypath/CourseProgress.tsx (class course-progress →
-// mp-progress) — Figma 20-46258 (การ์ด) + 3-37233 (สถานะแต่ละ step)
-// ต่างจาก prototype: % มาจาก data.progress, วันนี้มาจาก prop today ของ host,
-// ปุ่มเรียนเรียก startCourse (ตรึงวันเริ่มเหมือนหน้ารายละเอียด) ·
-// แผงทดสอบอยู่ฝั่ง host
+// Figma 20-46258 (card) + 3-37233 (state per step). The % comes from
+// data.progress; the button uses startCourse so it pins the start date just
+// like the course detail does.
 export default function CourseProgress({
   course,
 }: {
@@ -22,9 +20,8 @@ export default function CourseProgress({
 }) {
   const { plan, data } = usePlan()
   const startCourse = useStartCourse()
-  // ไม่มีค่า/ไม่ใช่ตัวเลข (host ส่งผิดรูปตอน runtime, key ที่ได้จาก prototype
-  // ของ object) = ยังไม่เริ่ม · ค่านอก 0–100 บีบเข้าช่วงเหมือน setProgress ของ
-  // prototype
+  // Missing or non-numeric (bad host data at runtime, or an inherited key like
+  // "toString") = not started. Values outside 0–100 are clamped.
   const raw: unknown = Object.hasOwn(data.progress, course.id)
     ? data.progress[course.id]
     : 0

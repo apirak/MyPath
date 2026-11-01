@@ -1,6 +1,7 @@
-// Characterization: ผลของแผนเรียน mock ที่บันทึกไว้ตอนยังเป็น prototype (tag
-// mockup-v1) — ตอนนี้คิดด้วย SDK จาก fixtures ของ host และต้องได้ snapshot เดิม
-// (ตัด owned ออก: การซื้อไม่ใช่ส่วนของแผน, ADR-0002)
+// Characterization: the mock plan as recorded from the prototype (tag
+// mockup-v1). The SDK, fed the host fixtures, must reproduce the same
+// snapshots. `owned` is excluded: purchases are not part of the plan
+// (ADR-0002).
 import { describe, expect, it } from 'vitest'
 import { buildPlan } from '../../packages/mypath/src/plan/buildPlan'
 import { MS, u, isoOf } from '../../packages/mypath/src/plan/dates'
@@ -36,7 +37,8 @@ describe('แผนเรียน: วิชาที่เรียน', () =>
 
 describe('แผนเรียน: แกน', () => {
   it('ช่วงแกนและเดือนบนแกน', () => {
-    // key เป็นชื่อค่าคงที่เดิมของ prototype เพื่อใช้ snapshot เดิมได้
+    // Keys keep the old prototype constant names so the snapshot still
+    // matches.
     expect({
       AXIS_START: axis.start,
       AXIS_END: axis.end,
@@ -47,8 +49,8 @@ describe('แผนเรียน: แกน', () => {
   })
 })
 
-// บันทึกตอนลบ prototype (#13) แทน oracle เดิมที่เทียบค่าเหล่านี้กับ prototype —
-// ค่าเท่ากับ prototype ณ ตอนนั้น
+// Recorded when the prototype was removed (#13), replacing the oracle that
+// compared these values against it; they equal the prototype's at that time.
 describe('แผนเรียน: ชั่วโมงตามแผน, เส้นเดือน, สีวิชา', () => {
   it('ชั่วโมงตามแผนรวมรายสัปดาห์ (กราฟชั่วโมงเรียน/สัปดาห์ของ All)', () => {
     const weeks: Record<string, number> = {}
@@ -57,8 +59,8 @@ describe('แผนเรียน: ชั่วโมงตามแผน, เ
         monday = isoOf(day - ((new Date(day).getUTCDay() + 6) % 7) * MS)
       weeks[monday] = (weeks[monday] ?? 0) + hours
     }
-    // รวมเต็มความละเอียดแบบ WeeklyLoad ใน AllView แล้วปัดเฉพาะผลรวมของสัปดาห์
-    // (ปัดทุกวันทำให้ error สะสม)
+    // Sum at full precision like WeeklyLoad, then round only the weekly
+    // total; rounding each day accumulates error.
     for (const monday in weeks) weeks[monday] = +weeks[monday].toFixed(4)
     expect({ totalHours, weeks }).toMatchSnapshot()
   })
@@ -73,7 +75,7 @@ describe('แผนเรียน: ชั่วโมงตามแผน, เ
 
 describe('งบปฏิทิน', () => {
   it('ทุกวันจันทร์ในแกน', () => {
-    // วันจันทร์แรกที่ไม่ก่อน axis.start (getUTCDay: อาทิตย์ = 0, จันทร์ = 1)
+    // First Monday on or after axis.start (getUTCDay: Sun = 0, Mon = 1)
     const firstMonday =
       u(axis.start) + ((8 - new Date(u(axis.start)).getUTCDay()) % 7) * MS
     const budgets: Record<string, number> = {}
@@ -83,8 +85,8 @@ describe('งบปฏิทิน', () => {
     expect(budgets).toMatchSnapshot()
   })
 
-  // วันที่ตรึงไว้ตาม plan.calendar ใน fixtures: วันพิเศษ 2026-12-12 (เสาร์),
-  // ช่วงปิดเทอม 2026-12-21 – 2027-01-03
+  // Dates follow plan.calendar in the fixtures: Special study day 2026-12-12
+  // (Sat), School break 2026-12-21 – 2027-01-03.
   it('ชั่วโมงรายวัน: วันธรรมดา, เสาร์/อาทิตย์, วันพิเศษ, ช่วงปิดเทอม', () => {
     expect({
       weekday: calendarHoursForDay(calendar, '2026-12-07'),

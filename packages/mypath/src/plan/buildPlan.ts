@@ -1,8 +1,7 @@
-// คิดแผนจากข้อมูลของ host — copy rebuildPlan() จาก src/prototype/mypath/plan.ts
-// มาเป็นฟังก์ชันล้วน (ไม่มี state ระดับ module)
-// ต่างจาก prototype: ไม่มี DAY_START/DAY_LAST —
-// คอร์สแรกที่ไม่มีวันเริ่มต้นเริ่มที่ "วันนี้" (สัญญาข้อมูล
-// "ไม่มีขอบเขตเวลาในสัญญา")
+// Builds the plan from host data as a pure function (no module state).
+// There is no fixed start/end of the timeline: a first course with no start
+// date starts on Today, and the Axis grows to fit (docs/mypath-sdk-plan.md,
+// data contract: no time bounds).
 import type {
   CourseCatalogItem,
   ExamEvent,
@@ -49,8 +48,8 @@ export type PlanInput = Pick<MyPathData, 'catalog' | 'plan' | 'events'> & {
 const DEFAULT_WEEKLY_HOURS = 5
 export const estimatedWeeksFor = (hours: number, weeklyHours: number) =>
   Math.ceil(hours / weeklyHours)
-// บีบให้อยู่ 1–10 ตามสัญญา — 0 จากแผนที่เสียทำให้จำนวนสัปดาห์เป็น Infinity และ
-// loop รายวันไม่จบ
+// Clamp to the contract's 1–10: a 0 from a corrupt plan would make weeks
+// Infinity and the per-day loop never end.
 const weeklyHoursFor = (
   weeklyHours: number | undefined,
   followPrevious: boolean,
@@ -60,7 +59,7 @@ const weeklyHoursFor = (
     ? previousWeeklyHours
     : Math.min(10, Math.max(1, weeklyHours ?? DEFAULT_WEEKLY_HOURS))
 
-// แกนเดือน: ต้นเดือนของสิ่งแรก ถึงสิ้นเดือนของสิ่งสุดท้าย
+// Axis: from the first of the earliest month to the end of the last month.
 const axisOf = (first: number, lastDay: number): Axis => {
   const last = new Date(lastDay)
   const start = `${isoOf(first).slice(0, 7)}-01`
@@ -87,16 +86,15 @@ const axisOf = (first: number, lastDay: number): Axis => {
   }
 }
 
-// คอร์สในวิชาเดียวกันต่อกันวันถัดไป; หนึ่งสัปดาห์ของคอร์สยาว 7 วันปฏิทินเสมอ
-// วิชาที่เรียน = วิชาใน catalog ที่เปิดใน calendar.subjects เรียงตาม catalog;
-// id ที่ไม่รู้จักถูกข้าม
+// Courses in a subject run back to back; a course week is always 7 calendar
+// days. Enabled subjects follow catalog order; unknown ids are skipped.
 export function buildPlan({
   catalog,
   plan,
   events: allEvents,
   today,
 }: PlanInput): Plan {
-  // วันสอบผิดรูป = ไม่มีรายการนั้น
+  // An exam with a malformed date is dropped.
   const events = allEvents.filter(event => isISODate(event.date))
   const enabled = catalog
     .flatMap(group => group.subjects)
@@ -116,8 +114,8 @@ export function buildPlan({
         !followPrevious && isISODate(student?.startDate)
           ? u(student.startDate)
           : undefined
-      // ไม่มีวันเริ่มต้น: คอร์สแรกเริ่มวันนี้, เล่มถัดไปต่อจากเล่มก่อน ·
-      // startDate ในอดีตไม่ถูกดันขึ้นมา
+      // No start date: the first course starts Today, later volumes follow
+      // the previous one. A past startDate is kept, not pushed to Today.
       const start = Math.max(
         nextStart,
         startDate ?? (index === 0 ? u(today) : nextStart),
@@ -172,7 +170,8 @@ export function buildPlan({
   )
   const eventDays = events.map(event => u(event.date))
   const firsts = [...starts.values(), ...eventDays]
-  // ไม่มีคอร์สและวันสอบเลย (catalog ว่าง) → แกนเดือนเดียวของวันนี้ แทนการ throw
+  // No courses or exams at all (empty catalog): one-month Axis on Today
+  // instead of throwing.
   const axis = axisOf(
     firsts.length ? Math.min(...firsts) : u(today),
     Math.max(u(today), ...ends.values(), ...eventDays),

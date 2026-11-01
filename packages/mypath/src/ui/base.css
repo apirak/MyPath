@@ -1,0 +1,33 @@
+/* App shell. The host must give .mypath-root a fixed height: the header stays
+   put and only .mp-scroll scrolls (and rubber-bands, like native iOS). */
+.mypath-root {
+  --mp-primary: #0078c4;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #f7f9fc;
+  color: #212529;
+}
+
+:where(.mypath-root) *,
+:where(.mypath-root) *::before,
+:where(.mypath-root) *::after {
+  box-sizing: border-box;
+}
+
+:where(.mypath-root) button {
+  font: inherit;
+}
+
+.mypath-root .mp-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior-y: contain;
+  padding: 0 16px 24px;
+}
+
+.mypath-root .mp-shell {
+  width: min(1024px, 100%);
+  margin: auto;
+}

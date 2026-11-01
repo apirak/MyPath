@@ -4,8 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath } from 'node:url'
 
 const abs = (path: string) => fileURLToPath(new URL(path, import.meta.url))
-// MYPATH_DIST=1 (pnpm verify:package): host ใช้ไฟล์ที่ build แล้วแบบคนนอก ·
-// ปกติชี้ source เพื่อ HMR
+// MYPATH_DIST=1 (pnpm verify:package): the host consumes the built files like
+// an outside app would. Otherwise point at source for HMR.
 const sdkPaths = process.env.MYPATH_DIST
   ? {
       entry: './packages/mypath/dist/index.js',
@@ -19,8 +19,8 @@ const sdkPaths = process.env.MYPATH_DIST
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
-    // ชี้ทีละไฟล์: host import ได้แค่ทางเข้าของ SDK กับ style.css (path
-    // ลึกอย่าง @learn/mypath/x resolve ไม่ได้)
+    // Exact-match aliases: the host may import only the SDK entry and
+    // style.css; deep paths like @learn/mypath/x must fail to resolve.
     alias: [
       { find: /^@learn\/mypath$/, replacement: abs(sdkPaths.entry) },
       { find: /^@learn\/mypath\/style\.css$/, replacement: abs(sdkPaths.css) },

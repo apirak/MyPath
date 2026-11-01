@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
-// พฤติกรรม modal ที่หน้ารายละเอียดคอร์สและแผงปฏิทินการเรียนใช้ร่วมกัน:
-// ย้ายโฟกัสเข้าตอนเปิด/คืนตอนปิด, วน Tab อยู่ข้างใน, Esc ปิด, และปิดหลัง
-// animation 280ms
+// Modal behaviour shared by the course detail and the study calendar panel:
+// focus moves in on open and back to the opener on close, Tab is trapped,
+// Esc closes, and onClose fires after the 280ms close animation.
 export function useModal<T extends HTMLElement>(onClose: () => void) {
   const [closing, setClosing] = useState(false)
   const ref = useRef<T>(null)
@@ -16,8 +16,9 @@ export function useModal<T extends HTMLElement>(onClose: () => void) {
     setClosing(true)
     window.setTimeout(onClose, 280)
   }
-  // ฟังที่ window: ปุ่มที่โฟกัสอยู่หายไป (เช่น ลบช่วงปิดเทอม) โฟกัสตกไปที่ body
-  // แต่ Tab ถัดไปยังดึงกลับเข้ามา
+  // Listen on window: when the focused button disappears (e.g. deleting a
+  // School break) focus falls to body, and the next Tab must still pull it
+  // back inside.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') return close()

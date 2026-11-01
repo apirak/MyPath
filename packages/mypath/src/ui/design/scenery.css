@@ -1,0 +1,78 @@
+/* Sky scenery behind the key-date flags in All view; flat style from the
+   Learn Anywhere theme (cyan to mint). */
+.mypath-root .mp-tp-full .mp-tp-sky {
+  overflow: clip;
+  background: linear-gradient(#9fe7fb, #bdf0f2 60%, #d6f6ec);
+}
+
+.mypath-root .mp-tp-sky-scene {
+  grid-area: 1/1;
+  position: sticky;
+  left: 0;
+  width: 100cqw;
+  margin-bottom: 6px;
+  overflow: clip;
+  pointer-events: none;
+}
+
+.mypath-root .mp-tp-clouds {
+  position: absolute;
+  inset: 0;
+  transform: translateX(calc(var(--sx, 0) * -0.4px));
+}
+
+.mypath-root .mp-tp-clouds.far {
+  transform: translateX(calc(var(--sx, 0) * -0.2px));
+  opacity: 0.7;
+}
+
+.mypath-root .mp-tp-cloud {
+  position: absolute;
+  height: auto;
+  fill: #effdff;
+  animation: mp-tp-drift 30s ease-in-out infinite alternate;
+}
+
+.mypath-root .mp-tp-grass-row {
+  position: absolute;
+  inset: auto 0 5px 176px;
+  height: 14px;
+  z-index: 0;
+}
+
+.mypath-root .mp-tp-grass {
+  position: absolute;
+  bottom: 0;
+  width: 16px;
+  height: auto;
+  fill: #8cc63f;
+  transform-origin: 50% 100%;
+  animation: mp-tp-sway 3.2s ease-in-out infinite;
+}
+
+.mypath-root .mp-tp-grass:nth-child(3n) {
+  fill: #a6cf4f;
+}
+
+@keyframes mp-tp-drift {
+  to {
+    translate: 50px 0;
+  }
+}
+
+@keyframes mp-tp-sway {
+  0%,
+  100% {
+    rotate: -6deg;
+  }
+  50% {
+    rotate: 6deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mypath-root .mp-tp-cloud,
+  .mypath-root .mp-tp-grass {
+    animation: none;
+  }
+}

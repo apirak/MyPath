@@ -1,16 +1,16 @@
-// ข้อมูล mock ที่ host ส่งเข้า <MyPath> — แปลงจาก src/prototype/mypath/*
-// ตามสัญญาข้อมูล
-// ปกมาจาก public/cover เท่านั้น คอร์สที่ไม่มีปกไม่ใส่ cover
-// เพื่อให้เห็นหน้าตาตอนไม่มีปก
-// id วิชาเป็นรหัสจริงของ backend (a_lv_*, tgat, tpat*)
+// Mock data the host passes into <MyPath>.
+// Covers come only from public/cover; courses without one deliberately omit
+// `cover` so the no-cover look stays visible.
+// Subject ids are the real backend ids (a_lv_*, tgat, tpat*).
 import type { ExamEvent, MyPathData } from '@learn/mypath'
 import json from './mypath.json'
 
-// วันอ้างอิงของ host จำลอง (GLOSSARY.md: "วันนี้") — ตรึงไว้เพราะวันที่ใน mock
-// data ผูกกับ ธ.ค. 2569 (แผงทดสอบเปลี่ยนได้)
+// The mock host's Today (GLOSSARY.md). Pinned because the mock dates are
+// tied to Dec 2026; the test panel can change it.
 export const TODAY = '2026-12-05'
 
-// JSON ขยาย kind เป็น string — cast แค่ events ที่เหลือให้ TS ตรวจตามสัญญาจริง
+// JSON widens `kind` to string; cast only `events` so TS still checks the
+// rest against the real contract.
 export const mypathData: MyPathData = {
   ...json,
   events: json.events as ExamEvent[],

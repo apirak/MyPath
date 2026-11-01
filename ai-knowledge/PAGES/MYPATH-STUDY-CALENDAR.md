@@ -4,7 +4,7 @@
 
 - **Route:** Panel overlay from the Study Calendar button ("ปฏิทินการเรียน") in the My Path header on `/mypath` (Month and All)
 - **Figma:** _No as-is frame; promoted from the approved My Path prototype_
-- **SDK:** `packages/mypath/src/ui/StudyCalendar.tsx` (ใบ 08 #11)
+- **SDK:** `packages/mypath/src/ui/calendar/StudyCalendar.tsx` (ใบ 08 #11)
 - **Original mockup:** removed in #13 after parity was verified; code is at git tag `mockup-v1` (`src/mypath/StudyCalendarPanel.tsx`)
 
 ## Purpose
@@ -26,8 +26,8 @@ Lets a learner choose which subjects are enabled, set their usual available stud
 
 | Component | File | Purpose | Behavior / states |
 |---|---|---|---|
-| StudyCalendar | `packages/mypath/src/ui/StudyCalendar.tsx` | The overlay and calendar controls | Opens from `PathHeader`; closes with ×, backdrop or Esc and animates down (280ms, `useModal`) before unmounting |
-| PathHeader | `packages/mypath/src/ui/PathHeader.tsx` | My Path shared header | Owns open/closed panel state for Month and All |
+| StudyCalendar | `packages/mypath/src/ui/calendar/StudyCalendar.tsx` | The overlay and calendar controls | Opens from `PathHeader`; closes with ×, backdrop or Esc and animates down (280ms, `useModal`) before unmounting |
+| PathHeader | `packages/mypath/src/ui/header/PathHeader.tsx` | My Path shared header | Owns open/closed panel state for Month and All |
 | calendar | `data.plan.calendar` (host: `src/host/fixtures/mypath.json`) | Learner calendar source data | Enabled subjects (`subjects`, ids), regular hours, special-day overrides, and break periods |
 | withStudyCalendar | `packages/mypath/src/plan/timeline.ts` | Pure update helper | Returns the whole new plan for `onPlanChange` (or `undefined` for invalid breaks); the host passes the plan back and Month / All re-render |
 | calendarHoursForDay / calendarBudgetForWeek | `packages/mypath/src/plan/timeline.ts` | Daily capacity and weekly Calendar budget | Priority rules below |
@@ -49,7 +49,7 @@ Lets a learner choose which subjects are enabled, set their usual available stud
 
 ## ต่างจาก mockup เดิม (tag `mockup-v1`)
 
-ตรวจครบเท่า mockup เดิม (tag `mockup-v1`) ใน #13. CSS อยู่ใน `packages/mypath/src/mypath.css` class `mp-scp-*` ใต้ `.mypath-root` (รวมสองไฟล์ของ prototype เป็นชุดเดียว เฉพาะ rule ที่ใช้จริง) หน้าตาเหมือน mockup ทั้ง desktop และ mobile ต่างกันตรงนี้:
+ตรวจครบเท่า mockup เดิม (tag `mockup-v1`) ใน #13. CSS อยู่ใน `packages/mypath/src/ui/calendar/StudyCalendar.css` class `mp-scp-*` ใต้ `.mypath-root` (รวมสองไฟล์ของ prototype เป็นชุดเดียว เฉพาะ rule ที่ใช้จริง) หน้าตาเหมือน mockup ทั้ง desktop และ mobile ต่างกันตรงนี้:
 
 - **แผงเป็น state ภายในของ header** ไม่มี URL และไม่แตะ history. ปิดด้วย ✕ / คลิกฉากหลัง / **Esc** (animation 280ms) และสลับ Month/All แล้วแผงปิด (ข้อสรุป #4) · แผงเป็น modal: โฟกัสเข้าแผง Tab วนในแผง ปิดแล้วโฟกัสกลับปุ่ม (hook `useModal` ใช้ร่วมกับหน้ารายละเอียดคอร์ส)
 - **ทุกการแก้ส่งแผนทั้งก้อนผ่าน `onPlanChange`** (helper ล้วน `withStudyCalendar` ใน `plan/timeline.ts` แทน `setStudyCalendar`) หน้าจอเปลี่ยนเมื่อ host ส่งแผนกลับ. ช่วงปิดเทอมที่ซ้อนกัน, เริ่มหลังจบ หรือวันผิดรูป = ไม่ส่ง ช่องกลับเป็นค่าเดิม. `courses` ไม่ถูกแตะ จึงปิดวิชาแล้วเปิดกลับมาได้ค่าเดิม

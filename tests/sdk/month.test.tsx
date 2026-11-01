@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-// Smoke test หน้า Month ของ SDK: render ผ่านทางเข้าเดียว (@learn/mypath) ด้วย
-// fixtures ของ host
+// Month smoke test: renders through the public entry (@learn/mypath) with
+// the host fixtures.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   cleanup,
@@ -41,9 +41,9 @@ describe('Month', () => {
     expect(screen.getByText('วันนี้ · กำลังเรียน')).toBeTruthy()
     expect(
       screen.getByText('Applied Math Admissions TCAS เล่ม 2 (For Dek70)'),
-    ).toBeTruthy() // MATH.2 ต่อจาก MATH.1 (จบ 25 พ.ย.)
+    ).toBeTruthy() // MATH.2 follows MATH.1 (ends 25 Nov)
     expect(screen.getByText('ถัดไป')).toBeTruthy()
-    // M1 วันที่ 20 อยู่ในกลุ่มถัดไป
+    // M1 on the 20th falls in the "next" group
     expect(screen.getByText('Mock ลองสนาม')).toBeTruthy()
   })
 
@@ -82,8 +82,8 @@ describe('Month', () => {
     fireEvent.click(screen.getByLabelText('Next month'))
     expect(screen.getByText('มกราคม 2570')).toBeTruthy()
     for (let i = 0; i < 6; i++)
-      fireEvent.click(screen.getByLabelText('Previous month')) // กดเกินขอบ
-    // เดือนแรกของแกน (TGAT.1 เริ่ม 1 ส.ค. 69)
+      fireEvent.click(screen.getByLabelText('Previous month')) // overshoot
+    // first month of the Axis (TGAT.1 starts 1 Aug 2026)
     expect(screen.getByText('สิงหาคม 2569')).toBeTruthy()
     expect(
       (screen.getByLabelText('Previous month') as HTMLButtonElement).disabled,
@@ -92,7 +92,7 @@ describe('Month', () => {
 
   it('ไม่ส่ง today: ใช้วันตามเวลาไทยจากนาฬิกาเครื่อง', () => {
     vi.useFakeTimers({ toFake: ['Date'] })
-    // UTC ยังเป็นวันที่ 4 แต่เวลาไทยเป็น 01:30 ของวันที่ 5
+    // Still the 4th in UTC but 01:30 on the 5th in Thai time
     vi.setSystemTime(new Date('2026-12-04T18:30:00Z'))
     try {
       render(

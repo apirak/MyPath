@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-// หน้า All ของ SDK: render ผ่านทางเข้าเดียว (@learn/mypath) ด้วย fixtures ของ
-// host
+// All view: renders through the public entry (@learn/mypath) with the host
+// fixtures.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
@@ -31,7 +31,7 @@ describe('สลับ Month / All', () => {
     expect(screen.getByText('มกราคม 2570')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'All' }))
     expect(screen.queryByText('มกราคม 2570')).toBeNull()
-    // All ไม่มีปุ่มเลื่อน
+    // All has no month navigation
     expect(screen.queryByLabelText('Next month')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Month' }))
     expect(screen.getByText('มกราคม 2570')).toBeTruthy()
@@ -72,16 +72,17 @@ describe('All', () => {
   })
 })
 
-// ลากหัวคอร์สใน jsdom: แกนกว้าง 10 px ต่อวัน (ส.ค. 69 – เม.ย. 71)
+// Dragging in jsdom: the Axis is mocked at 10 px per day
+// (Aug 2026 – Apr 2028).
 const PX_PER_DAY = 10
 const AXIS_DAYS = (Date.UTC(2028, 4, 1) - Date.UTC(2026, 7, 1)) / 86_400_000
 const MATH1 =
   /^Applied Math Admissions TCAS เล่ม 1 .* · 1 ต.ค. 69 – 25 พ.ย. 69$/
-// ลาก 7 วัน: 8 ต.ค. (พฤ.) → snap จ. 5 ต.ค.
+// Drag 7 days: 8 Oct (Thu) snaps to Mon 5 Oct.
 const MATH1_MOVED = /เล่ม 1 .* · 5 ต.ค. 69 – 29 พ.ย. 69$/
-// ลากผ่านทุกระยะใน days (หน่วยวัน) แล้วค้างไว้ — คืนฟังก์ชันปล่อย
-// move/up ส่งไปที่แถวแกนของวิชา = ตัวที่ถือ pointer capture (grip อาจถูก
-// unmount เมื่อแท่งหลุดแกน)
+// Drags through each offset in `days` and holds; returns a release fn.
+// move/up go to the subject's axis row because it holds pointer capture;
+// the grip may unmount once the bar leaves the Axis.
 const press = (title: RegExp, ...days: number[]) => {
   const grip = screen.getByTitle(title).querySelector('.mp-tp-grip')!
   const row = grip.closest('.mp-tp-axis')!
@@ -125,7 +126,7 @@ describe('ลากหัวคอร์ส (controlled)', () => {
       />,
     )
     openAll()
-    // ผ่านหลายวันจันทร์ แล้วกลับมาที่ 5 ต.ค.
+    // cross several Mondays, then come back to 5 Oct
     const release = press(MATH1, 14, 21, 7)
     expect(screen.getByTitle(MATH1_MOVED)).toBeTruthy()
     expect(onPlanChange).not.toHaveBeenCalled()
@@ -181,9 +182,9 @@ describe('ลากหัวคอร์ส (controlled)', () => {
   it('แกนไม่ขยับระหว่างลาก แล้วคิดใหม่ตอนปล่อย', () => {
     render(<EchoHost />)
     openAll()
-    // MATH.EX จบ 11 เม.ย. 71 — ดันไป 8 สัปดาห์ แผนจบ มิ.ย. 71
+    // MATH.EX ends 11 Apr 2028; pushing it 8 weeks ends the plan in Jun
     const release = press(/^.* · 1 มี.ค. 71 – 11 เม.ย. 71$/, 56)
-    // แผนชั่วคราว
+    // draft plan while dragging
     expect(screen.getByTitle(/ · 24 เม.ย. 71 – 4 มิ.ย. 71$/)).toBeTruthy()
     expect(screen.getByText('ส.ค. 69 – เม.ย. 71')).toBeTruthy()
     release()
@@ -243,7 +244,8 @@ describe('ลากหัวคอร์ส (controlled)', () => {
       />,
     )
     openAll()
-    // MATH.EX เริ่มเลยสิ้นแกน (1 พ.ค. 71) → แท่งหายจากแกนที่ถือไว้
+    // MATH.EX now starts past the Axis end (1 May 2028), so its bar
+    // disappears from the held Axis
     const release = press(/^.* · 1 มี.ค. 71 – 11 เม.ย. 71$/, 120)
     expect(screen.queryByTitle(/ · 1 มี.ค. 71 – 11 เม.ย. 71$/)).toBeNull()
     release()

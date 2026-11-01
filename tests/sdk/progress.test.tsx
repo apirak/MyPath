@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-// ความคืบหน้าบนการ์ดคอร์สที่ซื้อแล้วในหน้า Month: อ่าน data.progress
-// และวันนี้จาก host, ปุ่มเรียนเรียก onStartCourse
+// Progress on owned course cards in Month: driven by the host's
+// data.progress and Today; the study button calls onStartCourse.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   cleanup,
@@ -14,8 +14,8 @@ import { TODAY, mypathData } from '../../src/host/fixtures'
 
 afterEach(cleanup)
 
-// ธ.ค. 69: PHY.0 (ซื้อแล้ว 20%, 10 พ.ย. – 21 ธ.ค.) กำลังเรียน · PHY.1 (ซื้อแล้ว
-// 10%, เริ่ม 22 ธ.ค.) ถัดไป · MATH.2 ยังไม่ซื้อ
+// Dec 2026: PHY.0 (owned, 20%, 10 Nov – 21 Dec) is current; PHY.1 (owned,
+// 10%, starts 22 Dec) is next; MATH.2 is not owned.
 const PHY0 = 'ปรับพื้นฐานฟิสิกส์ TCAS (ปูพื้น ครบทุกทักษะ ครบทุกแนว)'
 const PHY1 = 'ฟิสิกส์ TCAS ล. 1'
 const MATH2 = 'Applied Math Admissions TCAS เล่ม 2 (For Dek70)'
@@ -43,7 +43,7 @@ describe('ความคืบหน้าบนการ์ดคอร์ส�
   it('แสดง % และข้อความตามสถานะจาก data.progress และวันนี้', () => {
     renderMyPath()
     expect(card(PHY0).textContent).toContain('คืบหน้า 20%')
-    // เลยวันของเป้าแรก (22 พ.ย.) แล้ว
+    // past the first target's date (22 Nov)
     expect(card(PHY0).textContent).toContain('ทำได้ดีแล้ว มาพยายามไปด้วยกันนะ')
     expect(card(PHY1).textContent).toContain('พิชิตเป้าหมายแรกภายใน 8 ม.ค. 70')
   })
@@ -56,7 +56,7 @@ describe('ความคืบหน้าบนการ์ดคอร์ส�
     rerender(withProgress({ 'PHY.0': 100 }))
     expect(card(PHY0).textContent).toContain('ยินดีด้วย! เรียนจบแล้ว')
     expect(card(PHY0).textContent).toContain('ทบทวน')
-    rerender(mypathData, '2026-11-15') // ก่อนวันของเป้าแรก
+    rerender(mypathData, '2026-11-15') // before the first target's date
     expect(card(PHY0).textContent).toContain('พิชิตเป้าหมายแรกภายใน 22 พ.ย. 69')
   })
 
@@ -97,7 +97,7 @@ describe('ความคืบหน้าบนการ์ดคอร์ส�
       within(card(PHY0)).getByRole('button', { name: 'เรียนต่อ' }),
     )
     expect(onStartCourse).toHaveBeenCalledWith('PHY.0')
-    expect(onPlanChange).not.toHaveBeenCalled() // มีวันเริ่มต้นแล้ว
+    expect(onPlanChange).not.toHaveBeenCalled() // start date already set
     expect(document.querySelector('.mp-cdp-sheet')).toBeNull()
   })
 
@@ -111,7 +111,7 @@ describe('ความคืบหน้าบนการ์ดคอร์ส�
     fireEvent.keyDown(
       within(card(PHY0)).getByRole('button', { name: /ปรับพื้นฐานฟิสิกส์/ }),
       { key: 'Enter' },
-    ) // ส่วนบนของการ์ดยังเปิดได้
+    ) // the card's top area still opens it
     expect(document.querySelector('.mp-cdp-sheet')).toBeTruthy()
   })
 
@@ -136,7 +136,7 @@ describe('ความคืบหน้าบนการ์ดคอร์ส�
         onPlanChange.mock.calls[0][0].courses.find(
           (c: { courseId: string }) => c.courseId === 'PHY.0',
         ),
-        // คอร์สแรกไม่มีวันเริ่ม = วันนี้
+        // first course with no start date starts Today
       ).toEqual({ courseId: 'PHY.0', weeklyHours: 3, startDate: TODAY })
       expect(onPlanChange.mock.invocationCallOrder[0]).toBeLessThan(
         onStartCourse.mock.invocationCallOrder[0],

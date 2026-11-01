@@ -1,0 +1,161 @@
+/* <PathHeader>: Month/All tabs and the month picker. */
+.mypath-root .mp-header {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: 2px solid #dee2e6;
+  background: #fff;
+}
+
+/* Month/All segment: flat grey track with a raised white pill (3px solid
+   bottom edge, same look as HeaderButton). */
+.mypath-root .mp-tabs {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  width: fit-content;
+  border-radius: 12px;
+  padding: 4px 4px 7px;
+  background: #e9ecef;
+}
+
+.mypath-root .mp-tabs button {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  padding: 6px 12px;
+  color: #6d757e;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+.mypath-root .mp-tabs .mp-active,
+.mypath-root .mp-tabs button:hover {
+  color: #212529;
+}
+
+.mypath-root .mp-tabs::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 4px;
+  bottom: 7px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow:
+    0 3px 0 #ced4da,
+    0 0 0 1px #dee2e6;
+}
+
+.mypath-root .mp-tabs[data-active='all']::before {
+  transform: translateX(100%);
+}
+
+.mypath-root .mp-tabs.mp-slide::before {
+  animation: mp-seg-slide-l 300ms cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+
+.mypath-root .mp-tabs.mp-slide[data-active='all']::before {
+  animation-name: mp-seg-slide-r;
+}
+
+@keyframes mp-seg-slide-l {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes mp-seg-slide-r {
+  from {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mypath-root .mp-tabs.mp-slide::before {
+    animation: none;
+  }
+}
+
+.mypath-root .mp-month-picker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+}
+
+.mypath-root .mp-month-picker button {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #6d757e;
+}
+
+.mypath-root .mp-month-picker button:disabled {
+  opacity: 0.3;
+}
+
+.mypath-root .mp-month-picker b {
+  font-size: 16px;
+}
+
+.mypath-root .mp-month-picker b.mp-now {
+  color: var(--mp-primary);
+}
+
+@media (max-width: 640px) {
+  .mypath-root .mp-header {
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+  .mypath-root .mp-tabs {
+    grid-column: 1;
+    grid-row: 1;
+    width: auto;
+    justify-self: start;
+  }
+  .mypath-root .mp-month-picker {
+    grid-column: 1/-1;
+    grid-row: 2;
+    justify-self: center;
+    transform: translateY(4px);
+  }
+}
+
+/* Study-calendar button; on mobile it moves up beside the tabs, icon only. */
+.mypath-root .mp-study-calendar {
+  justify-self: end;
+  align-self: end;
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  .mypath-root .mp-study-calendar {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .mypath-root .mp-study-calendar .mp-header-button__front {
+    padding: 8px;
+  }
+  .mypath-root .mp-study-calendar .mp-header-button__front > span {
+    display: none;
+  }
+}

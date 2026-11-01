@@ -1,10 +1,8 @@
 import { MS, isoOf, u } from './dates'
 
-// copy จาก src/prototype/mypath/progressStore.ts — ต่างจาก prototype:
-// เป็นฟังก์ชันล้วน รับ value (data.progress) และวันนี้ตรง ๆ
-// ไม่มี Map, seed หรือวันนี้จำลองระดับ module · เป้า 1 = 30% (ธง) · เป้า 2 =
-// 70% (ถ้วย)
-// กำหนดวันของแต่ละเป้า = start + 30% / 70% ของช่วงคอร์สในแผน
+// Pure: takes the value (data.progress) and Today directly, no module state.
+// Goal 1 = 30% (flag), goal 2 = 70% (trophy). Each goal is due at start +
+// 30% / 70% of the course's planned span.
 export const GOALS = [30, 70] as const
 
 export type ProgressMessage = {
@@ -15,12 +13,12 @@ export type ProgressMessage = {
 }
 export type ProgressState = {
   value: number
-  next?: number // เป้าถัดไป → แถบฟ้าอ่อนจาก value ถึงตรงนี้
-  passed: [boolean, boolean] // ผ่านธง / ถ้วยแล้ว
+  next?: number // next goal: light-blue bar runs from value to here
+  passed: [boolean, boolean] // flag / trophy reached
   message: ProgressMessage
 }
 
-// กติกาตาม Figma 3-37233 (ลำดับการเปลี่ยนของแต่ละ step)
+// Rules per Figma 3-37233 (state transitions for each step).
 export function progressState(
   course: { start: string; end: string },
   value: number,

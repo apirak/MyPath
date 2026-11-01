@@ -1,7 +1,6 @@
-// หน้า Month: หน้าต่างเดือน + agenda (copy agendaFor() จาก
-// src/prototype/mypath/plan.ts — กติกา section ล็อกไว้ใน GLOSSARY.md)
-// เส้นตัด R ของแต่ละเดือน: เดือนของวันนี้ → วันนี้ · เดือนอดีต → สิ้นเดือน ·
-// เดือนอนาคต → ก่อนต้นเดือน
+// Month view: Month window + agenda. Section rules are fixed in GLOSSARY.md.
+// Cut-off R per month: Today's month → Today, past month → month end,
+// future month → the day before the month starts.
 import type { ExamEvent, ISODate } from '../types'
 import type { Plan, PlannedCourse } from './buildPlan'
 import { addDays, addMonths, monthStartOf, u } from './dates'
@@ -15,14 +14,15 @@ export type AgendaGroup = {
 export type Agenda = {
   monthStart: ISODate
   monthEnd: ISODate // exclusive
-  isCurrent: boolean // หน้าต่างนี้ครอบวันนี้
+  isCurrent: boolean // window contains Today
   isPast: boolean
-  inProgress: AgendaCourse[] // เดือนของวันนี้: คอร์สที่ครอบวันนี้
-  active: AgendaCourse[] // เดือนอื่น: คอร์สที่ทับหน้าต่างเดือน
-  // กลุ่มตามวันเริ่ม/วันสอบ หลัง R ภายในเดือน (สอบของวันนี้รวมกลุ่มวันนี้)
+  inProgress: AgendaCourse[] // Today's month: courses spanning Today
+  active: AgendaCourse[] // other months: courses overlapping the window
+  // Grouped by start/exam date after R within the month (today's exams join
+  // the Today group)
   upcoming: AgendaGroup[]
-  finished: AgendaCourse[] // จบภายในเดือนก่อนถึง R
-  pastEvents: ExamEvent[] // สอบ/Mock ในเดือนที่ผ่าน R ไปแล้ว
+  finished: AgendaCourse[] // ended in this month before R
+  pastEvents: ExamEvent[] // exams/Mocks in this month already past R
 }
 
 export function agendaFor(
@@ -41,14 +41,12 @@ export function agendaFor(
   const inProgress = isCurrent
     ? withSubject.filter(c => u(c.start) <= u(today) && u(today) <= u(c.end))
     : []
-  // กำลังเรียนช่วงเดือน (เดือนอื่น): ทับหน้าต่างเดือนและยังไม่จบก่อน R —
-  // คอร์สที่จบในเดือนนั้นไปอยู่ finished อย่างเดียว
+  // A course that ends in the month before R goes to finished only, never
+  // both lists.
   const active = isCurrent
     ? []
     : withSubject.filter(c => u(c.start) < u(monthEnd) && u(c.end) >= u(R))
   const finished = withSubject.filter(c => inWin(c.end) && u(c.end) < u(R))
-  // กลุ่มถัดไป: รวมคอร์สที่เริ่มและสอบที่จัดหลัง R ภายในเดือน ตามวันที่
-  // (สอบวันนี้อยู่กลุ่มวันนี้)
   const byDate = new Map<string, AgendaGroup>()
   for (const c of withSubject) {
     const ok = isCurrent
