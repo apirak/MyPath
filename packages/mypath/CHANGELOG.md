@@ -7,6 +7,7 @@
 ### Added
 
 - `<MyPath>` หน้า Month, All timeline, รายละเอียดคอร์ส, แผงปฏิทินการเรียน และความคืบหน้ารายคอร์ส ครบเท่า prototype `mockup-v1`
-- สัญญาข้อมูล `MyPathData` / `StudentPlan` และ `view` / `onViewChange` สำหรับ deep link
+- สัญญาข้อมูล `MyPathData` / `StudentPlan`
+- `view` / `onViewChange` มีแค่ใน type ยังไม่ทำงาน: SDK เก็บ Month/All และเดือนไว้เองเสมอ ไม่เรียก `onViewChange` (deep link ยังใช้ไม่ได้)
 - Library build: `dist/index.js` (ES module) + `.d.ts` + `dist/style.css`, `exports` เปิดแค่ `.` กับ `./style.css`
 - peer `react` / `react-dom` `^19.0.0` ไม่มี dependency อื่น (ไอคอนเป็น SVG ของ SDK เอง) รูปฝังเป็น data URI
