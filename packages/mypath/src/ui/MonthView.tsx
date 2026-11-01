@@ -1,13 +1,14 @@
-import type { ReactNode } from 'react'
+import { useContext, type ReactNode } from 'react'
 import type { ExamEvent } from '../types'
 import { usePlan } from '../MyPathProvider'
 import { agendaFor, type Agenda as AgendaData, type AgendaCourse } from '../plan/agenda'
 import { addMonths, dayOf, fmtDate, fmtMonth, fmtShort, monthShortOf, monthStartOf } from '../plan/dates'
 import PathHeader, { type ModeProps } from './PathHeader'
+import { OpenCourseContext, courseButton } from './CourseDetail'
 import PlanEmptyState from './PlanEmptyState'
 
 // port จาก src/prototype/pages/MyPath.tsx — agenda คิดจากแผนทั้งหมด (กติกา section ล็อกไว้ใน GLOSSARY.md)
-// ต่างจาก prototype: เดือนที่เลือกเป็น state ภายในของ <MyPath> (ไม่มี ?month=), การ์ดยังกดไม่ได้ (ใบ 07) และไม่มีความคืบหน้า (ใบ 09)
+// ต่างจาก prototype: เดือนที่เลือกเป็น state ภายในของ <MyPath> (ไม่มี ?month=), การ์ดคอร์สเปิดหน้ารายละเอียดผ่าน OpenCourseContext และไม่มีความคืบหน้า (ใบ 09)
 
 // สีชนิดสอบ (encoding เดียวกับ All: น้ำเงิน = สอบจริง, แดง = Mock)
 const KIND_COLOR = { exam: '#2b6cd4', mock: '#ef6268' } as const
@@ -18,8 +19,8 @@ function Plate({ text, color, owned }: { text: string; color: string; owned: boo
 }
 
 function CourseCard({ course, done = false }: { course: AgendaCourse; done?: boolean }) {
-  const owned = usePlan().data.owned.includes(course.id)
-  return <article className={`mp-course${done ? ' mp-done' : ''}`}>
+  const owned = usePlan().data.owned.includes(course.id), open = useContext(OpenCourseContext)
+  return <article className={`mp-course${done ? ' mp-done' : ''}`} {...courseButton(open, course.id)}>
     <div className="mp-course-body">
       {course.cover ? <img src={course.cover} alt="" /> : <Plate text={course.short} color={course.color} owned={owned} />}
       <div>

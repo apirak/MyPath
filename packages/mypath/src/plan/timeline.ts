@@ -1,13 +1,15 @@
 // ฟังก์ชันล้วนของหน้า All — copy สูตรจาก src/prototype/pages/MyPathAllTimeline.tsx (dragStart) และ src/prototype/mypath/plan.ts
-import type { ISODate, StudentPlan, StudyCalendar } from '../types'
+import type { ISODate, StudentCourse, StudentPlan, StudyCalendar } from '../types'
 import { MS, isoOf, u } from './dates'
 
-// แผนใหม่ที่คอร์สนั้นมีวันเริ่มต้นใหม่ (แทน setCourseStartDate ที่แก้ของเดิม)
+// แผนใหม่ที่คอร์สนั้นแก้ตาม patch (แทน setCourse* ของ prototype ที่แก้ของเดิม)
 // คอร์สที่ไม่มีในแผน: คืน object เดิม เหมือน prototype (ผู้เรียกเทียบ !== เพื่อรู้ว่าเปลี่ยนจริง)
-export const withCourseStartDate = (plan: StudentPlan, courseId: string, startDate: ISODate): StudentPlan =>
+export const withCourse = (plan: StudentPlan, courseId: string, patch: Partial<StudentCourse>): StudentPlan =>
   plan.courses.some(c => c.courseId === courseId)
-    ? { ...plan, courses: plan.courses.map(c => c.courseId === courseId ? { ...c, startDate } : c) }
+    ? { ...plan, courses: plan.courses.map(c => c.courseId === courseId ? { ...c, ...patch } : c) }
     : plan
+
+export const withCourseStartDate = (plan: StudentPlan, courseId: string, startDate: ISODate) => withCourse(plan, courseId, { startDate })
 
 // วันจันทร์ที่ใกล้ที่สุด (ขอบที่ 3.5 วัน) ให้ตรงกับแท่งชั่วโมงเรียน/สัปดาห์
 export const snapToMonday = (ms: number): ISODate => {
