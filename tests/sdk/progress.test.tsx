@@ -58,6 +58,14 @@ describe('ความคืบหน้าบนการ์ดคอร์ส�
     expect(document.querySelector('.mp-cdp-sheet')).toBeNull()
   })
 
+  it('กด Enter บนปุ่มเรียนไม่ทะลุไปเปิดหน้ารายละเอียดของการ์ด', () => {
+    renderMyPath()
+    fireEvent.keyDown(within(card(PHY0)).getByRole('button', { name: 'เรียนต่อ' }), { key: 'Enter' })
+    expect(document.querySelector('.mp-cdp-sheet')).toBeNull()
+    fireEvent.keyDown(card(PHY0), { key: 'Enter' }) // คีย์บนการ์ดเองยังเปิดได้
+    expect(document.querySelector('.mp-cdp-sheet')).toBeTruthy()
+  })
+
   it('ปุ่มเรียนของคอร์สที่ไม่มีวันเริ่มต้น: ตรึงวันเริ่มผ่าน onPlanChange ก่อน onStartCourse', () => {
     const plan = { ...mypathData.plan, courses: mypathData.plan.courses.map(c => c.courseId === 'PHY.0' ? { courseId: 'PHY.0', weeklyHours: 3 } : c) }
     const { onStartCourse, onPlanChange } = renderMyPath({ ...mypathData, plan })
