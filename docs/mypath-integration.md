@@ -19,7 +19,7 @@ player  ◄───────────────────────
 
 - host เป็นเจ้าของข้อมูลทั้งหมด SDK แค่แสดงผลและแจ้งว่าผู้ใช้แก้อะไร
 - SDK ไม่ยิง API, ไม่ใช้ localStorage, ไม่ส่ง analytics
-- ข้อกำหนด: React และ React DOM `^19.0.0` (peerDependencies ของ SDK) ไม่ต้องติดตั้ง react-router, Tailwind หรือ `lucide-react` เพิ่มเพื่อ SDK (ไอคอนที่ใช้ bundle มากับ SDK แล้ว)
+- ข้อกำหนด: React และ React DOM `^19.0.0` (peerDependencies ของ SDK) ไม่ต้องติดตั้ง react-router หรือ Tailwind เพิ่มเพื่อ SDK. `lucide-react` ไม่ต้องติดตั้งเมื่อใช้วิธี A (ไอคอน bundle มากับ SDK แล้ว) แต่วิธี B ต้องติดตั้งเอง เพราะ host compile source ของ SDK ตรงๆ (ดูวิธี B)
 
 ## ขั้นที่ 1 — ติดตั้ง
 
@@ -79,6 +79,7 @@ export default defineConfig({
 ถ้า host ใช้ Next.js แทน Vite ให้ใช้ `transpilePackages` และตั้ง alias ใน `webpack` / `turbopack` แทน.
 
 สิ่งที่ต้องระวังเมื่อใช้ submodule:
+- **dependency ของ SDK:** source ของ SDK import `lucide-react` และ bundler ของ host จะหาจาก `node_modules` ของ host. ให้ host ติดตั้ง `lucide-react` เป็น dependency ของตัวเอง ใช้ major เดียวกับใน `devDependencies` ของ `vendor/mypath/packages/mypath/package.json` ไม่อย่างนั้น compile ไม่ผ่านทั้งบนเครื่อง dev และ CI. ไม่ต้องรัน install ข้างใน `vendor/mypath` (จะได้ React ชุดที่สองมาด้วย)
 - **CI:** ต้อง checkout submodule ด้วย (เช่น `actions/checkout` ตั้ง `submodules: true`) และ CI ต้องมีสิทธิ์อ่าน repo `apirak/MyPath` ผ่าน deploy key หรือ token
 - **Dev คนใหม่:** clone ด้วย `git clone --recurse-submodules` หรือรัน `git submodule update --init` หลัง clone ไม่อย่างนั้นโฟลเดอร์ `vendor/mypath` จะว่าง
 - **อัปเดตเวอร์ชัน:** `git -C vendor/mypath fetch --tags`, checkout tag ใหม่ แล้ว commit ตัวชี้ submodule. อ่าน changelog ก่อนขึ้นเวอร์ชันใหญ่
