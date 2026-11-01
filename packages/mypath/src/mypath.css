@@ -208,6 +208,7 @@
 .mypath-root .mp-cdp-a{position:fixed;inset:0;z-index:61;pointer-events:none}
 .mypath-root .mp-cdp-a .mp-cdp-backdrop{pointer-events:auto}
 .mypath-root .mp-cdp-sheet{pointer-events:auto;position:fixed;right:0;bottom:0;left:0;z-index:2;display:flex;flex-direction:column;max-height:calc(100vh - 32px);border-radius:18px 18px 0 0;background:#fff;box-shadow:0 -8px 30px rgba(33,37,41,.25);animation:mp-cdp-up .48s cubic-bezier(.22,1,.36,1);overflow:auto;will-change:translate}
+.mypath-root .mp-cdp-sheet:focus{outline:none}
 .mypath-root .mp-cdp-a.closing .mp-cdp-sheet{animation:mp-cdp-down .28s cubic-bezier(.16,1,.3,1) forwards}
 .mypath-root .mp-cdp-a.closing .mp-cdp-backdrop{animation:mp-cdp-fade-out .28s ease-out forwards}
 .mypath-root .mp-cdp-sheet>header{flex:none;padding:16px 16px 4px}

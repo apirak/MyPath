@@ -58,6 +58,26 @@ describe('เปิดจาก All', () => {
     expect(sheet()).toBeTruthy()
   })
 
+  it('โฟกัสอยู่ในชีท: Tab วนในชีท แล้วคืนโฟกัสให้แถบที่เปิดตอนปิด', () => {
+    vi.useFakeTimers()
+    renderMyPath()
+    openAll()
+    const bar = screen.getByTitle(MATH1)
+    bar.focus()
+    fireEvent.keyDown(bar, { key: 'Enter' })
+    const dialog = screen.getByRole('dialog')
+    expect(dialog.getAttribute('aria-modal')).toBe('true')
+    expect(document.activeElement).toBe(dialog)
+    const close = screen.getByLabelText('ปิด'), date = screen.getByLabelText('วันเริ่มต้น')
+    fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true })
+    expect(document.activeElement).toBe(date) // ย้อนจากชีท = ช่องสุดท้าย
+    fireEvent.keyDown(date, { key: 'Tab' })
+    expect(document.activeElement).toBe(close) // เลยช่องสุดท้าย = วนกลับปุ่มแรก
+    fireEvent.click(close)
+    act(() => { vi.advanceTimersByTime(280) })
+    expect(document.activeElement).toBe(screen.getByTitle(MATH1))
+  })
+
   it('คอร์สไม่มีรายละเอียด: การ์ดย่อจากข้อมูลแผน', () => {
     renderMyPath()
     openFromAll(TPAT31)

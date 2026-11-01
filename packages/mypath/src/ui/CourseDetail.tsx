@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState, type CSSProperties, type KeyboardEvent } from 'react'
+import { createContext, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import type { MyPathProps, StudentCourse } from '../types'
 import { usePlan } from '../MyPathProvider'
 import type { PlannedCourse } from '../plan/buildPlan'
@@ -36,6 +36,23 @@ function StepSlider({ course, disabled, onChange }: { course: PlannedCourse; dis
 export default function CourseDetail({ courseId, onClose, onBuyCourse, onStartCourse }: Props) {
   const { plan, data, onPlanChange } = usePlan()
   const [closing, setClosing] = useState(false)
+  const sheet = useRef<HTMLElement>(null)
+  // ชีทเป็น modal: ย้ายโฟกัสเข้าชีทตอนเปิด แล้วคืนโฟกัสให้การ์ด/แถบที่เปิดตอนปิด
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null
+    sheet.current?.focus()
+    return () => opener?.focus()
+  }, [])
+  // วน Tab / Shift+Tab อยู่ในชีท ไม่หลุดไปการ์ดข้างหลัง
+  const trapTab = (event: KeyboardEvent) => {
+    if (event.key !== 'Tab') return
+    const items = sheet.current!.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled])')
+    const first = items[0], last = items[items.length - 1], active = document.activeElement
+    if (event.shiftKey ? active === first || active === sheet.current : active === last) {
+      event.preventDefault()
+      ;(event.shiftKey ? last : first).focus()
+    }
+  }
   const close = () => {
     if (closing) return
     setClosing(true)
@@ -69,7 +86,7 @@ export default function CourseDetail({ courseId, onClose, onBuyCourse, onStartCo
   return (
     <div className={`mp-cdp-a${closing ? ' closing' : ''}`}>
       <div className="mp-cdp-backdrop" onClick={close} />
-      <section className="mp-cdp-sheet" role="dialog" aria-label={course.name} style={{ '--subject': subject.color } as CSSProperties}>
+      <section ref={sheet} className="mp-cdp-sheet" role="dialog" aria-modal="true" aria-label={course.name} tabIndex={-1} onKeyDown={trapTab} style={{ '--subject': subject.color } as CSSProperties}>
         <header>
           <div className="mp-cdp-sheet-top">
             <b><i className="mp-cdp-dot" />{subject.name}</b>
