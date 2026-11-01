@@ -204,7 +204,7 @@
 .mypath-root .mp-tp-grip{position:relative;cursor:ew-resize;touch-action:none}.mypath-root .mp-tp-grip::after{position:absolute;inset:-6px;content:''}
 
 /* หน้ารายละเอียดคอร์ส — copy จาก src/prototype/mypath/CourseDetailOverlay.css (cdp- → mp-cdp-) เฉพาะ rule ที่ CourseDetail ใช้ · bottom sheet ทุกขนาดจอ, 641–900px สองคอลัมน์ */
-.mypath-root .mp-course[role=button]{cursor:pointer}
+.mypath-root .mp-course-body[role=button]{cursor:pointer}
 .mypath-root .mp-cdp-backdrop{position:fixed;inset:0;z-index:1;background:rgba(33,37,41,.45);animation:mp-cdp-fade .15s}
 @keyframes mp-cdp-fade{from{opacity:0}}
 @keyframes mp-cdp-up{from{translate:0 100%;opacity:.7}to{translate:0 0;opacity:1}}

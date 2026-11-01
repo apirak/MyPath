@@ -44,6 +44,19 @@ describe('ความคืบหน้าบนการ์ดคอร์ส�
     expect(card(PHY0).textContent).toContain('ยังไม่เริ่มเรียน')
   })
 
+  it('ค่าที่ไม่ใช่ตัวเลข (ข้อมูลจาก host ตอน runtime) = 0%', () => {
+    renderMyPath(withProgress({ 'PHY.0': 'abc' as unknown as number, 'PHY.1': Number.NaN }))
+    expect(card(PHY0).textContent).toContain('คืบหน้า 0%')
+    expect(card(PHY1).textContent).toContain('คืบหน้า 0%')
+  })
+
+  it('ปุ่มเรียนไม่ซ้อนอยู่ในส่วนที่กดเปิดหน้ารายละเอียด', () => {
+    renderMyPath()
+    const opener = within(card(PHY0)).getByRole('button', { name: /ปรับพื้นฐานฟิสิกส์/ })
+    expect(opener.querySelector('button')).toBeNull()
+    expect(card(PHY0).getAttribute('role')).toBeNull()
+  })
+
   it('คอร์สที่ยังไม่ซื้อไม่มีแถบความคืบหน้า', () => {
     renderMyPath()
     expect(card(MATH2).querySelector('.mp-progress')).toBeNull()
@@ -62,7 +75,7 @@ describe('ความคืบหน้าบนการ์ดคอร์ส�
     renderMyPath()
     fireEvent.keyDown(within(card(PHY0)).getByRole('button', { name: 'เรียนต่อ' }), { key: 'Enter' })
     expect(document.querySelector('.mp-cdp-sheet')).toBeNull()
-    fireEvent.keyDown(card(PHY0), { key: 'Enter' }) // คีย์บนการ์ดเองยังเปิดได้
+    fireEvent.keyDown(within(card(PHY0)).getByRole('button', { name: /ปรับพื้นฐานฟิสิกส์/ }), { key: 'Enter' }) // ส่วนบนของการ์ดยังเปิดได้
     expect(document.querySelector('.mp-cdp-sheet')).toBeTruthy()
   })
 

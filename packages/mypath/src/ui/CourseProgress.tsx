@@ -15,9 +15,9 @@ import { Play } from './icons'
 export default function CourseProgress({ course }: { course: { id: string; start: string; end: string } }) {
   const { plan, data } = usePlan()
   const startCourse = useStartCourse()
-  // ไม่มีค่า/ไม่ใช่ตัวเลข = ยังไม่เริ่ม · ค่านอก 0–100 บีบเข้าช่วงเหมือน setProgress ของ prototype
-  const raw = data.progress[course.id] || 0
-  const { value, next, passed, message } = progressState(course, Math.max(0, Math.min(100, raw)), plan.today)
+  // ไม่มีค่า/ไม่ใช่ตัวเลข (host ส่งผิดรูปตอน runtime, key ที่ได้จาก prototype ของ object) = ยังไม่เริ่ม · ค่านอก 0–100 บีบเข้าช่วงเหมือน setProgress ของ prototype
+  const raw: unknown = Object.hasOwn(data.progress, course.id) ? data.progress[course.id] : 0
+  const { value, next, passed, message } = progressState(course, Number.isFinite(raw) ? Math.max(0, Math.min(100, raw as number)) : 0, plan.today)
   const label = value === 0 ? 'เริ่มเรียน' : value === 100 ? 'ทบทวน' : 'เรียนต่อ'
   return <div className="mp-progress">
     <div className="mp-progress-track">
@@ -37,8 +37,7 @@ export default function CourseProgress({ course }: { course: { id: string; start
         {message.text}{message.date && <> <b>{fmtDate(message.date)}</b></>}
         {message.egg && <img src={eggIcon} alt="" />}
       </span>
-      {/* กันคลิก/คีย์ทะลุไปเปิดหน้ารายละเอียดคอร์สของการ์ด */}
-      <HeaderButton variant="primary" className="mp-progress-start" onClick={e => { e.stopPropagation(); startCourse(course.id) }} onKeyDown={e => e.stopPropagation()}>
+      <HeaderButton variant="primary" className="mp-progress-start" onClick={() => startCourse(course.id)}>
         <Play size={14} />{label}
       </HeaderButton>
     </div>

@@ -21,8 +21,9 @@ function Plate({ text, color, owned }: { text: string; color: string; owned: boo
 
 function CourseCard({ course, done = false }: { course: AgendaCourse; done?: boolean }) {
   const owned = usePlan().data.owned.includes(course.id), open = useContext(OpenCourseContext)
-  return <article className={`mp-course${done ? ' mp-done' : ''}${owned ? ' mp-has-progress' : ''}`} {...courseButton(open, course.id)}>
-    <div className="mp-course-body">
+  // ส่วนบนเป็นตัวเปิดหน้ารายละเอียด แถบความคืบหน้า (มีปุ่มเรียน) เป็นพี่น้องกัน — ไม่ซ้อน control ใน control
+  return <article className={`mp-course${done ? ' mp-done' : ''}${owned ? ' mp-has-progress' : ''}`}>
+    <div className="mp-course-body" {...courseButton(open, course.id)}>
       {course.cover ? <img src={course.cover} alt="" /> : <Plate text={course.short} color={course.color} owned={owned} />}
       <div>
         <div className="mp-course-top"><b>{course.subject}</b><span>เรียน (ติวเข้ม)</span></div>
