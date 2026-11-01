@@ -1,7 +1,7 @@
 // Characterization: บันทึกข้อความความคืบหน้า (progressState) ทุก branch ไว้เป็นค่าอ้างอิง
 // progress เป็น state ระดับ module → resetProgress() ก่อนทุกเคส
 import { beforeEach, describe, expect, it } from 'vitest'
-import { progressState, resetProgress, setProgress } from '../../src/mypath/progressStore'
+import { progressState, resetProgress, setProgress } from '../../src/prototype/mypath/progressStore'
 
 // คอร์ส 30 วัน: เป้าแรก (30%) = 2027-01-10, เป้าสอง (70%) = 2027-01-22
 const course = { id: 'CHAR.1', start: '2027-01-01', end: '2027-01-31' }

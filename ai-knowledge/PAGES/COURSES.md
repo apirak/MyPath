@@ -5,7 +5,7 @@
 - **Route:** `/courses`
 - **Figma (desktop):** https://www.figma.com/design/iFHH2DGrbFd8cIOPVNHT1D/Tung-Kai?node-id=4-41323&t=EJUDVJteWvhtznaT-4
 - **Figma (mobile):** https://www.figma.com/design/iFHH2DGrbFd8cIOPVNHT1D/Tung-Kai?node-id=4-42078&t=EJUDVJteWvhtznaT-4
-- **Mockup:** `src/pages/Courses.tsx`
+- **Mockup:** `src/host/pages/Courses.tsx`
 
 ## Purpose
 
@@ -26,11 +26,11 @@ The learner's course library. It provides subject tabs, status filters, search a
 
 | Component | File | Purpose | Behavior / states |
 |---|---|---|---|
-| Courses | `src/pages/Courses.tsx` | Composes the course-library screen | Static as-is logged-in state; Courses is active |
-| CourseCard | `src/pages/Courses.tsx` | Shows a course thumbnail, type, progress, expiry and completion state | Supports learn, practice, E-Book, completed and expired/locked variants |
-| SubjectGroup | `src/pages/Courses.tsx` | Groups cards under a subject accordion label | Expanded in supplied frame |
-| Sort menu | `src/pages/Courses.tsx` | Shows the current sort choice and alternatives | Static open state matching Figma |
-| Bottom navigation | `src/pages/Courses.tsx` | Persistent primary navigation | Courses is the active item; only Home and Courses routes are wired |
+| Courses | `src/host/pages/Courses.tsx` | Composes the course-library screen | Static as-is logged-in state; Courses is active |
+| CourseCard | `src/host/pages/Courses.tsx` | Shows a course thumbnail, type, progress, expiry and completion state | Supports learn, practice, E-Book, completed and expired/locked variants |
+| SubjectGroup | `src/host/pages/Courses.tsx` | Groups cards under a subject accordion label | Expanded in supplied frame |
+| Sort menu | `src/host/pages/Courses.tsx` | Shows the current sort choice and alternatives | Static open state matching Figma |
+| Bottom navigation | `src/host/pages/Courses.tsx` | Persistent primary navigation | Courses is the active item; only Home and Courses routes are wired |
 
 ## States & variants
 

@@ -1,7 +1,7 @@
 import { ArrowRight, BookDown, CircleHelp, MessageSquareWarning, Shirt, Share2, Settings, Sparkles, Star, TicketCheck } from 'lucide-react'
-import oeLogo from '../assets/profile/oe-logo.png'
-import igniteLogo from '../assets/profile/ignite-logo.png'
-import assembledAvatar from '../assets/profile/assembled.png'
+import oeLogo from '../../assets/profile/oe-logo.png'
+import igniteLogo from '../../assets/profile/ignite-logo.png'
+import assembledAvatar from '../../assets/profile/assembled.png'
 import HeaderButton from '../components/HeaderButton'
 import BottomNav from '../components/BottomNav'
 
