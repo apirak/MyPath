@@ -1,0 +1,97 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="My Path">
+<g id="egg-mini-profile-blue">
+<g clip-path="url(#clip0_0_1)">
+<path d="M0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8C16 12.4183 12.4183 16 8 16C3.58172 16 0 12.4183 0 8Z" fill="#3993FF"/>
+<g id="mini profile">
+<g id="graphic">
+<g id="egg" filter="url(#filter0_n_0_1)">
+<path d="M19.6685 14.4157C19.0077 20.1355 14.3558 22.1273 9.73879 21.5938C5.1218 21.0603 1.04664 18.0602 1.70747 12.3403C2.36829 6.62047 7.41967 1.17082 12.0367 1.7043C16.6537 2.23779 20.3293 8.69583 19.6685 14.4157Z" fill="url(#paint0_radial_0_1)"/>
+<path d="M12.0184 1.86047C14.2594 2.11941 16.2964 3.82213 17.6961 6.19513C19.0939 8.56473 19.8389 11.5749 19.5129 14.3973C19.1876 17.2128 17.8834 19.0971 16.1038 20.2163C14.3187 21.3389 12.0393 21.701 9.75665 21.4373C7.47405 21.1735 5.33814 20.3012 3.85614 18.8012C2.37844 17.3055 1.5384 15.1737 1.8637 12.358C2.18986 9.53565 3.60072 6.7745 5.50187 4.78611C7.40577 2.79492 9.77741 1.60162 12.0184 1.86047Z" stroke="url(#paint1_radial_0_1)" stroke-width="0.314286"/>
+</g>
+<g id="headband">
+<g id="Vector 353" filter="url(#filter1_n_0_1)">
+<path d="M18.7002 7.83143C14.6457 5.51964 7.82137 5.12062 4.91599 5.21008C4.67159 4.34245 5.59428 3.73601 6.08617 3.54124C10.8841 2.75608 16.1261 4.74322 18.1473 5.83493C18.7168 6.2846 18.7532 7.35329 18.7002 7.83143Z" fill="url(#paint2_radial_0_1)"/>
+<path d="M18.7002 7.83143C14.6457 5.51964 7.82137 5.12062 4.91599 5.21008C4.67159 4.34245 5.59428 3.73601 6.08617 3.54124C10.8841 2.75608 16.1261 4.74322 18.1473 5.83493C18.7168 6.2846 18.7532 7.35329 18.7002 7.83143Z" fill="url(#paint3_linear_0_1)" fill-opacity="0.2"/>
+</g>
+</g>
+<g id="face">
+<path id="Vector 351 (Stroke)" d="M10.7053 11.7406C10.8292 11.6992 10.9633 11.7662 11.0047 11.8901C11.046 12.0141 10.9791 12.1482 10.8551 12.1896C10.7767 12.2157 10.7183 12.2663 10.6752 12.3251C10.6389 12.3749 10.6183 12.4245 10.6091 12.4548C10.6108 12.4869 10.6197 12.5384 10.6451 12.589C10.6733 12.645 10.7191 12.6968 10.8005 12.7269C10.9231 12.7722 10.9858 12.9083 10.9405 13.0309C10.8951 13.1535 10.759 13.2162 10.6364 13.1708C10.3988 13.083 10.2682 12.9161 10.2004 12.7536C9.87121 12.8571 9.51585 12.8578 9.19453 12.7864C8.78074 12.6944 8.38639 12.4742 8.16292 12.1478C8.08908 12.04 8.11664 11.8927 8.22447 11.8188C8.33231 11.745 8.4796 11.7725 8.55344 11.8804C8.69045 12.0805 8.96375 12.2502 9.29722 12.3243C9.59597 12.3908 9.91296 12.3734 10.1772 12.2576C10.2461 12.0814 10.4041 11.8412 10.7053 11.7406Z" fill="#82333E"/>
+<path id="Rectangle 383" d="M6.13406 9.15399C6.23699 8.64974 6.72918 8.32441 7.2334 8.42735L7.26238 8.43326C7.76659 8.5362 8.0919 9.02842 7.98897 9.53267L7.86472 10.1414C7.76179 10.6456 7.2696 10.9709 6.76538 10.868L6.7364 10.8621C6.23218 10.7591 5.90688 10.2669 6.00981 9.76268L6.13406 9.15399Z" fill="#82333E"/>
+<path id="Rectangle 384" d="M11.5835 10.2676C11.6865 9.76339 12.1786 9.43806 12.6829 9.54099L12.7118 9.54691C13.2161 9.64985 13.5414 10.1421 13.4384 10.6463L13.3142 11.255C13.2112 11.7593 12.7191 12.0846 12.2148 11.9816L12.1859 11.9757C11.6816 11.8728 11.3563 11.3806 11.4593 10.8763L11.5835 10.2676Z" fill="#82333E"/>
+<path id="Ellipse 81" d="M10.3741 10.8387C10.3235 11.0868 9.97748 11.2257 9.60132 11.1489C9.22516 11.0721 8.96128 10.8087 9.01193 10.5606C9.06258 10.3125 9.40858 10.1736 9.78474 10.2504C10.1609 10.3272 10.4248 10.5906 10.3741 10.8387Z" fill="#EB8C31"/>
+<g id="dot">
+<ellipse id="Ellipse 82" cx="0.236805" cy="0.236821" rx="0.236805" ry="0.236821" transform="matrix(0.979791 0.200023 -0.200003 0.979795 5.30701 11.0874)" fill="#EB8C31"/>
+<ellipse id="Ellipse 83" cx="0.236805" cy="0.236821" rx="0.236805" ry="0.236821" transform="matrix(0.979791 0.200023 -0.200003 0.979795 4.40234 11.6592)" fill="#EB8C31"/>
+<ellipse id="Ellipse 84" cx="0.236805" cy="0.236821" rx="0.236805" ry="0.236821" transform="matrix(0.979791 0.200023 -0.200003 0.979795 5.85596 11.9541)" fill="#EB8C31"/>
+</g>
+<g id="dot_2">
+<ellipse id="Ellipse 82_2" cx="0.236805" cy="0.236821" rx="0.236805" ry="0.236821" transform="matrix(-0.979791 -0.200023 -0.200003 0.979795 13.5107 12.6726)" fill="#EB8C31"/>
+<ellipse id="Ellipse 83_2" cx="0.236805" cy="0.236821" rx="0.236805" ry="0.236821" transform="matrix(-0.979791 -0.200023 -0.200003 0.979795 14.1171 13.5238)" fill="#EB8C31"/>
+<ellipse id="Ellipse 84_2" cx="0.236805" cy="0.236821" rx="0.236805" ry="0.236821" transform="matrix(-0.979791 -0.200023 -0.200003 0.979795 12.7325 13.359)" fill="#EB8C31"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<filter id="filter0_n_0_1" x="1.63684" y="1.66809" width="18.1088" height="20.0089" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feTurbulence type="fractalNoise" baseFrequency="31.818174362182617 31.818174362182617" stitchTiles="stitch" numOctaves="3" result="noise" seed="4446" />
+<feComponentTransfer in="noise" result="coloredNoise1">
+<feFuncR type="linear" slope="2" intercept="-0.5" />
+<feFuncG type="linear" slope="2" intercept="-0.5" />
+<feFuncB type="linear" slope="2" intercept="-0.5" />
+<feFuncA type="discrete" tableValues="0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+</feComponentTransfer>
+<feComposite operator="in" in2="shape" in="coloredNoise1" result="noise1Clipped" />
+<feComponentTransfer in="noise1Clipped" result="color1">
+<feFuncA type="table" tableValues="0 0.1" />
+</feComponentTransfer>
+<feMerge result="effect1_noise_0_1">
+<feMergeNode in="shape" />
+<feMergeNode in="color1" />
+</feMerge>
+</filter>
+<filter id="filter1_n_0_1" x="4.87549" y="3.36218" width="13.8423" height="4.46924" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feTurbulence type="fractalNoise" baseFrequency="10.606059074401855 10.606059074401855" stitchTiles="stitch" numOctaves="3" result="noise" seed="5004" />
+<feColorMatrix in="noise" type="luminanceToAlpha" result="alphaNoise" />
+<feComponentTransfer in="alphaNoise" result="coloredNoise1">
+<feFuncA type="discrete" tableValues="0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+</feComponentTransfer>
+<feComposite operator="in" in2="shape" in="coloredNoise1" result="noise1Clipped" />
+<feFlood flood-color="rgba(0, 0, 0, 0.15)" result="color1Flood" />
+<feComposite operator="in" in2="noise1Clipped" in="color1Flood" result="color1" />
+<feMerge result="effect1_noise_0_1">
+<feMergeNode in="shape" />
+<feMergeNode in="color1" />
+</feMerge>
+</filter>
+<radialGradient id="paint0_radial_0_1" cx="0" cy="0" r="1" gradientTransform="matrix(9.37736 18.2219 -15.3361 7.61255 6.91137 7.14542)" gradientUnits="userSpaceOnUse">
+<stop offset="0.5" stop-color="white"/>
+<stop offset="0.8" stop-color="#ABC9CE"/>
+<stop offset="1" stop-color="#7DA1BC"/>
+</radialGradient>
+<radialGradient id="paint1_radial_0_1" cx="0" cy="0" r="1" gradientTransform="matrix(-26.2113 -8.26978 17.7652 -54.9267 9.69295 11.9711)" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DEE2E6" stop-opacity="0"/>
+<stop offset="1" stop-color="#ABC9CE"/>
+</radialGradient>
+<radialGradient id="paint2_radial_0_1" cx="0" cy="0" r="1" gradientTransform="matrix(7.87508 11.8917 -16.2732 10.5927 7.96972 4.12367)" gradientUnits="userSpaceOnUse">
+<stop stop-color="#EC9364"/>
+<stop offset="0.305418" stop-color="#E7473B"/>
+<stop offset="1" stop-color="#7B2019"/>
+</radialGradient>
+<linearGradient id="paint3_linear_0_1" x1="16.1344" y1="7.43563" x2="18.1155" y2="5.98288" gradientUnits="userSpaceOnUse">
+<stop stop-color="#7B2019" stop-opacity="0"/>
+<stop offset="1" stop-color="#7B2019"/>
+</linearGradient>
+<clipPath id="clip0_0_1">
+<path d="M0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8C16 12.4183 12.4183 16 8 16C3.58172 16 0 12.4183 0 8Z" fill="white"/>
+</clipPath>
+</defs>
+</svg>
