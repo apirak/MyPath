@@ -24,13 +24,15 @@ The redesigned My Path defaults to a monthly study agenda. It puts courses avail
 
 ## SDK version (`/mypath`)
 
-The Month view also exists in the SDK (`packages/mypath/src/ui/MonthView.tsx`), rendered by the host's tab 3 at `/mypath` from host fixtures (`src/host/fixtures`). It matches `/prototype/mypath` pixel-for-pixel in layout, with these differences:
+The Month and All views also exist in the SDK (`packages/mypath/src/ui/MonthView.tsx`, `AllView.tsx`), rendered by the host's tab 3 at `/mypath` from host fixtures (`src/host/fixtures`). They match `/prototype/mypath` and `/prototype/mypath/all` in layout, with these differences:
 
-- **No URL state:** the selected month lives in component state (starts at the month of **วันนี้**); ‹ › move within the axis and never touch the URL or history. A selected month that falls outside a recomputed axis is clamped to the nearest edge (the prototype jumps back to TODAY's month).
+- **No URL state:** Month/All and the selected month live in `<MyPath>` state (month starts at the month of **วันนี้**), so switching to All and back keeps the month; the segment switches without a router. ‹ › move within the axis and never touch the URL or history. A selected month that falls outside a recomputed axis is clamped to the nearest edge (the prototype jumps back to TODAY's month).
 - **วันนี้ comes from the host** (`today` prop); when omitted the SDK uses the Thai-time date from the device clock at render time.
 - **Plan maths is a pure function** (`packages/mypath/src/plan/buildPlan.ts`, copied from `plan.ts`; `tests/sdk/buildPlan.test.ts` deep-equals it against the prototype). No `DAY_START`: a subject's first course with no earliest start date begins on วันนี้. Each `<MyPath>` computes its own plan in `MyPathProvider`, so several can render side by side.
-- **Not yet in the SDK:** the All tab (kept invisible so the segment keeps its width; ticket 05), the Study Calendar button (08), opening Course Detail from a card (07), and course progress (09).
-- **CSS** lives in `packages/mypath/src/mypath.css`: every selector is under `.mypath-root` with an `mp-` class prefix (checked by `tests/boundary.test.ts`); the primary blue is `--mp-primary`. `.mypath-root` fills its host box (`height:100%`, flex column); the header stays fixed and only `.mp-scroll` scrolls. Header images are bundled from `packages/mypath/src/assets/`.
+- **All drag is controlled:** dragging a course's lead grip (desktop) snaps to the nearest Monday (`snapToMonday`, 3.5-day edge) and calls `onPlanChange(withCourseStartDate(plan, id, iso))` on every new Monday (`packages/mypath/src/plan/timeline.ts`); the bar only moves when the host passes the new plan back. The axis is frozen from pointer-down to release (state, replacing the prototype's `holdAxis`). Courses that follow the previous one move with it.
+- **All opens scrolled to วันนี้** every time (the prototype restores the last scroll position across tab switches).
+- **Not yet in the SDK:** the Study Calendar button (08), opening Course Detail from a card or bar (07; All bars are not focusable/clickable yet), and course progress (09).
+- **CSS** lives in `packages/mypath/src/mypath.css`: every selector is under `.mypath-root` with an `mp-` class prefix (checked by `tests/boundary.test.ts`; All's `tp-` classes became `mp-tp-`, and `.mp-scroll.mp-tp-full` stands in for the prototype's `.path-scroll`); the primary blue is `--mp-primary`. `.mypath-root` fills its host box (`height:100%`, flex column); the header stays fixed and only `.mp-scroll` scrolls. Header images are bundled from `packages/mypath/src/assets/`.
 
 ## Components
 

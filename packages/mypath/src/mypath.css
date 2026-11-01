@@ -1,5 +1,5 @@
 /* CSS ทั้งหมดของ SDK — ทุก selector อยู่ใต้ .mypath-root และ class ขึ้นต้นด้วย mp-
-   copy ค่าที่มีผลจริงจาก src/index.css + PathHeader.css + PlanEmptyState.css + HeaderButton.css ของ prototype
+   copy ค่าที่มีผลจริงจาก src/index.css + PathHeader.css + PlanEmptyState.css + HeaderButton.css + MyPathAllTimeline.css ของ prototype
    (ยุบ rule ที่ทับกันด้วย !important ให้เหลือค่าสุดท้าย) */
 
 /* โครง: host ให้กล่องสูงแน่นอน · header นิ่ง · เด้ง (rubber-band) เฉพาะ .mp-scroll เหมือน native iOS */
@@ -17,6 +17,11 @@
 .mypath-root .mp-tabs .mp-active,.mypath-root .mp-tabs button:hover{color:#212529}
 .mypath-root .mp-tabs::before{content:'';position:absolute;z-index:0;top:4px;bottom:7px;left:4px;width:calc(50% - 4px);border-radius:8px;background:#fff;box-shadow:0 3px 0 #ced4da,0 0 0 1px #dee2e6}
 .mypath-root .mp-tabs[data-active=all]::before{transform:translateX(100%)}
+.mypath-root .mp-tabs.mp-slide::before{animation:mp-seg-slide-l 300ms cubic-bezier(0.3,0.7,0.4,1)}
+.mypath-root .mp-tabs.mp-slide[data-active=all]::before{animation-name:mp-seg-slide-r}
+@keyframes mp-seg-slide-l{from{transform:translateX(100%)}}
+@keyframes mp-seg-slide-r{from{transform:translateX(0)}}
+@media(prefers-reduced-motion:reduce){.mypath-root .mp-tabs.mp-slide::before{animation:none}}
 .mypath-root .mp-month-picker{display:flex;justify-content:center;align-items:center;gap:18px}
 .mypath-root .mp-month-picker button{display:grid;place-items:center;border:0;background:transparent;color:#6d757e}
 .mypath-root .mp-month-picker button:disabled{opacity:.3}
@@ -114,3 +119,61 @@
   .mypath-root .mp-pes-banner h2{font-size:22px;line-height:30px}
   .mypath-root .mp-pes-banner p{font-size:14px;line-height:21px}
 }
+
+/* All (copy MyPathAllTimeline.css: tp- → mp-tp-) — .mp-scroll.mp-tp-full แทน .path-scroll ของ .tp-page/.tp-full/.tp-sky-page ใน prototype */
+.mypath-root .mp-tp-scroll{width:min(1180px,100%);margin:auto;overflow-x:auto;border:2px solid #dee2e6;border-radius:12px;background:#fff}.mypath-root .mp-tp-grid{display:grid;width:max-content;min-width:100%;background:#fff}.mypath-root .mp-tp-label{position:sticky;left:0;z-index:4;display:flex;align-items:center;gap:8px;min-height:52px;padding:10px 14px;border-right:2px solid #dee2e6;border-bottom:1px solid #e9ecef;background:#fff;font-size:14px}.mypath-root .mp-tp-month-label{position:sticky;top:0;z-index:7;min-height:40px;border-bottom:1px solid #dee2e6}.mypath-root .mp-tp-month{position:sticky;top:0;z-index:6;display:grid;place-items:center;min-height:40px;border-right:1px solid #e9ecef;border-bottom:1px solid #dee2e6;background:#fff;color:#6d757e;font-size:10px;white-space:nowrap}.mypath-root .mp-tp-month.now{background:#e5f0fb;color:#0078c4;font-weight:700}.mypath-root .mp-tp-axis{position:relative;grid-column:2 / -1;min-width:0;min-height:52px;border-bottom:1px solid #e9ecef;overflow:hidden}.mypath-root .mp-tp-month-bands{position:absolute;inset:0;display:grid;pointer-events:none}.mypath-root .mp-tp-month-bands i{border-right:1px solid #e9ecef;background:#fff}.mypath-root .mp-tp-month-bands i.alternate{background:#f8f9fa}.mypath-root .mp-tp-events,.mypath-root .mp-tp-events-label{background:#fffafa}.mypath-root .mp-tp-event{--event-color:#ef6268;position:absolute;z-index:2;display:flex;flex-direction:column;align-items:center;transform:translateX(-50%);max-width:118px;padding:4px 7px;border-radius:8px;background:var(--event-color);color:#fff;font-size:10px;font-weight:700;line-height:12px;text-align:center}.mypath-root .mp-tp-event::after{position:absolute;top:100%;width:2px;height:var(--line);background:var(--event-color);content:'';opacity:.45}.mypath-root .mp-tp-event small{font-size:9px;font-weight:500}.mypath-root .mp-tp-event.exam{--event-color:#2b6cd4}.mypath-root .mp-tp-event.no{border:1.5px dashed #ef6268;background:#fdf0f0;color:#c0353c}.mypath-root .mp-tp-event-marker{position:absolute;bottom:10px;z-index:3;width:10px;height:10px;transform:translateX(-50%);border:2px solid #fff;border-radius:50%;background:#ef6268;box-shadow:0 0 0 2px #ef6268}.mypath-root .mp-tp-event-marker.exam{background:#2b6cd4;box-shadow:0 0 0 2px #2b6cd4}.mypath-root .mp-tp-event-marker.no{background:#fff}.mypath-root .mp-tp-subject i{width:12px;height:12px;border-radius:50%;background:var(--subject);flex:none}.mypath-root .mp-tp-course{position:absolute;top:11px;z-index:2;display:flex;align-items:center;overflow:hidden;height:30px;cursor:pointer;border:1px solid #dee2e6;border-radius:8px;background:#fff;padding:0 6px 0 4px;color:#212529;font-size:11px;font-weight:700;line-height:16.5px;white-space:nowrap;text-overflow:ellipsis}.mypath-root .mp-tp-grip{flex:none;align-self:stretch;width:4px;margin:6px 6px 6px 0;border-radius:2px;background:var(--subject)}.mypath-root .mp-tp-course.own{border-color:var(--subject);background:var(--subject);box-shadow:inset 0 -2px 0 rgba(0,0,0,.1)}.mypath-root .mp-tp-course.own .mp-tp-grip{background:#fff}.mypath-root .mp-tp-load-label,.mypath-root .mp-tp-load{min-height:56px;border-bottom:0}.mypath-root .mp-tp-load-label{color:#6d757e;font-size:12px}.mypath-root .mp-tp-week-label.mp-tp-load-label,.mypath-root .mp-tp-load{min-height:42px}.mypath-root .mp-tp-week-label{gap:6px;padding-top:6px;padding-bottom:6px;color:#212529;font-weight:700}.mypath-root .mp-tp-mobile,.mypath-root .mp-tp-mobile-head{display:none}@media(max-width:640px){.mypath-root .mp-tp-full{padding:0 0 24px}.mypath-root .mp-tp-scroll{display:none}.mypath-root .mp-tp-mobile{display:block;margin-top:14px;padding-bottom:26px}.mypath-root .mp-tp-mobile-head{flex:none;display:flex;gap:3px;margin-bottom:0;padding:8px 16px;background:#f7f9fc;border-bottom:2px solid #dee2e6}.mypath-root .mp-tp-mobile-head>i{width:46px;flex:none;margin-right:3px}.mypath-root .mp-tp-mobile-head b{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;color:#6d757e;font-size:10px;font-weight:600;text-align:center}.mypath-root .mp-tp-mobile-head b i{width:12px;height:12px;border-radius:3px}.mypath-root .mp-tp-mobile-months{display:grid;gap:1px}.mypath-root .mp-tp-mobile-month{display:grid;grid-template-columns:46px 1fr;background:#fff;padding:0 16px}.mypath-root .mp-tp-mobile-month:nth-child(even){background:#f8f9fa}.mypath-root .mp-tp-mobile-month.now{background:#e5f0fb}.mypath-root .mp-tp-mobile-month.now>b{color:#0078c4;font-weight:700}.mypath-root .mp-tp-mobile-month>b{display:flex;align-items:flex-start;justify-content:flex-end;padding:12px 4px 0 0;color:#6d757e;font-size:10px;font-weight:400;white-space:nowrap}.mypath-root .mp-tp-mobile-month-content{min-width:0}.mypath-root .mp-tp-mobile-events{display:flex;flex-wrap:wrap;gap:4px;padding:5px 3px 0}.mypath-root .mp-tp-mobile-event{display:flex;align-items:center;min-height:18px;border-radius:7px;padding:2px 5px;color:#fff;font-size:9px;font-weight:700;line-height:12px}.mypath-root .mp-tp-mobile-event.exam{background:#2b6cd4}.mypath-root .mp-tp-mobile-event.mock{background:#ef6268}.mypath-root .mp-tp-mobile-event.mock.no{border:1.5px dashed #ef6268;background:#fdf0f0;color:#c0353c}.mypath-root .mp-tp-mobile-subjects{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.mypath-root .mp-tp-mobile-cell{display:grid;align-content:start;gap:4px;min-height:64px;padding:4px 0}.mypath-root .mp-tp-mobile-cell.full-month{align-content:stretch}.mypath-root .mp-tp-mobile-course{display:flex;min-height:38px;align-items:flex-start;justify-content:center;overflow:hidden;border-top:5px solid var(--subject);border-radius:4px 4px 7px 7px;background:color-mix(in srgb,var(--subject) 15%,#fff);padding:4px 2px 0;color:#212529;font-size:10px;font-weight:700;line-height:12px;text-align:center}.mypath-root .mp-tp-mobile-course.own{background:var(--subject)}.mypath-root .mp-tp-mobile-course.own-no{background:color-mix(in srgb,var(--subject) 15%,#fff);color:#212529}}
+.mypath-root b.mp-tp-events-label.mp-tp-load-label{background:#fff;border-bottom:1px solid #e9ecef}
+.mypath-root .mp-tp-events::after{position:absolute;right:0;bottom:14px;left:0;z-index:1;height:2px;border-radius:999px;background:#f6d5d7;content:''}
+.mypath-root .mp-tp-full .mp-tp-scroll{width:100%;margin:14px auto 0}
+@media(max-width:640px){.mypath-root .mp-tp-mobile{margin-top:0}.mypath-root .mp-tp-mobile-head b i{border-radius:50%}}
+@media(max-width:640px){.mypath-root .mp-tp-mobile-month>b{justify-content:flex-start;padding:12px 0 0 4px}}
+.mypath-root .mp-tp-help{display:grid;place-items:center;width:16px;height:16px;flex:none;border:0;border-radius:50%;background:#212529;color:#fff;font-size:11px;font-weight:700;line-height:1;cursor:pointer}
+.mypath-root .mp-tp-help-pop{inset:0;margin:auto;height:fit-content;width:min(320px,calc(100vw - 32px));padding:16px;border:0;border-radius:12px;box-shadow:0 8px 32px rgb(0 0 0/.2);color:#212529;font-size:13px;font-weight:400;line-height:1.5}.mypath-root .mp-tp-help-pop::backdrop{background:rgb(0 0 0/.2)}
+.mypath-root .mp-tp-help-pop>b{display:block;margin-bottom:6px;font-size:14px}.mypath-root .mp-tp-help-pop p{margin:0 0 8px}.mypath-root .mp-tp-help-pop ul{margin:0 0 8px;padding:0;list-style:none}.mypath-root .mp-tp-help-pop li{display:flex;align-items:center;gap:8px}.mypath-root .mp-tp-help-pop li i{width:16px;height:8px;border-radius:999px}
+.mypath-root .mp-tp-week{position:absolute;top:0;bottom:0;z-index:2}.mypath-root .mp-tp-bar{position:absolute;left:2.5px;right:2.5px;display:flex;flex-direction:column;overflow:hidden;border-radius:5px 5px 2px 2px}.mypath-root .mp-tp-bar i{display:block}
+.mypath-root .mp-tp-load i.ok{flex:1;background:#5ccb3c}.mypath-root .mp-tp-load i.over{flex:none;background:#ff7a7f}.mypath-root .mp-tp-help-pop li i.ok{background:#5ccb3c}.mypath-root .mp-tp-help-pop li i.over{background:#ff7a7f}
+.mypath-root .mp-tp-plan{position:absolute;left:0;right:0;border-top:1.5px dashed #868e96;opacity:.7}.mypath-root .mp-tp-help-pop li i.plan{height:0;border-radius:0;border-top:1.5px dashed #868e96}
+.mypath-root .mp-tp-no-course{position:absolute;top:50%;left:12px;z-index:2;transform:translateY(-50%);color:#adb5bd;font-size:12px}
+/* All เต็มจอ ไม่มีกรอบ — .mp-tp-scroll เป็น scroller เดียวทั้งสองแกน (ท้องฟ้า+ธงอยู่ในนี้ ไม่ต้อง sync): ป้ายซ้าย sticky left, หัวเดือน sticky top, กราฟชั่วโมง sticky bottom
+   ปิด overscroll แนวนอน — ถ้าเด้ง sticky จะเด้งตามเนื้อหา (ทางเดียวที่หัวนิ่งได้คือแยก scroller ซึ่งต้อง sync ด้วย JS แล้วหน่วง) */
+.mypath-root .mp-tp-sky{position:relative;z-index:8;display:grid;width:max-content;min-width:100%;margin-bottom:-6px}
+.mypath-root .mp-tp-events-strip{grid-area:1/1;position:relative;padding-top:14px}
+.mypath-root .mp-tp-events-strip.mp-tp-grid,.mypath-root .mp-tp-events-strip b.mp-tp-events-label.mp-tp-load-label,.mypath-root .mp-tp-events-top{background:transparent;border:0}
+.mypath-root .mp-tp-events-top .mp-tp-month-bands,.mypath-root .mp-tp-events-top::after{display:none}
+.mypath-root .mp-tp-events-top .mp-tp-event-marker{bottom:-1px}
+.mypath-root .mp-tp-full{display:flex;flex-direction:column;padding:0}
+.mypath-root .mp-tp-full .mp-tp-scroll{flex:1;min-height:0;overscroll-behavior-x:none;display:flex;flex-direction:column;container-type:inline-size;margin:0;border:0;border-radius:0}
+/* ซ่อน scrollbar — ถ้ามีจะกินที่ด้านล่างทับกราฟชั่วโมง ยังเลื่อนด้วย trackpad/ล้อเมาส์ได้ */
+.mypath-root .mp-tp-full .mp-tp-scroll{scrollbar-width:none}.mypath-root .mp-tp-full .mp-tp-scroll::-webkit-scrollbar{display:none}
+.mypath-root .mp-tp-full .mp-tp-sky+.mp-tp-grid{position:relative;z-index:9;flex:1;grid-template-rows:auto repeat(var(--rows),auto) 1fr auto;border-top:2px solid #dee2e6}
+.mypath-root .mp-tp-full .mp-tp-spacer{min-height:0;border-bottom:1px solid #dee2e6}
+.mypath-root .mp-tp-full .mp-tp-load,.mypath-root .mp-tp-full .mp-tp-week-label{position:sticky;bottom:0;z-index:5;box-shadow:0 -1px #dee2e6}.mypath-root .mp-tp-full .mp-tp-week-label{z-index:7}
+/* มือถือ: วันสำคัญอยู่ในตารางรายเดือนแล้ว ไม่ต้องมี strip */
+@media(max-width:640px){.mypath-root .mp-tp-sky,.mypath-root .mp-tp-full .mp-tp-scroll{display:none}.mypath-root .mp-tp-full{display:block;padding:0 0 24px}}
+/* ท้องฟ้าหลังธงวันสำคัญ — flat style ตาม theme Learn Anywhere (ฟ้า cyan → mint) */
+.mypath-root .mp-tp-full .mp-tp-sky{overflow:clip;background:linear-gradient(#9fe7fb,#bdf0f2 60%,#d6f6ec)}
+.mypath-root .mp-tp-sky-scene{grid-area:1/1;position:sticky;left:0;width:100cqw;margin-bottom:6px;overflow:clip;pointer-events:none}
+.mypath-root .mp-tp-clouds{position:absolute;inset:0;transform:translateX(calc(var(--sx,0) * -.4px))}
+.mypath-root .mp-tp-clouds.far{transform:translateX(calc(var(--sx,0) * -.2px));opacity:.7}
+.mypath-root .mp-tp-cloud{position:absolute;height:auto;fill:#effdff;animation:mp-tp-drift 30s ease-in-out infinite alternate}
+.mypath-root .mp-tp-grass-row{position:absolute;inset:auto 0 5px 176px;height:14px;z-index:0}
+.mypath-root .mp-tp-grass{position:absolute;bottom:0;width:16px;height:auto;fill:#8cc63f;transform-origin:50% 100%;animation:mp-tp-sway 3.2s ease-in-out infinite}
+.mypath-root .mp-tp-grass:nth-child(3n){fill:#a6cf4f}
+@keyframes mp-tp-drift{to{translate:50px 0}}
+@keyframes mp-tp-sway{0%,100%{rotate:-6deg}50%{rotate:6deg}}
+@media(prefers-reduced-motion:reduce){.mypath-root .mp-tp-cloud,.mypath-root .mp-tp-grass{animation:none}}
+/* ขีดหน้า course = มีวันเริ่มของตัวเอง; คอร์สที่ "ตาม Course ก่อนหน้า" ไม่มีขีด (desktop + มือถือ); มือถือมีขีดเฉพาะเดือนที่เริ่ม */
+.mypath-root .mp-tp-course.no-lead{padding:0 6px}
+@media(max-width:640px){.mypath-root .mp-tp-mobile-course{position:relative;border-top:0;border-radius:7px;padding:10px 2px 4px}.mypath-root .mp-tp-mobile-course::before{position:absolute;top:3px;right:5px;left:5px;height:3px;border-radius:2px;background:var(--subject);content:''}.mypath-root .mp-tp-mobile-course.own::before{background:#fff}.mypath-root .mp-tp-mobile-course.no-lead{padding-top:5px}.mypath-root .mp-tp-mobile-course.no-lead::before{display:none}}
+/* มือถือ: .mp-scroll เลื่อนทั้งสองแกน — หัววิชา sticky top, ชื่อเดือน sticky left, วันสำคัญของเดือนอยู่กับที่ (sticky left กว้างเท่าจอ), ปิดเด้งเพราะ sticky จะเด้งตาม */
+@media(max-width:640px){
+  .mypath-root .mp-tp-full{overscroll-behavior:none}
+  .mypath-root .mp-tp-mobile{width:max(100%, calc(78px + var(--n) * var(--col) + (var(--n) - 1) * 6px))}
+  .mypath-root .mp-tp-mobile-subjects{grid-template-columns:repeat(var(--n),minmax(var(--col),1fr))}
+  .mypath-root .mp-tp-mobile-head{position:sticky;top:0;z-index:3;display:grid;grid-template-columns:62px 1fr;gap:0;padding:8px 16px 8px 0}
+  .mypath-root .mp-tp-mobile-head>i{position:sticky;left:0;z-index:1;width:auto;margin:0;background:inherit}
+  .mypath-root .mp-tp-mobile-month{grid-template-columns:62px 1fr;padding:0 16px 0 0}
+  .mypath-root .mp-tp-mobile-month>b{position:sticky;left:0;z-index:1;padding-left:20px;background:inherit}
+  .mypath-root .mp-tp-mobile-events{position:sticky;left:62px;width:calc(100vw - 78px)}
+}
+.mypath-root .mp-tp-grip{position:relative;cursor:ew-resize;touch-action:none}.mypath-root .mp-tp-grip::after{position:absolute;inset:-6px;content:''}
