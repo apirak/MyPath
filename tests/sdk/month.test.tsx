@@ -64,4 +64,15 @@ describe('Month', () => {
       vi.useRealTimers()
     }
   })
+
+  it('today ผิดรูป = ไม่ได้ส่ง (ไม่พัง)', () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-12-05T03:00:00Z'))
+    try {
+      renderMyPath(mypathData, '2026/12/05')
+      expect(screen.getByText('วันนี้ · 5 ธ.ค. 69')).toBeTruthy()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
 })

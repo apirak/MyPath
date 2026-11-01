@@ -49,4 +49,16 @@ describe('buildPlan: วันนี้และข้อมูลไม่ค�
     expect(subjects).toEqual([])
     expect(axis.label).toBe('มี.ค. 70 – มี.ค. 70')
   })
+
+  it('จังหวะเรียนนอกช่วง 1–10 ถูกบีบ (0 ไม่ทำให้ค้าง)', () => {
+    const course = (weeklyHours: number) => buildPlan({ ...base, plan: { calendar, courses: [{ courseId: 'TGAT.1', weeklyHours }] } }).subjects[0].courses[0]
+    expect(course(0)).toMatchObject({ weeklyHours: 1, estimatedWeeks: 15 }) // TGAT.1 = 15 ชม.
+    expect(course(40).weeklyHours).toBe(10)
+  })
+
+  it('วันสอบผิดรูปถูกข้าม ไม่ทำให้แกนพัง', () => {
+    const { events, axis } = buildPlan({ ...base, events: [{ id: 'X', date: '', label: 'x', kind: 'exam' }], plan: { calendar, courses: [] } })
+    expect(events).toEqual([])
+    expect(axis.start).toBe('2027-03-01')
+  })
 })

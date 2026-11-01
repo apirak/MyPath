@@ -33,8 +33,9 @@ export type PlanInput = Pick<MyPathData, 'catalog' | 'plan' | 'events'> & { toda
 
 const DEFAULT_WEEKLY_HOURS = 5
 export const estimatedWeeksFor = (hours: number, weeklyHours: number) => Math.ceil(hours / weeklyHours)
+// บีบให้อยู่ 1–10 ตามสัญญา — 0 จากแผนที่เสียทำให้จำนวนสัปดาห์เป็น Infinity และ loop รายวันไม่จบ
 const weeklyHoursFor = (weeklyHours: number | undefined, followPrevious: boolean, previousWeeklyHours: number) =>
-  followPrevious ? previousWeeklyHours : weeklyHours ?? DEFAULT_WEEKLY_HOURS
+  followPrevious ? previousWeeklyHours : Math.min(10, Math.max(1, weeklyHours ?? DEFAULT_WEEKLY_HOURS))
 
 // แกนเดือน: ต้นเดือนของสิ่งแรก ถึงสิ้นเดือนของสิ่งสุดท้าย
 const axisOf = (first: number, lastDay: number): Axis => {
@@ -56,7 +57,8 @@ const axisOf = (first: number, lastDay: number): Axis => {
 
 // คอร์สในวิชาเดียวกันต่อกันวันถัดไป; หนึ่งสัปดาห์ของคอร์สยาว 7 วันปฏิทินเสมอ
 // วิชาที่เรียน = วิชาใน catalog ที่เปิดใน calendar.subjects เรียงตาม catalog; id ที่ไม่รู้จักถูกข้าม
-export function buildPlan({ catalog, plan, events, today }: PlanInput): Plan {
+export function buildPlan({ catalog, plan, events: allEvents, today }: PlanInput): Plan {
+  const events = allEvents.filter(event => isISODate(event.date)) // วันสอบผิดรูป = ไม่มีรายการนั้น
   const enabled = catalog.flatMap(group => group.subjects).filter(subject => plan.calendar.subjects.includes(subject.id))
   const planById = new Map(plan.courses.map(c => [c.courseId, c]))
   const starts = new Map<string, number>(), ends = new Map<string, number>()
