@@ -26,6 +26,7 @@ describe('แผนเรียน: วิชาที่เรียน', () =>
 
 describe('แผนเรียน: แกน', () => {
   it('ช่วงแกนและเดือนบนแกน', () => {
+    // key เป็นชื่อค่าคงที่เดิมของ prototype เพื่อใช้ snapshot เดิมได้
     expect({ AXIS_START: axis.start, AXIS_END: axis.end, TOTAL_DAYS: axis.totalDays, axisLabel: axis.label, axisMonths: axis.months }).toMatchSnapshot()
   })
 })
