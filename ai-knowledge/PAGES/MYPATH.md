@@ -22,6 +22,16 @@ The redesigned My Path defaults to a monthly study agenda. It puts courses avail
 
 **App shell (native-iOS scroll):** `.mypath-layout` is `position:fixed; inset:0`, a flex column of the page + tab bar, so there is no document scroll for Safari to bounce. Each view is `.path-page` → `.path-screen` (header + `.path-scroll`, the only scrolling/bouncing element) — `.path-screen` is the unit meant to move into the real app (it fills `100%` of its container). Mock-only bits (`prototype-data`, `ProgressTestPanel`) sit outside `.path-screen`. Changing month remounts the scroller (`key={month}`) so it returns to the top. Trade-off: Safari's URL bar no longer collapses on scroll.
 
+## SDK version (`/mypath`)
+
+The Month view also exists in the SDK (`packages/mypath/src/ui/MonthView.tsx`), rendered by the host's tab 3 at `/mypath` from host fixtures (`src/host/fixtures`). It matches `/prototype/mypath` pixel-for-pixel in layout, with these differences:
+
+- **No URL state:** the selected month lives in component state (starts at the month of **วันนี้**); ‹ › move within the axis and never touch the URL or history. A selected month that falls outside a recomputed axis is clamped to the nearest edge (the prototype jumps back to TODAY's month).
+- **วันนี้ comes from the host** (`today` prop); when omitted the SDK uses the Thai-time date from the device clock at render time.
+- **Plan maths is a pure function** (`packages/mypath/src/plan/buildPlan.ts`, copied from `plan.ts`; `tests/sdk/buildPlan.test.ts` deep-equals it against the prototype). No `DAY_START`: a subject's first course with no earliest start date begins on วันนี้. Each `<MyPath>` computes its own plan in `MyPathProvider`, so several can render side by side.
+- **Not yet in the SDK:** the All tab (kept invisible so the segment keeps its width; ticket 05), the Study Calendar button (08), opening Course Detail from a card (07), and course progress (09).
+- **CSS** lives in `packages/mypath/src/mypath.css`: every selector is under `.mypath-root` with an `mp-` class prefix (checked by `tests/boundary.test.ts`); the primary blue is `--mp-primary`. `.mypath-root` fills its host box (`height:100%`, flex column); the header stays fixed and only `.mp-scroll` scrolls. Header images are bundled from `packages/mypath/src/assets/`.
+
 ## Components
 
 | Component | File | Purpose | Behavior / states |

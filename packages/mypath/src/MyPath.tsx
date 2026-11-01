@@ -1,9 +1,10 @@
 import type { MyPathProps } from './types'
+import { MyPathProvider } from './MyPathProvider'
+import MonthView from './ui/MonthView'
 
-// ยังเป็นหน้าเปล่า (UI เริ่มใบ 04) — แสดง "วันนี้" เพื่อพิสูจน์ว่าได้ข้อมูลจาก host จริง
-export default function MyPath({ today }: MyPathProps) {
-  return <div className="mypath-root">
-    <p>My Path SDK ยังไม่มีหน้าจอ</p>
-    <p>วันนี้: {today ?? 'ไม่ได้ส่งมา'}</p>
-  </div>
+// host ให้กล่องที่มีความสูงแน่นอน — .mypath-root เติมเต็มกล่อง header นิ่ง scroll อยู่ใน .mp-scroll
+export default function MyPath({ data, today }: MyPathProps) {
+  return <MyPathProvider data={data} today={today}>
+    <div className="mypath-root"><MonthView /></div>
+  </MyPathProvider>
 }

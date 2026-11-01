@@ -1,0 +1,116 @@
+/* CSS ทั้งหมดของ SDK — ทุก selector อยู่ใต้ .mypath-root และ class ขึ้นต้นด้วย mp-
+   copy ค่าที่มีผลจริงจาก src/index.css + PathHeader.css + PlanEmptyState.css + HeaderButton.css ของ prototype
+   (ยุบ rule ที่ทับกันด้วย !important ให้เหลือค่าสุดท้าย) */
+
+/* โครง: host ให้กล่องสูงแน่นอน · header นิ่ง · เด้ง (rubber-band) เฉพาะ .mp-scroll เหมือน native iOS */
+.mypath-root{--mp-primary:#0078c4;height:100%;display:flex;flex-direction:column;background:#f7f9fc;color:#212529}
+:where(.mypath-root) *,:where(.mypath-root) *::before,:where(.mypath-root) *::after{box-sizing:border-box}
+:where(.mypath-root) button{font:inherit}
+.mypath-root .mp-scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior-y:contain;padding:0 16px 24px}
+.mypath-root .mp-shell{width:min(1024px,100%);margin:auto}
+
+/* Header: Month/All · ตัวเลือกเดือน */
+.mypath-root .mp-header{flex:none;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:12px 16px;border-bottom:2px solid #dee2e6;background:#fff}
+/* Segment Month/All: รางเทาเรียบ + pill ขาวยก (ขอบล่างแข็ง 3px แบบ HeaderButton) */
+.mypath-root .mp-tabs{position:relative;isolation:isolate;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;width:fit-content;border-radius:12px;padding:4px 4px 7px;background:#e9ecef}
+.mypath-root .mp-tabs button{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;min-width:72px;border:0;border-radius:6px;background:transparent;padding:6px 12px;color:#6d757e;font-size:14px;font-weight:700;cursor:pointer;transition:color 200ms ease}
+.mypath-root .mp-tabs .mp-active,.mypath-root .mp-tabs button:hover{color:#212529}
+.mypath-root .mp-tabs::before{content:'';position:absolute;z-index:0;top:4px;bottom:7px;left:4px;width:calc(50% - 4px);border-radius:8px;background:#fff;box-shadow:0 3px 0 #ced4da,0 0 0 1px #dee2e6}
+.mypath-root .mp-tabs[data-active=all]::before{transform:translateX(100%)}
+.mypath-root .mp-month-picker{display:flex;justify-content:center;align-items:center;gap:18px}
+.mypath-root .mp-month-picker button{display:grid;place-items:center;border:0;background:transparent;color:#6d757e}
+.mypath-root .mp-month-picker button:disabled{opacity:.3}
+.mypath-root .mp-month-picker b{font-size:16px}
+.mypath-root .mp-month-picker b.mp-now{color:var(--mp-primary)}
+
+/* Agenda */
+.mypath-root .mp-agenda{margin-top:14px}
+.mypath-root .mp-today-callout{border-radius:16px;background:var(--mp-primary);padding:20px;color:#fff}
+.mypath-root .mp-today-callout span{font-size:12px;font-weight:700}
+.mypath-root .mp-today-callout h2{margin:4px 0;font-size:22px}
+.mypath-root .mp-today-callout p{margin:0;color:#d3e6ff;font-size:13px}
+.mypath-root .mp-agenda-empty{border:2px dashed #dee2e6;border-radius:12px;background:#fff;padding:28px;text-align:center;color:#6d757e;font-size:14px}
+.mypath-root .mp-now-heading,.mypath-root .mp-date-heading{display:flex;align-items:baseline;gap:8px;margin:20px 0 10px}
+.mypath-root .mp-now-heading span{color:#212529;font-size:22px;font-weight:700}
+.mypath-root .mp-date-heading{margin-top:30px}
+.mypath-root .mp-date-heading b{color:#212529;font-size:30px;line-height:1}
+.mypath-root .mp-date-heading span{color:#6d757e;font-size:13px}
+.mypath-root .mp-date-heading i{height:1px;flex:1;background:#dee2e6}
+.mypath-root .mp-course-stack{display:grid;gap:12px}
+
+/* การ์ดคอร์ส / สอบ */
+.mypath-root .mp-course{display:block;overflow:hidden;border:1px solid #ced4da;border-radius:12px;background:#fff}
+.mypath-root .mp-course.mp-done{opacity:.62}
+.mypath-root .mp-course-body{display:flex;gap:12px;border-radius:12px;background:#fff;padding:12px}
+.mypath-root .mp-course-body>img{width:128px;height:72px;flex:none;border-radius:4px;object-fit:cover}
+.mypath-root .mp-course-body>div{min-width:0;flex:1}
+.mypath-root .mp-plate{width:128px;height:72px;flex:none;border-radius:5px;display:grid;place-items:center;text-align:center;font-weight:700;font-size:13px;line-height:1.2;padding:4px}
+.mypath-root .mp-course-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mypath-root .mp-course-top b{font-size:16px}
+.mypath-root .mp-course-top span{overflow:hidden;max-width:130px;border-radius:999px;background:#eaf1ff;padding:3px 7px;color:#3a7ecf;font-size:11px;white-space:nowrap;text-overflow:ellipsis}
+.mypath-root .mp-course strong,.mypath-root .mp-course small{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.mypath-root .mp-course strong{margin-top:3px;font-size:14px;line-height:20px}
+.mypath-root .mp-course small{margin-top:4px;color:#6d757e;font-size:11px}
+
+/* Empty state เมื่อยังไม่ได้เลือกวิชาที่เรียน */
+.mypath-root .mp-pes{width:min(1133px,100%);margin:0 auto;padding-top:6px}
+.mypath-root .mp-pes-hint{display:flex;justify-content:flex-end;align-items:flex-end;gap:4px;margin-right:56px}
+.mypath-root .mp-pes-hint b{padding-bottom:6px;color:#495057;font-size:16px}
+.mypath-root .mp-pes-hint svg{width:96px;height:72px;flex:none;fill:none;stroke:#495057;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.mypath-root .mp-pes-banners{display:grid;justify-items:center;gap:16px;margin-top:24px}
+.mypath-root .mp-pes-banner{display:grid;justify-items:center;gap:8px;width:min(768px,100%);border-radius:16px;background:#1d5fae url(./assets/plan-header-bg.png) center/cover;padding:32px 24px;color:#fff;text-align:center}
+.mypath-root .mp-pes-banner h2,.mypath-root .mp-pes-banner p{text-wrap:balance}
+.mypath-root .mp-pes-banner h2{margin:0;font-size:28px;font-weight:700;line-height:40px}
+.mypath-root .mp-pes-banner p{margin:0;font-size:16px;line-height:24px}
+.mypath-root .mp-pes-cta{position:relative;width:100%;margin-top:18px}
+.mypath-root .mp-pes-cta img{position:absolute;right:0;top:-33px;z-index:2;pointer-events:none}
+.mypath-root .mp-pes-cta .mp-header-button{width:100%;min-height:48px;font-size:16px}
+.mypath-root .mp-pes-cta .mp-header-button__front{justify-content:center;gap:10px}
+
+/* ปุ่มดันได้ (copy HeaderButton.css) — button = กล่อง layout, edge = ด้านข้างทึบอยู่กับที่, front = หน้าปุ่มยกลอย */
+.mypath-root .mp-header-button{
+  --mp-hb-face:#fff;--mp-hb-ink:#212529;--mp-hb-border:#dee2e6;--mp-hb-edge:#dee2e6;
+  position:relative;display:inline-flex;border:0;padding:0;min-height:40px;
+  border-radius:10px;background:transparent;color:var(--mp-hb-ink);font-weight:700;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;user-select:none;transform:translateY(2px);
+}
+.mypath-root .mp-header-button--primary{--mp-hb-face:var(--mp-primary);--mp-hb-ink:#fff;--mp-hb-border:var(--mp-primary);--mp-hb-edge:#03548b}
+.mypath-root .mp-header-button:focus:not(:focus-visible){outline:none}
+.mypath-root .mp-header-button:focus-visible{outline-offset:2px}
+.mypath-root .mp-header-button__edge{position:absolute;inset:0;border-radius:inherit;background:var(--mp-hb-edge)}
+.mypath-root .mp-header-button__front{
+  position:relative;align-self:stretch;flex:1;min-width:0;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  border-radius:inherit;background:var(--mp-hb-face);border:2px solid var(--mp-hb-border);border-bottom:0;padding:8px 12px;
+  transform:translateY(-4px);transition:transform 600ms cubic-bezier(0.3,0.7,0.4,1);will-change:transform;
+}
+.mypath-root .mp-header-button--plain .mp-header-button__front{border:0}
+.mypath-root .mp-header-button--secondary.mp-header-button--plain{--mp-hb-edge:#ffffff80}
+@media(hover:hover){
+  .mypath-root .mp-header-button:hover .mp-header-button__front{transform:translateY(-6px);transition:transform 250ms cubic-bezier(0.3,0.7,0.4,1.5)}
+}
+.mypath-root .mp-header-button:active .mp-header-button__front{transform:translateY(-2px);transition:transform 34ms ease}
+.mypath-root .mp-header-button:disabled{cursor:default}
+.mypath-root .mp-header-button:disabled .mp-header-button__front{transform:translateY(-2px)}
+@media(prefers-reduced-motion:reduce){
+  .mypath-root .mp-header-button__front,.mypath-root .mp-header-button:hover .mp-header-button__front{transform:none;transition:none}
+}
+
+@media(max-width:640px){
+  .mypath-root .mp-header{grid-template-columns:1fr auto;gap:10px;padding-top:16px;padding-bottom:16px}
+  .mypath-root .mp-tabs{grid-column:1;grid-row:1;width:auto;justify-self:start}
+  .mypath-root .mp-month-picker{grid-column:1/-1;grid-row:2;justify-self:center;transform:translateY(4px)}
+  .mypath-root .mp-course-body{gap:9px;padding:10px}
+  .mypath-root .mp-course-body>img,.mypath-root .mp-plate{width:96px;height:54px}
+  .mypath-root .mp-plate{font-size:11px}
+  .mypath-root .mp-course-top b{font-size:14px}
+  .mypath-root .mp-course-top span{display:none}
+  .mypath-root .mp-course strong{font-size:12px;line-height:17px}
+  .mypath-root .mp-course small{font-size:10px}
+  .mypath-root .mp-pes-hint{margin-right:24px}
+  .mypath-root .mp-pes-hint b{font-size:14px}
+  .mypath-root .mp-pes-hint svg{width:64px;height:48px}
+  .mypath-root .mp-pes-banner{padding:24px 16px}
+  .mypath-root .mp-pes-banner h2{font-size:22px;line-height:30px}
+  .mypath-root .mp-pes-banner p{font-size:14px;line-height:21px}
+}
