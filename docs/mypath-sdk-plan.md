@@ -54,7 +54,7 @@ host ใช้หน้า Home, Courses, Profile และ BottomNav ที่�
 | 3. ย้ายส่วนคำนวณ | `buildPlan(catalog, plan, today)` เป็นฟังก์ชันล้วน + เทสต์เทียบกับ prototype | UI ทุกชิ้นใช้ส่วนนี้ จึงต้องนิ่งก่อน |
 | 4. ปั้น UI ทีละชิ้น | header + Month → All timeline → Course detail → Study calendar → Progress. แต่ละชิ้นเขียน CSS แบบมี scope (`.mypath-root`, prefix `mp-`) ตั้งแต่แรก + smoke test | แต่ละชิ้นเสร็จแล้วใช้ได้ทันทีใน host. CSS ของ My Path เป็น CSS ธรรมดา ไม่ได้ใช้ Tailwind จึงไม่ต้องลากเอา Tailwind ไปด้วย |
 | 5. ตัดสินว่าครบแล้ว | เมื่อ SDK ทำได้ครบเท่า prototype ให้ลบ `src/prototype` ออก | เลิกมีโค้ดซ้ำสองชุด |
-| 6. Library build + publish | Vite library mode, ใส่ react เป็น peerDependencies, รวม CSS เป็นไฟล์เดียว, ใช้ npm workspaces, publish ไป private registry | ถึงตอนนี้โค้ดไม่ผูกกับอะไรแล้ว ตั้ง build ครั้งเดียวจบ |
+| 6. Library build + publish | Vite library mode, ใส่ react เป็น peerDependencies, รวม CSS เป็นไฟล์เดียว, ใช้ pnpm workspaces, publish ตาม [Build และ publish](#build-และ-publish) | ถึงตอนนี้โค้ดไม่ผูกกับอะไรแล้ว ตั้ง build ครั้งเดียวจบ |
 
 ระหว่างขั้น 2–5 ใช้ path alias `@learn/mypath` ไปก่อน.
 
@@ -80,8 +80,8 @@ src/prototype/              ← ของเดิม ไม่แก้ → /pr
 **กลไกแยก 3 ชั้น**
 
 1. **แยกโฟลเดอร์** ตามโครงข้างบน
-2. **Import ได้ทางเดียว: host → SDK.** ตอนนี้ตั้ง alias `@learn/mypath` ใน `vite.config.ts` และ `tsconfig.json` ให้ชี้ไป `packages/mypath/src/index.ts` ไฟล์เดียว path ลึกจึง resolve ไม่ได้. ตอนทำ T11 ย้ายไป npm workspaces + field `exports` ใน `package.json` การ import ไฟล์ภายในจะถูกปิดตั้งแต่ระดับ Node. SDK มีแค่ `react` / `react-dom` เป็น peerDependencies และใช้ `lucide-react` ส่วน `react-router` กับ Tailwind เป็นของ host เท่านั้น
-3. **เทสต์ตรวจขอบเขต:** scan `packages/mypath/src` แล้ว fail ถ้าเจอ import ไป `src/`, `react-router` หรือ `/public` และ scan `src/host` แล้ว fail ถ้า import `packages/mypath` ด้วย path ตรงๆ
+2. **Import ได้ทางเดียว: host → SDK.** ตอนนี้ตั้ง alias `@learn/mypath` ใน `vite.config.ts` และ `tsconfig.json` ให้ชี้ไป `packages/mypath/src/index.ts` ไฟล์เดียว path ลึกจึง resolve ไม่ได้. ตอนทำ #14 ย้ายไป pnpm workspaces + field `exports` ใน `package.json` การ import ไฟล์ภายในจะถูกปิดตั้งแต่ระดับ Node. SDK มีแค่ `react` / `react-dom` เป็น peerDependencies และไม่มี dependency อื่น (ไอคอนเป็น SVG ของ SDK เอง ดู [Build และ publish](#build-และ-publish)) ส่วน `react-router` กับ Tailwind เป็นของ host เท่านั้น
+3. **เทสต์ตรวจขอบเขต:** scan `packages/mypath/src` แล้ว fail ถ้าเจอ import ไป `src/`, `react-router`, `lucide-react` หรือ `/public` และ scan `src/host` แล้ว fail ถ้า import `packages/mypath` ด้วย path ตรงๆ
 
 **จุดที่ตอนนี้ปนกันอยู่**
 
@@ -516,6 +516,60 @@ type MyPathProps = {
 - [ ] เลื่อนเดือนแล้ว scroll กลับขึ้นบนสุด
 
 
+## Build และ publish
+
+ข้อสรุปจาก grill #6.
+
+**ขอบเขตของใบ 13 (#14):** แยก module ให้ชัดเท่านั้น คือ pnpm workspace + `exports`, Vite library build (`dist/` = JS + `.d.ts` + `style.css`), script `verify:package`, บีบรูปให้อยู่ในเพดาน, ทดสอบแบบคนนอกด้วย `pnpm pack` ในเครื่อง (วิธี A ที่ไม่ publish) และผ่าน alias (วิธี B), และ `CHANGELOG.md` ที่มีหัวข้อ `0.1.0` แต่ยังไม่ออก. **ไม่ทำ** CI release, tag หรือ publish (ดู [ช่องทางแจก](#ช่องทางแจก-ยังไม่ทำ)) ส่วนนี้ค่อยเปิด issue ใหม่เมื่อรู้ว่า Learn Anywhere จะเชื่อมกับ SDK อย่างไร
+
+### ที่อยู่ของ repo
+
+- ยังอยู่ที่ `apirak/MyPath` (public, บัญชีส่วนตัว) ไปก่อน ยังไม่ย้ายไป org ของ Learn Co., Ltd.
+- **ต้องตรวจก่อนแจกนอกทีม:** repo public จึงเห็นได้ทั้ง source และเอกสารแผน (รวมแผน My Path redesign ที่ยังไม่ออก) ควรย้ายไป org ของบริษัทแบบ private เมื่อพร้อม
+
+### Workspace และ package
+
+- ใช้ **pnpm workspaces** (`packages: ['packages/*']` ใน `pnpm-workspace.yaml`) เพราะ repo ใช้ pnpm อยู่แล้ว ส่วน host ติดตั้งด้วย npm ได้ตามปกติ
+- `peerDependencies`: `react`, `react-dom` เท่านั้น ช่วง `^19.0.0` ทั้งคู่ (Learn Anywhere ใช้ React ล่าสุด) ถ้าวันหลังต้องรองรับ 18 การขยายช่วงลงเป็น minor
+- **ไอคอนเป็น SVG ของ SDK เอง ไม่ใช้ `lucide-react`:** copy path ของไอคอนที่ใช้ (ประมาณ 8–9 ตัว) จาก lucide มาเป็น component ใน `packages/mypath/src/ui/icons.tsx` รับ props `size` / `fill` / `className` แบบเดียวกับ lucide และเก็บข้อความ license ISC ของ lucide ไว้บนไฟล์. host ใช้ lucide ของตัวเองต่อได้ตามปกติ
+  **เหตุผล:** SDK ไม่มี dependency นอกจาก React ทั้งวิธี A และ B host ไม่ต้องติดตั้งอะไรเพิ่ม (ถ้า bundle lucide วิธี B ซึ่ง compile source ตรงๆ จะบังคับให้ host ติดตั้ง lucide เอง) และไม่ชนกันถ้า host ใช้ lucide คนละ major. ข้อเสียคือไอคอนใหม่ต้อง copy เอง ซึ่งรับได้เพราะใช้ไม่ถึงสิบตัว
+
+### รูปและ CSS
+
+- CSS รวมเป็น `dist/style.css` ไฟล์เดียว
+- รูปที่ SDK ใช้เองฝังเป็น data URI (ค่าเริ่มต้นของ Vite library mode) **รูปทั้งหมดรวมกันไม่เกิน 100 KB** ต้องบีบ `plan-header-bg.png` (229 KB) ก่อน
+- host ต้องอนุญาต `img-src data:` ใน CSP
+  **เหตุผล:** host ได้ JS + CSS ที่ใช้ได้ทันทีโดยไม่ต้องตั้งค่า asset. ถ้า copy เป็นไฟล์ host ต้องพึ่ง bundler ที่ resolve `new URL(..., import.meta.url)` ได้ ส่วนวิธี B bundler ของ host จัดการรูปเอง
+
+### เวอร์ชัน
+
+- เวอร์ชันแรกคือ **`0.1.0`** ขึ้น `1.0.0` เมื่อ Learn Anywhere ใช้ My Path บน production จริงครั้งแรก
+- ระหว่าง `0.x` ทุกข้อด้านล่างเลื่อนลงหนึ่งขั้น: ของที่เป็น major ขึ้น minor (`0.2.0`), ของที่เป็น minor หรือ patch ขึ้น patch (`0.1.1`) เพราะ npm มองการขึ้น minor ของ `0.x` เป็น breaking
+- ตั้งแต่ `1.0.0`:
+  - **major:** ลบหรือเปลี่ยนความหมายของ prop หรือฟิลด์ใน `data` / `StudentPlan`, ลบ export หรือ subpath (`./style.css`), ขยับช่วงของ peerDependency ขึ้น (เช่น เลิกรองรับ React 18)
+  - **minor:** prop หรือฟิลด์ใหม่ที่ไม่บังคับ, ฟีเจอร์ใหม่, การเปลี่ยนหน้าตาที่ตั้งใจ
+  - **patch:** แก้ bug รวมถึงแก้หน้าตาให้ตรงกับที่ตั้งใจไว้
+- **class CSS ไม่ใช่ API:** `.mypath-root` และ `mp-*` เป็นของภายใน host ห้ามเขียน style ทับ การเปลี่ยน class จึงไม่ breaking
+
+### Changelog
+
+- เขียนเองใน `packages/mypath/CHANGELOG.md` รูปแบบ [Keep a Changelog](https://keepachangelog.com/)
+- คนเปิด PR ที่เปลี่ยนพฤติกรรมของ SDK เพิ่มบรรทัดใต้ `Unreleased` ตอน release ย้ายเป็นหัวข้อเวอร์ชัน
+  **เหตุผล:** มี package เดียวและ release ไม่บ่อย changesets ไม่คุ้มกับเครื่องมือที่เพิ่ม
+
+### ช่องทางแจก (ยังไม่ทำ)
+
+- เมื่อถึงเวลาแจก: CI แนบ tarball จาก `pnpm pack` (`learn-mypath-X.Y.Z.tgz`) ไว้กับ GitHub Release ของ tag แล้ว host ติดตั้งจาก URL ของ Release ไม่ใช้ registry และไม่ต้องใช้ token เพราะ repo public
+- **ยังไม่ทำ CI release, tag หรือ publish** จนกว่าจะรู้ชัดว่า Learn Anywhere จะเชื่อมกับ SDK อย่างไร ตอนนี้เน้นแยก module ระหว่าง host กับ SDK ให้ชัดก่อน
+- **เหตุผล:** repo ยังอยู่ใต้บัญชีส่วนตัว GitHub Packages บังคับ scope ให้ตรงกับเจ้าของ (ได้ `@apirak/mypath` ซึ่งขัดกับชื่อที่ล็อกไว้) และยังไม่มี registry ของบริษัท. ถ้าย้าย repo ไป org ของบริษัทแบบ private ต้องเลือก registry ใหม่ และ tarball จาก Release จะใช้ไม่ได้โดยไม่มี token
+- ไม่ทำ ADR เพราะยังไม่ได้ผูกมัด host เปลี่ยน URL บรรทัดเดียวก็ย้ายได้
+
+### Tag และการ release (เมื่อเริ่มแจก)
+
+- ทุก release รวม patch มี git tag `mypath-vX.Y.Z` ตรงกับ `version` ใน `packages/mypath/package.json`
+- release จาก GitHub Actions เมื่อ push tag `mypath-v*`: test → build → ตรวจว่า tag ตรงกับ `version` → publish. ไม่ publish จากเครื่อง dev
+  **เหตุผล:** build ที่แจกมาจากเครื่องสะอาด token ไม่อยู่บนเครื่องใคร และการ push tag คือจุดที่คนยืนยัน (#14 ต้องถามผู้ใช้ก่อน push tag)
+
 ## Ticket
 
 Ticket อยู่ใน GitHub Issues ของ `apirak/MyPath` (ชื่อขึ้นต้นด้วย "My Path SDK NN") และผูก blocked-by ด้วยระบบ dependency ของ GitHub. ตารางนี้เป็นภาพรวม รายละเอียดและ acceptance criteria อยู่ใน issue.
@@ -536,6 +590,6 @@ Ticket อยู่ใน GitHub Issues ของ `apirak/MyPath` (ชื่อ�
 | 10 | #5 | [Grill] เกณฑ์ "ครบเท่า prototype" | ready-for-human | – |
 | 11 | #13 | ตรวจว่าครบเท่า prototype + ลบ prototype | ready-for-human | #9, #10, #11, #12, #5 |
 | 12 | #6 | [Grill] build และ publish (ต้องรองรับ git submodule ด้วย) | ready-for-human | – |
-| 13 | #14 | Library build + publish `@learn/mypath` | ready-for-agent | #13, #6 |
+| 13 | #14 | Library build `@learn/mypath` (ยังไม่ publish) | ready-for-agent | #13, #6 |
 
 เริ่มได้ทันที: #2, #3, #4, #5, #6. หลัง #8 เสร็จ #9, #11, #12 ทำพร้อมกันได้ (#10 ต้องรอ #4 ด้วย).
