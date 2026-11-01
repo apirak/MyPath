@@ -51,11 +51,16 @@ describe('All', () => {
 const PX_PER_DAY = 10
 const AXIS_DAYS = (Date.UTC(2028, 4, 1) - Date.UTC(2026, 7, 1)) / 86_400_000
 const MATH1 = /^Applied Math Admissions TCAS เล่ม 1 .* · 1 ต.ค. 69 – 25 พ.ย. 69$/
-const dragByDays = (title: RegExp, days: number) => {
+const dragByDays = (title: RegExp, days: number, { release = true } = {}) => {
   const grip = screen.getByTitle(title).querySelector('.mp-tp-grip')!
   fireEvent.pointerDown(grip, { pointerId: 1, clientX: 0 })
   fireEvent.pointerMove(grip, { pointerId: 1, clientX: days * PX_PER_DAY })
-  fireEvent.pointerUp(grip, { pointerId: 1 })
+  if (release) fireEvent.pointerUp(grip, { pointerId: 1 })
+  return grip
+}
+function EchoHost() {
+  const [plan, setPlan] = useState(mypathData.plan)
+  return <MyPath data={{ ...mypathData, plan }} today={TODAY} onPlanChange={setPlan} onBuyCourse={noop} onStartCourse={noop} />
 }
 
 describe('ลากหัวคอร์ส (controlled)', () => {
@@ -76,14 +81,21 @@ describe('ลากหัวคอร์ส (controlled)', () => {
   })
 
   it('host ส่งแผนกลับ: คอร์สขยับ และคอร์สที่ตาม Course ก่อนหน้าขยับตาม', () => {
-    function Host() {
-      const [plan, setPlan] = useState(mypathData.plan)
-      return <MyPath data={{ ...mypathData, plan }} today={TODAY} onPlanChange={setPlan} onBuyCourse={noop} onStartCourse={noop} />
-    }
-    render(<Host />)
+    render(<EchoHost />)
     openAll()
     dragByDays(MATH1, 7)
     expect(screen.getByTitle(/เล่ม 1 .* · 5 ต.ค. 69 – 29 พ.ย. 69$/)).toBeTruthy()
     expect(screen.getByTitle(/เล่ม 2 .* · 30 พ.ย. 69 – 24 ม.ค. 70$/)).toBeTruthy()
+  })
+
+  it('แกนไม่ขยับระหว่างลาก แล้วคิดใหม่ตอนปล่อย', () => {
+    render(<EchoHost />)
+    openAll()
+    // MATH.EX จบ 11 เม.ย. 71 — ดันไป 8 สัปดาห์ แผนจบ มิ.ย. 71
+    const grip = dragByDays(/^.* · 1 มี.ค. 71 – 11 เม.ย. 71$/, 56, { release: false })
+    expect(screen.getByTitle(/ · 24 เม.ย. 71 – 4 มิ.ย. 71$/)).toBeTruthy() // host ได้แผนใหม่แล้ว
+    expect(screen.getByText('ส.ค. 69 – เม.ย. 71')).toBeTruthy()
+    fireEvent.pointerUp(grip, { pointerId: 1 })
+    expect(screen.getByText('ส.ค. 69 – มิ.ย. 71')).toBeTruthy()
   })
 })
