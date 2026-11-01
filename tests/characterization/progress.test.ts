@@ -1,8 +1,6 @@
-// Characterization: บันทึกข้อความความคืบหน้า (progressState) ทุก branch ไว้เป็นค่าอ้างอิง
-// progress เป็น state ระดับ module → resetProgress() ก่อนทุกเคส
-import { beforeEach, describe, expect, it } from 'vitest'
-import { progressState, resetProgress, setProgress } from '../../src/prototype/mypath/progressStore'
-import { progressState as sdkProgressState } from '../../packages/mypath/src/plan/progress'
+// Characterization: บันทึกข้อความความคืบหน้า (progressState) ทุก branch ไว้เป็นค่าอ้างอิง — snapshot บันทึกไว้ตอนยังเป็น prototype (tag mockup-v1) ตอนนี้คิดด้วย SDK
+import { describe, expect, it } from 'vitest'
+import { progressState } from '../../packages/mypath/src/plan/progress'
 
 // คอร์ส 30 วัน: เป้าแรก (30%) = 2027-01-10, เป้าสอง (70%) = 2027-01-22
 const course = { id: 'CHAR.1', start: '2027-01-01', end: '2027-01-31' }
@@ -22,24 +20,7 @@ const cases: { name: string; value: number; today: string }[] = [
 ]
 
 describe('progressState', () => {
-  beforeEach(() => {
-    resetProgress()
-  })
-
   it.each(cases)('$name', ({ value, today }) => {
-    setProgress(course.id, value)
-    expect(progressState(course, today)).toMatchSnapshot()
-  })
-})
-
-// ใบ 09: SDK port เป็นฟังก์ชันล้วน (รับ value/today ตรง ๆ) ต้องให้ผลเท่ากับ prototype ทุก branch
-describe('progressState ของ SDK เท่ากับ prototype', () => {
-  beforeEach(() => {
-    resetProgress()
-  })
-
-  it.each(cases)('$name', ({ value, today }) => {
-    setProgress(course.id, value)
-    expect(sdkProgressState(course, value, today)).toEqual(progressState(course, today))
+    expect(progressState(course, value, today)).toMatchSnapshot()
   })
 })

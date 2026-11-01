@@ -2,9 +2,10 @@
 
 ## Identity
 
-- **Route:** Panel overlay from the Study Calendar button on `/prototype/mypath` and `/prototype/mypath/all`
+- **Route:** Panel overlay from the Study Calendar button ("ปฏิทินการเรียน") in the My Path header on `/mypath` (Month and All)
 - **Figma:** _No as-is frame; promoted from the approved My Path prototype_
-- **Mockup:** `src/prototype/mypath/StudyCalendarPanel.tsx`
+- **SDK:** `packages/mypath/src/ui/StudyCalendar.tsx` (ใบ 08 #11)
+- **Original mockup:** removed in #13 after parity was verified; code is at git tag `mockup-v1` (`src/mypath/StudyCalendarPanel.tsx`)
 
 ## Purpose
 
@@ -25,15 +26,16 @@ Lets a learner choose which subjects are enabled, set their usual available stud
 
 | Component | File | Purpose | Behavior / states |
 |---|---|---|---|
-| StudyCalendarPanel | `src/prototype/mypath/StudyCalendarPanel.tsx` | The overlay and calendar controls | Opens from `PathHeader`; closes with × or backdrop and animates down before unmounting |
-| PathHeader | `src/prototype/components/PathHeader.tsx` | My Path shared header | Owns open/closed panel state for Month and All |
-| studyCalendar | `src/prototype/mypath/studentPlan.ts` | Learner calendar source data | Enabled subjects, regular hours, special-day overrides, and break periods |
-| setStudyCalendar | `src/prototype/mypath/plan.ts` | In-memory update entry point | Rebuilds the plan, then notifies Month / All |
-| subjectGroups | `src/prototype/mypath/courseCatalog.ts` | The 17 selectable subjects in 3 groups | Its order is the All row order |
+| StudyCalendar | `packages/mypath/src/ui/StudyCalendar.tsx` | The overlay and calendar controls | Opens from `PathHeader`; closes with ×, backdrop or Esc and animates down (280ms, `useModal`) before unmounting |
+| PathHeader | `packages/mypath/src/ui/PathHeader.tsx` | My Path shared header | Owns open/closed panel state for Month and All |
+| calendar | `data.plan.calendar` (host: `src/host/fixtures/mypath.json`) | Learner calendar source data | Enabled subjects (`subjects`, ids), regular hours, special-day overrides, and break periods |
+| withStudyCalendar | `packages/mypath/src/plan/timeline.ts` | Pure update helper | Returns the whole new plan for `onPlanChange` (or `undefined` for invalid breaks); the host passes the plan back and Month / All re-render |
+| calendarHoursForDay / calendarBudgetForWeek | `packages/mypath/src/plan/timeline.ts` | Daily capacity and weekly Calendar budget | Priority rules below |
+| catalog | `data.catalog` (host fixtures) | The selectable subjects in groups (22 subjects in 3 groups in the host fixtures) | Its order is the All row order |
 
 ## States & rules
 
-- Enabled subjects live in `studyCalendar.subjects` (17 subjects in 3 groups; default TPAT, TGAT, คณิต, ฟิสิกส์, เคมี). Only these subjects' courses appear in Month / All and count toward Course budget (owned courses included); disabling a subject leaves its `studentCourses` settings intact, so re-enabling restores them. With no subject enabled, Month and All show the plan empty state (see `MYPATH.md`). Layout chosen from a 3-variant prototype (chip groups won); the variants are kept on branch `prototype/subject-enable`.
+- Enabled subjects live in `data.plan.calendar.subjects` as subject ids (host fixtures default: TPAT3, TGAT, คณิต 1, ฟิสิกส์, เคมี). Each group has one toggle button (เลือกทั้งหมด / ยกเลิกทั้งหมด). Only enabled subjects' courses appear in Month / All and count toward Course budget (owned courses included); disabling a subject leaves its `plan.courses` settings intact, so re-enabling restores them. With no subject enabled, Month and All show the plan empty state (see `MYPATH.md`). Layout chosen from a 3-variant prototype (chip groups won); the variants are kept on branch `prototype/subject-enable`.
 
 - The weekly-total summary (“เรียนสัปดาห์ละ”) was removed by owner decision 2026-10-27; Calendar budget remains visible as the dashed line in All.
 - Daily capacity priority: special day → school-break range → normal weekly setting.
@@ -43,11 +45,11 @@ Lets a learner choose which subjects are enabled, set their usual available stud
 - Actual study time will later be recorded per course and day; it is intentionally not part of this mock yet.
 - A one-digit special-day hour marker is circular; `10` is a same-height pill.
 - Sliders are visually cloned from the course weekly-hours control; this panel allows 0 (“พัก”).
-- This is a frontend mock: changes persist only while the app runs.
+- The SDK stores nothing: every change goes to the host via `onPlanChange`; the host mock (`MyPathTab`) keeps it in React state only while the app runs.
 
-## SDK version (`/mypath`, ใบ 08 #11)
+## ต่างจาก mockup เดิม (tag `mockup-v1`)
 
-port ไว้ที่ `packages/mypath/src/ui/StudyCalendar.tsx` เปิดจากปุ่ม "ปฏิทินการเรียน" ใน `PathHeader` ของ SDK (CSS ใน `mypath.css` class `mp-scp-*` ใต้ `.mypath-root` รวมสองไฟล์ของ prototype เป็นชุดเดียว เฉพาะ rule ที่ใช้จริง) หน้าตาเหมือน prototype ทั้ง desktop และ mobile ต่างกันตรงนี้:
+ตรวจครบเท่า mockup เดิม (tag `mockup-v1`) ใน #13. CSS อยู่ใน `packages/mypath/src/mypath.css` class `mp-scp-*` ใต้ `.mypath-root` (รวมสองไฟล์ของ prototype เป็นชุดเดียว เฉพาะ rule ที่ใช้จริง) หน้าตาเหมือน mockup ทั้ง desktop และ mobile ต่างกันตรงนี้:
 
 - **แผงเป็น state ภายในของ header** ไม่มี URL และไม่แตะ history. ปิดด้วย ✕ / คลิกฉากหลัง / **Esc** (animation 280ms) และสลับ Month/All แล้วแผงปิด (ข้อสรุป #4) · แผงเป็น modal: โฟกัสเข้าแผง Tab วนในแผง ปิดแล้วโฟกัสกลับปุ่ม (hook `useModal` ใช้ร่วมกับหน้ารายละเอียดคอร์ส)
 - **ทุกการแก้ส่งแผนทั้งก้อนผ่าน `onPlanChange`** (helper ล้วน `withStudyCalendar` ใน `plan/timeline.ts` แทน `setStudyCalendar`) หน้าจอเปลี่ยนเมื่อ host ส่งแผนกลับ. ช่วงปิดเทอมที่ซ้อนกัน, เริ่มหลังจบ หรือวันผิดรูป = ไม่ส่ง ช่องกลับเป็นค่าเดิม. `courses` ไม่ถูกแตะ จึงปิดวิชาแล้วเปิดกลับมาได้ค่าเดิม

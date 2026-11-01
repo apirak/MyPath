@@ -1,34 +1,7 @@
-// Oracle: SDK buildPlan ต้องคิดแผนได้เท่ากับ rebuildPlan() ของ prototype เมื่อได้ข้อมูลชุดเดียวกัน
-// fixtures ของ host แปลงมาจาก src/prototype/mypath/* ตามสัญญาข้อมูล → ป้อนได้ตรงๆ
+// buildPlan ของ SDK: วันนี้และข้อมูลที่ไม่ครบ (ผลของแผน mock ทั้งก้อนคุมด้วย tests/characterization/plan.test.ts)
 import { describe, expect, it } from 'vitest'
-import * as proto from '../../src/prototype/mypath/plan'
 import { buildPlan } from '../../packages/mypath/src/plan/buildPlan'
-import { TODAY, mypathData } from '../../src/host/fixtures'
-
-proto.rebuildPlan()
-const plan = buildPlan({ ...mypathData, today: TODAY })
-
-const pick = (courses: { id: string; start: string; end: string; weeklyHours: number; estimatedWeeks: number }[]) =>
-  courses.map(({ id, start, end, weeklyHours, estimatedWeeks }) => ({ id, start, end, weeklyHours, estimatedWeeks }))
-
-describe('buildPlan เท่ากับ prototype', () => {
-  it('คอร์สทุกตัวในวิชาที่เรียน', () => {
-    expect(plan.subjects.map(s => ({ name: s.name, color: s.color, courses: pick(s.courses) })))
-      .toEqual(proto.subjects.map(s => ({ name: s.name, color: s.color, courses: pick(s.courses) })))
-    expect(plan.totalHours).toBe(proto.totalHours)
-  })
-
-  it('แกน', () => {
-    expect(plan.axis).toEqual({
-      start: proto.AXIS_START, end: proto.AXIS_END, totalDays: proto.TOTAL_DAYS,
-      months: proto.axisMonths, label: proto.axisLabel, monthLines: proto.monthLines,
-    })
-  })
-
-  it('ชั่วโมงตามแผนรายวัน', () => {
-    expect(plan.scheduledHoursByDay).toEqual(proto.scheduledHoursByDay)
-  })
-})
+import { mypathData } from '../../src/host/fixtures'
 
 describe('buildPlan: วันนี้และข้อมูลไม่ครบ', () => {
   const base = { catalog: mypathData.catalog, events: [], today: '2027-03-10' }

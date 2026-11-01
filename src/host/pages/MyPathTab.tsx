@@ -6,7 +6,7 @@ import { TODAY, mypathData } from '../fixtures'
 
 const SHOP_URL = 'https://shoponline.ondemand.in.th'
 
-// แท็บ 3 ของ host: โครงเดียวกับ MyPathLayout ของ prototype — SDK เติมช่องที่เหลือ, tab bar เป็นของ host
+// แท็บ 3 ของ host: .mypath-layout เต็มจอ — SDK เติมช่องที่เหลือ, tab bar เป็นของ host
 export default function MyPathTab() {
   const [plan, setPlan] = useState<StudentPlan>(mypathData.plan) // controlled: SDK ส่งแผนใหม่ host เก็บแล้วส่งกลับ
   const [progress, setProgress] = useState(mypathData.progress) // แผงทดสอบแก้ได้

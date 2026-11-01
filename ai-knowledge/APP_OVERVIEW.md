@@ -30,7 +30,7 @@ A **frontend-only as-is mockup** of the current Learn Anywhere website:
 
 1. The owner sends Figma links page by page (desktop + mobile) — see `FIGMA-LINKS.md`.
 2. Design details are read through the **Figma MCP** (server "Figma Desktop", `https://mcp.figma.com/mcp`, workspace-scoped in `.zcode/config.json`).
-3. The app is split in three (see `docs/mypath-sdk-plan.md`, "แยก host กับ SDK"): `src/host/` = simulated Learn Anywhere (pages, BottomNav, HeaderButton, fixtures), `src/prototype/` = the frozen My Path mockup, `packages/mypath/` = the My Path SDK, imported by the host only as `@learn/mypath`. `tests/boundary.test.ts` enforces the import rules.
+3. The app is split in two (see `docs/mypath-sdk-plan.md`, "แยก host กับ SDK"): `src/host/` = simulated Learn Anywhere (pages, BottomNav, HeaderButton, fixtures), `packages/mypath/` = the My Path SDK, imported by the host only as `@learn/mypath`. `tests/boundary.test.ts` enforces the import rules. The original My Path mockup (`src/prototype/`, `/prototype/mypath`) was removed once the SDK reached parity (#13); its code is still at git tag `mockup-v1` (`src/pages/MyPath*.tsx`, `src/mypath/`; the last `src/prototype/` version is the parent of the removal commit).
 4. Every finished page gets a doc in `ai-knowledge/PAGES/<PAGE>.md` following `_TEMPLATE.md` — purpose, layout, every component, states.
 
 ## Page inventory
@@ -39,7 +39,6 @@ A **frontend-only as-is mockup** of the current Learn Anywhere website:
 |---|---|---|---|
 | Home | `/` | Complete | `PAGES/HOME.md` |
 | Courses | `/courses` | Complete | `PAGES/COURSES.md` |
-| My Path (host tab 3) | `/mypath` | Renders `<MyPath>` from `@learn/mypath` — still an empty page showing **วันนี้** (UI arrives from ticket 04) | — |
-| My Path prototype | `/prototype/mypath`, `/prototype/mypath/all` | Frozen as-is mockup, reference for SDK parity | `PAGES/MYPATH.md` |
+| My Path (host tab 3) | `/mypath` | Renders `<MyPath>` from `@learn/mypath` (Month, All, course detail, study calendar, progress) — parity with the old mockup verified in #13 | `PAGES/MYPATH.md` |
 | Profile | `/profile` | Complete | `PAGES/PROFILE.md` |
 | _more pages added as Figma links arrive_ | | | |

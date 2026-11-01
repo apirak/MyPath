@@ -1,16 +1,8 @@
-import { Routes, Route, Outlet } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import Home from './host/pages/Home'
 import Courses from './host/pages/Courses'
 import Profile from './host/pages/Profile'
 import MyPathTab from './host/pages/MyPathTab'
-import MyPath from './prototype/pages/MyPath'
-import MyPathAllTimeline from './prototype/pages/MyPathAllTimeline'
-import BottomNav from './prototype/components/BottomNav'
-
-// โครงของ prototype ที่แช่แข็งไว้ (/prototype/mypath) — tab bar อยู่นอกหน้า My Path
-function MyPathLayout() {
-  return <div className="mypath-layout"><Outlet /><BottomNav active="mypath" /></div>
-}
 
 export default function App() {
   return (
@@ -19,10 +11,6 @@ export default function App() {
       <Route path="/courses" element={<Courses />} />
       <Route path="/mypath" element={<MyPathTab />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="/prototype/mypath" element={<MyPathLayout />}>
-        <Route index element={<MyPath />} />
-        <Route path="all" element={<MyPathAllTimeline />} />
-      </Route>
     </Routes>
   )
 }
