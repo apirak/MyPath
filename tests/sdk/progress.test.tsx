@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // ความคืบหน้าบนการ์ดคอร์สที่ซื้อแล้วในหน้า Month: อ่าน data.progress และวันนี้จาก host, ปุ่มเรียนเรียก onStartCourse
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { MyPath, type MyPathData } from '@learn/mypath'
 import { TODAY, mypathData } from '../../src/host/fixtures'
 
@@ -51,9 +51,18 @@ describe('ความคืบหน้าบนการ์ดคอร์ส�
   })
 
   it('ปุ่มเรียนเรียก onStartCourse และไม่เปิดหน้ารายละเอียด', () => {
-    const { onStartCourse } = renderMyPath()
-    fireEvent.click(screen.getAllByRole('button', { name: 'เรียนต่อ' })[0])
+    const { onStartCourse, onPlanChange } = renderMyPath()
+    fireEvent.click(within(card(PHY0)).getByRole('button', { name: 'เรียนต่อ' }))
     expect(onStartCourse).toHaveBeenCalledWith('PHY.0')
+    expect(onPlanChange).not.toHaveBeenCalled() // มีวันเริ่มต้นแล้ว
     expect(document.querySelector('.mp-cdp-sheet')).toBeNull()
+  })
+
+  it('ปุ่มเรียนของคอร์สที่ไม่มีวันเริ่มต้น: ตรึงวันเริ่มผ่าน onPlanChange ก่อน onStartCourse', () => {
+    const plan = { ...mypathData.plan, courses: mypathData.plan.courses.map(c => c.courseId === 'PHY.0' ? { courseId: 'PHY.0', weeklyHours: 3 } : c) }
+    const { onStartCourse, onPlanChange } = renderMyPath({ ...mypathData, plan })
+    fireEvent.click(within(card(PHY0)).getByRole('button', { name: 'เรียนต่อ' }))
+    expect(onPlanChange.mock.calls[0][0].courses.find((c: { courseId: string }) => c.courseId === 'PHY.0')).toEqual({ courseId: 'PHY.0', weeklyHours: 3, startDate: TODAY }) // คอร์สแรกไม่มีวันเริ่ม = วันนี้
+    expect(onPlanChange.mock.invocationCallOrder[0]).toBeLessThan(onStartCourse.mock.invocationCallOrder[0])
   })
 })

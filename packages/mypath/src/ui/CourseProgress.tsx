@@ -1,4 +1,4 @@
-import { usePlan } from '../MyPathProvider'
+import { usePlan, useStartCourse } from '../MyPathProvider'
 import { fmtDate } from '../plan/dates'
 import { GOALS, progressState } from '../plan/progress'
 import flagIcon from '../assets/progress/flag.svg'
@@ -11,11 +11,12 @@ import HeaderButton from './HeaderButton'
 import { Play } from './icons'
 
 // port จาก src/prototype/mypath/CourseProgress.tsx (class course-progress → mp-progress) — Figma 20-46258 (การ์ด) + 3-37233 (สถานะแต่ละ step)
-// ต่างจาก prototype: % มาจาก data.progress, วันนี้มาจาก prop today ของ host, ปุ่มเรียนเรียก onStartCourse · แผงทดสอบอยู่ฝั่ง host
+// ต่างจาก prototype: % มาจาก data.progress, วันนี้มาจาก prop today ของ host, ปุ่มเรียนเรียก startCourse (ตรึงวันเริ่มเหมือนหน้ารายละเอียด) · แผงทดสอบอยู่ฝั่ง host
 export default function CourseProgress({ course }: { course: { id: string; start: string; end: string } }) {
-  const { plan, data, onStartCourse } = usePlan()
-  // ไม่มีค่า = ยังไม่เริ่ม · ค่านอก 0–100 บีบเข้าช่วงเหมือน setProgress ของ prototype
-  const raw = data.progress[course.id] ?? 0
+  const { plan, data } = usePlan()
+  const startCourse = useStartCourse()
+  // ไม่มีค่า/ไม่ใช่ตัวเลข = ยังไม่เริ่ม · ค่านอก 0–100 บีบเข้าช่วงเหมือน setProgress ของ prototype
+  const raw = data.progress[course.id] || 0
   const { value, next, passed, message } = progressState(course, Math.max(0, Math.min(100, raw)), plan.today)
   const label = value === 0 ? 'เริ่มเรียน' : value === 100 ? 'ทบทวน' : 'เรียนต่อ'
   return <div className="mp-progress">
@@ -37,7 +38,7 @@ export default function CourseProgress({ course }: { course: { id: string; start
         {message.egg && <img src={eggIcon} alt="" />}
       </span>
       {/* กันคลิก/คีย์ทะลุไปเปิดหน้ารายละเอียดคอร์สของการ์ด */}
-      <HeaderButton variant="primary" className="mp-progress-start" onClick={e => { e.stopPropagation(); onStartCourse(course.id) }} onKeyDown={e => e.stopPropagation()}>
+      <HeaderButton variant="primary" className="mp-progress-start" onClick={e => { e.stopPropagation(); startCourse(course.id) }} onKeyDown={e => e.stopPropagation()}>
         <Play size={14} />{label}
       </HeaderButton>
     </div>
