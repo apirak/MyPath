@@ -81,3 +81,12 @@ describe('ขอบเขต: เทสต์จับการ import ข้า
     expect(violations(file, source)).toEqual([])
   })
 })
+
+describe('ขอบเขต: CSS ของ SDK', () => {
+  it('ทุก selector อยู่ใต้ .mypath-root', () => {
+    const css = readFileSync(join(ROOT, 'packages/mypath/src/mypath.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+    const selectors = [...css.matchAll(/([^{}]+)\{/g)].map(([, s]) => s.trim()).filter(s => !s.startsWith('@')).flatMap(s => s.split(','))
+    expect(selectors.length).toBeGreaterThan(0)
+    expect(selectors.map(s => s.trim()).filter(s => !/^(\.mypath-root|:where\(\.mypath-root\))([\s.:[]|$)/.test(s))).toEqual([])
+  })
+})
