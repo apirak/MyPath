@@ -1,4 +1,5 @@
-// Prettier ไม่ตัดคอมเมนต์และ string — สคริปต์นี้กันบรรทัดเกิน 80 ตัวอักษรที่หลุดมา
+// Prettier does not wrap comments or strings; this catches lines over 80
+// characters that slip through.
 import { execSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 

@@ -1,29 +1,29 @@
-// ขอบเขต 3 ชั้น (docs/mypath-sdk-plan.md "แยก host กับ SDK"): host → SDK
-// ได้ทางเดียวผ่าน @learn/mypath
+// Layer boundary (docs/mypath-sdk-plan.md "แยก host กับ SDK"): the host
+// reaches the SDK only through @learn/mypath.
 import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 const ROOT = resolve(__dirname, '..')
 
-// import x from 'a' · import 'a' · import('a') · export … from 'a' · @import
-// 'a' (CSS)
+// import x from 'a' · import 'a' · import('a') · export … from 'a' ·
+// @import 'a' (CSS)
 const IMPORT = /(?:\bfrom\s*|\bimport\s*\(?\s*|@import\s+)(['"])([^'"]+)\1/g
 // @import url('a') · @import url(a) (CSS)
 const CSS_IMPORT_URL = /@import\s+url\(\s*(['"]?)([^'")\s]+)\1\s*\)/g
-// path ใน public/ ที่ SDK อ้างไม่ได้ — ตรวจทุก string รวม url() ของ CSS
-// ที่มักไม่มี quote
+// public/ paths the SDK must not reference. Checks every string, including
+// CSS url() which is often unquoted.
 const PUBLIC_PATH = /(['"`(])\/(?:mypath|cover)\//
 
-// file เป็น path จาก ROOT, คืนเหตุผลของทุกจุดที่ข้ามขอบเขต
+// `file` is relative to ROOT; returns a reason for every boundary crossing.
 function violations(file: string, source: string): string[] {
   const out: string[] = []
   for (const [, , spec] of [
     ...source.matchAll(IMPORT),
     ...source.matchAll(CSS_IMPORT_URL),
   ]) {
-    // relative และ '/…' (Vite resolve จาก root) → path จาก ROOT
-    // เพื่อเทียบกับโฟลเดอร์ของแต่ละชั้น
+    // Normalize relative and '/…' (Vite resolves from root) to ROOT-relative
+    // so they can be compared with each layer's folder.
     const local = spec.startsWith('.') || spec.startsWith('/')
     const target = spec.startsWith('.')
       ? relative(ROOT, resolve(ROOT, dirname(file), spec))
@@ -35,7 +35,7 @@ function violations(file: string, source: string): string[] {
     if (file.startsWith('packages/mypath/')) {
       if (local && !target.startsWith('packages/mypath/'))
         out.push(`ออกนอก package: ${spec}`)
-      // SDK ไม่มี dependency นอกจาก react (ไอคอนเป็น SVG ของ SDK เอง)
+      // The SDK depends only on react; its icons are its own SVGs.
       if (spec.startsWith('react-router') || spec === 'lucide-react')
         out.push(`dependency ของ host: ${spec}`)
     } else if (file.startsWith('src/host/')) {
@@ -106,18 +106,23 @@ describe('ขอบเขต: เทสต์จับการ import ข้า
   })
 })
 
+// Every SDK stylesheet; @import lines are skipped (they aren't selectors).
+const sdkCss = () =>
+  sourceFiles('packages/mypath/src')
+    .filter(file => file.endsWith('.css'))
+    .map(file => readFileSync(join(ROOT, file), 'utf8'))
+    .join('\n')
+    .replace(/^@import .*$/gm, '')
+
 describe('ขอบเขต: CSS ของ SDK', () => {
   it('ทุก selector อยู่ใต้ .mypath-root', () => {
-    const css = readFileSync(
-      join(ROOT, 'packages/mypath/src/mypath.css'),
-      'utf8',
-    ).replace(/\/\*[\s\S]*?\*\//g, '')
+    const css = sdkCss().replace(/\/\*[\s\S]*?\*\//g, '')
     const selectors = [...css.matchAll(/([^{}]+)\{/g)]
       .map(([, s]) => s.trim())
       .filter(s => !s.startsWith('@'))
       .flatMap(s => s.split(','))
     expect(selectors.length).toBeGreaterThan(0)
-    // ขั้นของ @keyframes (from/to/0%) ไม่ใช่ selector
+    // @keyframes steps (from/to/0%) are not selectors.
     expect(
       selectors
         .map(s => s.trim())
@@ -130,10 +135,7 @@ describe('ขอบเขต: CSS ของ SDK', () => {
   })
 
   it('ชื่อ @keyframes ขึ้นต้นด้วย mp- (ชื่อเป็น global ชนกับ host ได้)', () => {
-    const css = readFileSync(
-      join(ROOT, 'packages/mypath/src/mypath.css'),
-      'utf8',
-    )
+    const css = sdkCss()
     expect(
       [...css.matchAll(/@keyframes\s+([\w-]+)/g)]
         .map(([, name]) => name)
@@ -160,8 +162,8 @@ describe('ขอบเขต: package ของ SDK', () => {
     expect(Object.keys(pkg.exports)).toEqual(['.', './style.css'])
   })
 
-  // library mode ฝังทุกรูปเป็น data URI — คิดแบบ base64 (โตขึ้น 4/3)
-  // ซึ่งเป็นกรณีใหญ่สุด
+  // Library mode inlines every image as a data URI; assume base64 (4/3
+  // growth), the worst case.
   it('รูปที่ฝังใน bundle รวมกันไม่เกิน 100 KB', () => {
     const dir = join(ROOT, 'packages/mypath/src/assets')
     const bytes = (readdirSync(dir, { recursive: true }) as string[])

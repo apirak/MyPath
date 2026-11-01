@@ -1,7 +1,8 @@
 @import 'tailwindcss';
 
-/* My Path (แท็บ 3) = แอปเชลล์: fixed จึงไม่มี document scroll ให้ Safari
-   เด้งทั้งหน้า · SDK เติมช่องที่เหลือและ scroll ข้างในเอง · tab bar อยู่ล่าง */
+/* My Path (tab 3) is an app shell: fixed, so there is no document scroll
+   for Safari to rubber-band. The SDK fills the remaining space and scrolls
+   internally; the tab bar sits at the bottom. */
 .mypath-layout {
   position: fixed;
   inset: 0;

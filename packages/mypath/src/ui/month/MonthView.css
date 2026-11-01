@@ -1,0 +1,196 @@
+/* <MonthView>: agenda list of the selected month. */
+.mypath-root .mp-agenda {
+  margin-top: 14px;
+}
+
+.mypath-root .mp-today-callout {
+  border-radius: 16px;
+  background: var(--mp-primary);
+  padding: 20px;
+  color: #fff;
+}
+
+.mypath-root .mp-today-callout span {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mypath-root .mp-today-callout h2 {
+  margin: 4px 0;
+  font-size: 22px;
+}
+
+.mypath-root .mp-today-callout p {
+  margin: 0;
+  color: #d3e6ff;
+  font-size: 13px;
+}
+
+.mypath-root .mp-agenda-empty {
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  background: #fff;
+  padding: 28px;
+  text-align: center;
+  color: #6d757e;
+  font-size: 14px;
+}
+
+.mypath-root .mp-now-heading,
+.mypath-root .mp-date-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 20px 0 10px;
+}
+
+.mypath-root .mp-now-heading span {
+  color: #212529;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.mypath-root .mp-date-heading {
+  margin-top: 30px;
+}
+
+.mypath-root .mp-date-heading b {
+  color: #212529;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.mypath-root .mp-date-heading span {
+  color: #6d757e;
+  font-size: 13px;
+}
+
+.mypath-root .mp-date-heading i {
+  height: 1px;
+  flex: 1;
+  background: #dee2e6;
+}
+
+.mypath-root .mp-course-stack {
+  display: grid;
+  gap: 12px;
+}
+
+/* Course and exam cards. */
+.mypath-root .mp-course {
+  display: block;
+  overflow: hidden;
+  border: 1px solid #ced4da;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.mypath-root .mp-course.mp-done {
+  opacity: 0.62;
+}
+
+.mypath-root .mp-course-body {
+  display: flex;
+  gap: 12px;
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+.mypath-root .mp-course-body > img {
+  width: 128px;
+  height: 72px;
+  flex: none;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.mypath-root .mp-course-body > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.mypath-root .mp-plate {
+  width: 128px;
+  height: 72px;
+  flex: none;
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.2;
+  padding: 4px;
+}
+
+.mypath-root .mp-course-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mypath-root .mp-course-top b {
+  font-size: 16px;
+}
+
+.mypath-root .mp-course-top span {
+  overflow: hidden;
+  max-width: 130px;
+  border-radius: 999px;
+  background: #eaf1ff;
+  padding: 3px 7px;
+  color: #3a7ecf;
+  font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mypath-root .mp-course strong,
+.mypath-root .mp-course small {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mypath-root .mp-course strong {
+  margin-top: 3px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.mypath-root .mp-course small {
+  margin-top: 4px;
+  color: #6d757e;
+  font-size: 11px;
+}
+
+@media (max-width: 640px) {
+  .mypath-root .mp-course-body {
+    gap: 9px;
+    padding: 10px;
+  }
+  .mypath-root .mp-course-body > img,
+  .mypath-root .mp-plate {
+    width: 96px;
+    height: 54px;
+  }
+  .mypath-root .mp-plate {
+    font-size: 11px;
+  }
+  .mypath-root .mp-course-top b {
+    font-size: 14px;
+  }
+  .mypath-root .mp-course-top span {
+    display: none;
+  }
+  .mypath-root .mp-course strong {
+    font-size: 12px;
+    line-height: 17px;
+  }
+  .mypath-root .mp-course small {
+    font-size: 10px;
+  }
+}

@@ -1,6 +1,6 @@
 # My Path — Course Detail
 
-> **SDK** — `packages/mypath/src/ui/CourseDetail.tsx` (ใบ 07 #10) เปิดบน `/mypath` · ต้นแบบ prototype รวมเข้า main ผ่าน PR #1 (24 ต.ค. 69) และถูกลบใน #13 หลังตรวจครบเท่า SDK แล้ว — โค้ดเดิมดูได้ที่ tag `mockup-v1` (`src/mypath/CourseDetailOverlay.tsx`, `courseDetail.ts`) และ branch `prototype/course-detail`
+> **SDK** — `packages/mypath/src/ui/course/CourseDetail.tsx` (ใบ 07 #10) เปิดบน `/mypath` · ต้นแบบ prototype รวมเข้า main ผ่าน PR #1 (24 ต.ค. 69) และถูกลบใน #13 หลังตรวจครบเท่า SDK แล้ว — โค้ดเดิมดูได้ที่ tag `mockup-v1` (`src/mypath/CourseDetailOverlay.tsx`, `courseDetail.ts`) และ branch `prototype/course-detail`
 
 ## ผลการตัดสินและสถานะปัจจุบัน
 
@@ -8,10 +8,10 @@
 
 แบบที่ล็อก (24 ต.ค. 69 + ปรับเพิ่มวันเดียวกัน) ตามที่ SDK ทำอยู่:
 
-- **Bottom sheet ทุกขนาดจอ:** desktop ≥641px อยู่กลางจอ กว้างไม่เกิน 960px (641–900px เป็นสองคอลัมน์) · มือถือ ≤640px เต็มความกว้าง (CSS `mp-cdp-*` ใน `packages/mypath/src/mypath.css` คือของจริง) · **กฎ layout:** header ของชีทเป็น `flex:none` ห้ามยืดหด ชีทสูงไม่เกิน `100vh - 32px` และ `overflow:auto` เป็น fallback ให้จอสั้นมาก (เลื่อนทั้งใบแทนการล้นทับ)
+- **Bottom sheet ทุกขนาดจอ:** desktop ≥641px อยู่กลางจอ กว้างไม่เกิน 960px (641–900px เป็นสองคอลัมน์) · มือถือ ≤640px เต็มความกว้าง (CSS `mp-cdp-*` ใน `packages/mypath/src/ui/course/CourseDetail.css` คือของจริง) · **กฎ layout:** header ของชีทเป็น `flex:none` ห้ามยืดหด ชีทสูงไม่เกิน `100vh - 32px` และ `overflow:auto` เป็น fallback ให้จอสั้นมาก (เลื่อนทั้งใบแทนการล้นทับ)
 - **Cover** เป็นรูปย่อ 77×43 ข้างชื่อคอร์ส มาจาก `cover` ของคอร์สใน `data.catalog` (รูปเดียวกับการ์ด Month) · คอร์สที่ไม่มี `cover` ไม่แสดงรูป
 - **แผง/sheet ไม่มี border** — เฉพาะเงา
-- **ปุ่มเริ่มเรียน** (คอร์สที่ซื้อแล้ว = อยู่ใน `data.owned`) · คอร์สที่ยังไม่ซื้อเป็นปุ่ม "หาซื้อบน OnDemand" + ราคา — **ทุกปุ่มใช้ `HeaderButton` ของ SDK** (`packages/mypath/src/ui/HeaderButton.tsx`, copy จากของ host ที่หน้า Profile ใช้) · เริ่มเรียน = `variant="primary"` ส่วนที่เหลือเป็น secondary/ขาว (✕ ปิด = ไอคอน X ของ SDK ใน `ui/icons.tsx`)
+- **ปุ่มเริ่มเรียน** (คอร์สที่ซื้อแล้ว = อยู่ใน `data.owned`) · คอร์สที่ยังไม่ซื้อเป็นปุ่ม "หาซื้อบน OnDemand" + ราคา — **ทุกปุ่มใช้ `HeaderButton` ของ SDK** (`packages/mypath/src/ui/components/HeaderButton.tsx`, copy จากของ host ที่หน้า Profile ใช้) · เริ่มเรียน = `variant="primary"` ส่วนที่เหลือเป็น secondary/ขาว (✕ ปิด = ไอคอน X ของ SDK ใน `ui/components/icons.tsx`)
 - รายละเอียดเป็น **ระดับเล่ม** + บริบทแพ็ก (`data.courseDetails` → `data.packs`) · คอร์สที่ไม่มีใน `courseDetails` (10/25 ใน fixtures) แสดงการ์ดย่อ + ข้อความ "ยังไม่มีรายละเอียดเนื้อหาสำหรับคอร์สนี้"
 - คลิกได้จากทุกที่ที่คอร์สปรากฏ: แถบ All, เซลล์ All มือถือ, การ์ด Month (ป้ายสอบ/Mock ไม่รวม)
 - เปิดเป็น overlay บนหน้าเดิม · ปิดด้วย ✕ / คลิกฉากหลัง / Esc · สถานะเทียบ**วันนี้** (`today` ของ host; host จำลองส่ง `2026-12-05`)
@@ -32,12 +32,13 @@
 
 | ไฟล์ | หน้าที่ |
 |---|---|
-| `packages/mypath/src/ui/CourseDetail.tsx` | bottom sheet + `OpenCourseContext` / `courseButton` ที่การ์ด Month และแถบ/เซลล์ All ใช้เปิดชีท |
+| `packages/mypath/src/ui/course/CourseDetail.tsx` | bottom sheet |
+| `packages/mypath/src/ui/course/openCourse.ts` | `OpenCourseContext` / `courseButton` ที่การ์ด Month และแถบ/เซลล์ All ใช้เปิดชีท |
 | `packages/mypath/src/MyPath.tsx` | เก็บคอร์สที่เปิดอยู่เป็น state แล้ว mount `<CourseDetail>` |
 | `packages/mypath/src/MyPathProvider.tsx` | `useStartCourse()` ที่ปุ่มเริ่มเรียนใช้ร่วมกับแถบความคืบหน้า |
-| `packages/mypath/src/ui/useModal.ts` | โฟกัส/Esc/animation ปิด ใช้ร่วมกับแผงปฏิทินการเรียน |
-| `packages/mypath/src/mypath.css` | สไตล์ `mp-cdp-*` ใต้ `.mypath-root` — ปุ่มไม่มีสไตล์เอง ใช้ `HeaderButton` ของ SDK |
-| `packages/mypath/src/ui/HeaderButton.tsx` | ปุ่มกลาง — pushable (ขอบทึบ + หน้าปุ่มลอย) + variant primary/secondary |
+| `packages/mypath/src/ui/components/useModal.ts` | โฟกัส/Esc/animation ปิด ใช้ร่วมกับแผงปฏิทินการเรียน |
+| `packages/mypath/src/ui/course/CourseDetail.css` | สไตล์ `mp-cdp-*` ใต้ `.mypath-root` — ปุ่มไม่มีสไตล์เอง ใช้ `HeaderButton` ของ SDK |
+| `packages/mypath/src/ui/components/HeaderButton.tsx` | ปุ่มกลาง — pushable (ขอบทึบ + หน้าปุ่มลอย) + variant primary/secondary |
 | `src/host/fixtures/mypath.json` | `courseDetails` / `packs` / `prices` / `catalog[].cover` — mirror ของ SAMPLE_DATA (แพ็ก MATH/PHY + ExamGym ×3 + ราคา) |
 
 แม็ปข้อมูล: MATH.1–5 ← TCAS70_Math · PHY.1–7 ← TCAS70_Physic · EX ×3 ← Exam_GYM_* · ที่เหลือไม่มีรายละเอียด (ดู `SAMPLE_DATA/courses.md` § รายละเอียดคอร์ส)

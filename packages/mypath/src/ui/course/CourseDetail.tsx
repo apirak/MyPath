@@ -1,40 +1,14 @@
-import { createContext, type CSSProperties, type KeyboardEvent } from 'react'
-import type { MyPathProps, StudentCourse } from '../types'
-import { usePlan, useStartCourse } from '../MyPathProvider'
-import type { PlannedCourse } from '../plan/buildPlan'
-import { withCourse } from '../plan/timeline'
-import HeaderButton from './HeaderButton'
-import { X } from './icons'
-import { useModal } from './useModal'
+import type { CSSProperties } from 'react'
+import type { MyPathProps, StudentCourse } from '../../types'
+import { usePlan, useStartCourse } from '../../MyPathProvider'
+import type { PlannedCourse } from '../../plan/buildPlan'
+import { withCourse } from '../../plan/timeline'
+import HeaderButton from '../components/HeaderButton'
+import { X } from '../components/icons'
+import { useModal } from '../components/useModal'
 
-// port จาก src/prototype/mypath/CourseDetailOverlay.tsx — bottom sheet
-// ทุกขนาดจอ (class cdp- → mp-cdp-)
-// ต่างจาก prototype: คอร์สที่เปิดเป็น state ของ <MyPath> (ไม่มี ?course=,
-// ไม่แตะ history), การตั้งค่าส่งแผนทั้งก้อนผ่าน onPlanChange
-// และปุ่มซื้อ/เริ่มเรียนเรียก callback ของ host แทน window.open
-
-// การ์ดคอร์สใน Month/All เรียกตัวนี้เพื่อเปิดหน้ารายละเอียด
-export const OpenCourseContext = createContext<(courseId: string) => void>(
-  () => {},
-)
-
-// props ของการ์ด/แถบคอร์สที่กดเปิดรายละเอียดได้ — กด Enter หรือ Space
-// ได้เหมือนปุ่ม
-export const courseButton = (
-  open: (courseId: string) => void,
-  courseId: string,
-) => ({
-  role: 'button',
-  tabIndex: 0,
-  onClick: () => open(courseId),
-  onKeyDown: (event: KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      open(courseId)
-    }
-  },
-})
-
+// Course sheet (bottom sheet on every screen size). Edits send the whole plan
+// via onPlanChange (ADR-0003); buy/start call back into the host.
 type Props = Pick<MyPathProps, 'onBuyCourse'> & {
   courseId: string
   onClose: () => void
@@ -89,13 +63,13 @@ export default function CourseDetail({
 }: Props) {
   const { plan, data, onPlanChange } = usePlan()
   const startCourse = useStartCourse()
-  // ชีทเป็น modal: โฟกัสอยู่ในชีท คืนโฟกัสให้การ์ด/แถบที่เปิดตอนปิด
   const { ref: sheet, closing, close } = useModal<HTMLElement>(onClose)
   const subject = plan.subjects.find(s =>
     s.courses.some(c => c.id === courseId),
   )
   const course = subject?.courses.find(c => c.id === courseId)
-  if (!subject || !course) return null // host เอาวิชาออกจากแผนระหว่างเปิดอยู่
+  // The host may drop the subject from the plan while the sheet is open.
+  if (!subject || !course) return null
 
   const change = (patch: Partial<StudentCourse>) =>
     onPlanChange(withCourse(data.plan, course.id, patch))
@@ -169,8 +143,8 @@ export default function CourseDetail({
             <div className="mp-cdp-weekly">
               <div>
                 <span>เวลาเรียนต่อสัปดาห์</span>
-                {/* ปิดการตามค่า = คงชั่วโมงที่กำลังรับมาไว้เป็นค่าของคอร์สนี้
-                    (เหมือน setCourseFollowPreviousWeeklyHours) */}
+                {/* Unfollowing keeps the inherited hours as this course's
+                    own value, so the slider doesn't jump. */}
                 <label className="mp-cdp-follow" title={noPrevious}>
                   <input
                     aria-label="ตาม Course ก่อนหน้า"

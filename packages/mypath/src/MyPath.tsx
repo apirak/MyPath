@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import type { MyPathProps, MyPathView } from './types'
 import { MyPathProvider } from './MyPathProvider'
-import AllView from './ui/AllView'
-import CourseDetail, { OpenCourseContext } from './ui/CourseDetail'
-import MonthView from './ui/MonthView'
+import AllView from './ui/all/AllView'
+import CourseDetail from './ui/course/CourseDetail'
+import { OpenCourseContext } from './ui/course/openCourse'
+import MonthView from './ui/month/MonthView'
 
-// host ให้กล่องที่มีความสูงแน่นอน — .mypath-root เติมเต็มกล่อง header นิ่ง
-// scroll อยู่ใน .mp-scroll
-// Month/All, เดือนที่เลือก และคอร์สที่เปิดอยู่เป็น state ภายใน (ไม่ใช้ router)
-// — เดือนอยู่ที่นี่จึงไม่หายตอนสลับไป All
+// The host must give a box with a fixed height: .mypath-root fills it, the
+// header stays put and only .mp-scroll scrolls.
+// Month/All, the selected month and the open course are internal state (no
+// router). The month lives here so it survives switching to All and back.
 export default function MyPath({
   data,
   today,
@@ -17,11 +18,11 @@ export default function MyPath({
   onStartCourse,
 }: MyPathProps) {
   const [mode, setMode] = useState<MyPathView['mode']>('month')
-  const [month, setMonth] = useState<string>() // ไม่มี = เดือนของวันนี้
-  // หน้ารายละเอียดคอร์สที่เปิดอยู่
+  const [month, setMonth] = useState<string>() // undefined = Today's month
   const [course, setCourse] = useState<string>()
   const [slide, setSlide] = useState(false)
-  // เปลี่ยนโหมดแล้วหน้ารายละเอียดคอร์สปิด (View state และ deep link)
+  // Switching mode closes the course detail (docs/mypath-sdk-plan.md, View
+  // state and deep link).
   const onModeChange = (next: MyPathView['mode']) => {
     setMode(next)
     setSlide(true)
@@ -46,7 +47,7 @@ export default function MyPath({
           ) : (
             <AllView onModeChange={onModeChange} slide={slide} />
           )}
-          {/* key: เปิดคอร์สใหม่ = เริ่ม animation เปิดใหม่ */}
+          {/* key: opening another course replays the open animation */}
           {course && (
             <CourseDetail
               key={course}

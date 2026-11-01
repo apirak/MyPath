@@ -1,19 +1,19 @@
 import { useState } from 'react'
-import type { MyPathView } from '../types'
-import HeaderButton from './HeaderButton'
-import { CalendarDays, ChevronLeft, ChevronRight } from './icons'
-import StudyCalendar from './StudyCalendar'
+import type { MyPathView } from '../../types'
+import HeaderButton from '../components/HeaderButton'
+import { CalendarDays, ChevronLeft, ChevronRight } from '../components/icons'
+import StudyCalendar from '../calendar/StudyCalendar'
 
 export type ModeProps = {
   onModeChange: (mode: MyPathView['mode']) => void
-  // สลับแท็บมาแล้ว — เลื่อน pill ตอน mount (ไม่เลื่อนตอนเปิดหน้าครั้งแรก)
+  // Arrived via a tab switch: animate the pill on mount, but not on first load
   slide: boolean
 }
 
 type PathHeaderProps = ModeProps & {
   mode: MyPathView['mode']
   period: string
-  now?: boolean // period นี้คือเดือนของวันนี้ — ไฮไลต์ตัวหนังสือ
+  now?: boolean // period is Today's month: highlight it
   showNavigation?: boolean
   canPrev?: boolean
   canNext?: boolean
@@ -21,10 +21,9 @@ type PathHeaderProps = ModeProps & {
   onNext?: () => void
 }
 
-// port จาก src/prototype/components/PathHeader.tsx — Month/All สลับ state
-// ภายในแทน <Link>
-// แผงปฏิทินการเรียนเป็น state ของ header: สลับ Month/All = header ของอีกโหมด
-// mount ใหม่ แผงจึงปิด (View state และ deep link)
+// The study calendar panel is header state on purpose: switching Month/All
+// mounts the other mode's header, which closes the panel
+// (docs/mypath-sdk-plan.md, View state and deep link).
 export default function PathHeader({
   mode,
   onModeChange,

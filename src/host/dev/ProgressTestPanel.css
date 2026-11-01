@@ -1,5 +1,4 @@
-/* แผงทดสอบความคืบหน้าของ host — copy จาก
-   src/prototype/mypath/CourseProgress.css */
+/* Host-side progress test panel (dev only). */
 .progress-test-toggle {
   position: fixed;
   right: 16px;

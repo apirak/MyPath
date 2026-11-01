@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-// แผงปฏิทินการเรียนของ SDK: ทุกการแก้สร้างแผนใหม่ด้วย withStudyCalendar
-// แล้วส่งผ่าน onPlanChange
+// Study calendar panel: every edit builds a new plan via withStudyCalendar
+// and emits it through onPlanChange.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
@@ -90,7 +90,7 @@ describe('เปิด/ปิดแผง', () => {
     openPanel()
     expect(screen.getByRole('dialog', { name: 'ปฏิทินการเรียน' })).toBeTruthy()
     fireEvent.click(screen.getByLabelText('ปิดปฏิทินการเรียน'))
-    expect(panel()).toBeTruthy() // ยังเล่น animation ปิด
+    expect(panel()).toBeTruthy() // still playing the close animation
     act(() => {
       vi.advanceTimersByTime(280)
     })
@@ -175,7 +175,7 @@ describe('การแก้ส่งแผนผ่าน onPlanChange', () => 
     const onPlanChange = renderMyPath()
     openPanel()
     fireEvent.click(screen.getByRole('button', { name: 'ตั้งค่าวันพิเศษ' }))
-    // วันที่เลือกตอนเปิดคือ 12 ธ.ค. ซึ่งเป็นวันพิเศษอยู่แล้ว
+    // The picker opens on 12 Dec, which is already a Special study day.
     fireEvent.click(screen.getByRole('button', { name: 'ลบข้อยกเว้น' }))
     expect(onPlanChange.mock.calls[0][0].calendar.specialDays).toEqual([])
   })
@@ -194,7 +194,7 @@ describe('การแก้ส่งแผนผ่าน onPlanChange', () => 
     ])
     fireEvent.change(screen.getAllByLabelText('เรียนได้ต่อวัน')[2], {
       target: { value: '0' },
-    }) // [วันธรรมดา, วันหยุด, ช่วงแรก]
+    }) // inputs: [weekday, weekend, first School break]
     expect(onPlanChange.mock.calls[1][0].calendar.breaks).toEqual([
       { ...calendar.breaks[0], hours: 0 },
     ])

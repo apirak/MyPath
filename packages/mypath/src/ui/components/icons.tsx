@@ -1,6 +1,6 @@
 /*
- * path ของไอคอนในไฟล์นี้ copy จาก Lucide (https://lucide.dev) — เก็บ license
-   ไว้ตาม docs/mypath-sdk-plan.md "Workspace และ package"
+ * Icon paths in this file are copied from Lucide (https://lucide.dev); the
+ * licenses are kept as docs/mypath-sdk-plan.md (Workspace section) requires.
  *
  * ISC License
  *
@@ -20,8 +20,8 @@
  *
  * ---
  *
- * ChevronLeft, ChevronRight, ArrowRight, X, Plus, Trash2 มาจาก Lucide ที่
-   derive จาก Feather:
+ * ChevronLeft, ChevronRight, ArrowRight, X, Plus, Trash2 are Lucide icons
+ * derived from Feather:
  *
  * The MIT License (MIT)
  * Copyright (c) 2013-present Cole Bemis
@@ -45,14 +45,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-// ไอคอนเป็น SVG ของ SDK เอง (SDK ไม่มี dependency นอกจาก react) — path เดียวกับ
-// lucide-react ที่ prototype ใช้
+// Inline SVGs instead of lucide-react: the SDK's only dependency is react.
 import type { SVGProps } from 'react'
 
 type IconProps = SVGProps<SVGSVGElement> & { size?: number }
 
-// props แบบ lucide: size / fill / className / strokeWidth และ SVG prop
-// อื่นส่งต่อได้หมด
+// Lucide-compatible props: size plus any SVG prop is passed through.
 const Icon = ({ size = 24, children, ...props }: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

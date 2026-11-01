@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { MyPath, type StudentPlan } from '@learn/mypath'
-// แบบวิธี A: ตอน verify:package ที่ใช้ dist (ตอน dev ซ้ำกับที่ index.ts import
-// อยู่แล้ว)
+// Option A: needed for verify:package against dist (in dev it duplicates
+// the import index.ts already does).
 import '@learn/mypath/style.css'
 import BottomNav from '../components/BottomNav'
 import ProgressTestPanel from '../dev/ProgressTestPanel'
@@ -9,12 +9,12 @@ import { TODAY, mypathData } from '../fixtures'
 
 const SHOP_URL = 'https://shoponline.ondemand.in.th'
 
-// แท็บ 3 ของ host: .mypath-layout เต็มจอ — SDK เติมช่องที่เหลือ, tab bar
-// เป็นของ host
+// Host tab 3: full-screen .mypath-layout. The SDK fills the remaining space;
+// the tab bar belongs to the host.
 export default function MyPathTab() {
-  // controlled: SDK ส่งแผนใหม่ host เก็บแล้วส่งกลับ
+  // Controlled: the SDK emits a new plan, the host stores and passes it back.
   const [plan, setPlan] = useState<StudentPlan>(mypathData.plan)
-  // แผงทดสอบแก้ได้
+  // Editable from the test panel.
   const [progress, setProgress] = useState(mypathData.progress)
   const [today, setToday] = useState(TODAY)
   const data = { ...mypathData, plan, progress }

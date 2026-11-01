@@ -1,5 +1,5 @@
-// ฟังก์ชันล้วนของหน้า All: snap วันเริ่มไปวันจันทร์
-// และแก้วันเริ่มต้นโดยไม่แตะแผนเดิม
+// Pure helpers behind the All view: snapping a start date to Monday and
+// changing a start date without mutating the input plan.
 import { describe, expect, it } from 'vitest'
 import { MS, u } from '../../packages/mypath/src/plan/dates'
 import {
@@ -11,7 +11,8 @@ import type { StudentPlan } from '../../packages/mypath/src/types'
 import { mypathData } from '../../src/host/fixtures'
 
 describe('snapToMonday', () => {
-  // สัปดาห์ของ จ. 7 ธ.ค. 69: จ.–พฤ. ปัดลงไป 7, ศ.–อา. ปัดขึ้นไป 14
+  // Week of Mon 7 Dec 2026: Mon–Thu round down to the 7th, Fri–Sun up to
+  // the 14th.
   it.each([
     ['2026-12-07', '2026-12-07'],
     ['2026-12-08', '2026-12-07'],
@@ -71,8 +72,8 @@ describe('withCourseStartDate', () => {
 })
 
 describe('calendarBudgetForWeek', () => {
-  // สัปดาห์ 7 ธ.ค. มีวันพิเศษ (เสาร์ 12 ธ.ค. = 5 ชม.), สัปดาห์ 21 ธ.ค.
-  // อยู่ในช่วงปิดเทอม (2 ชม./วัน)
+  // Week of 7 Dec has a Special study day (Sat 12 Dec = 5 h); week of 21 Dec
+  // falls in a School break (2 h/day).
   it.each([
     ['2026-12-07', 13],
     ['2026-12-21', 14],

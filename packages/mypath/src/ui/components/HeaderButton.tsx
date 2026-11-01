@@ -2,8 +2,7 @@ import type { ButtonHTMLAttributes } from 'react'
 
 export type HeaderButtonVariant = 'secondary' | 'primary'
 
-// copy จาก src/prototype/components/HeaderButton.tsx (class เปลี่ยนเป็น mp-) —
-// ปุ่มดันได้ 2 ชั้น ขอบทึบอยู่กับที่ หน้าปุ่มเลื่อนขึ้นลง
+// Two-layer push button: the solid edge stays put while the face moves.
 export default function HeaderButton({
   variant = 'secondary',
   className = '',

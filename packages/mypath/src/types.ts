@@ -1,14 +1,19 @@
-// สัญญาข้อมูลของ <MyPath> — ตามหัวข้อ "สัญญาข้อมูล" ใน docs/mypath-sdk-plan.md
-// ทุกตัวอักษร
-export type ISODate = string // 'YYYY-MM-DD' วันในปฏิทินตามเวลาไทย
+// The <MyPath> data contract. Must match the data contract section of
+// docs/mypath-sdk-plan.md exactly.
+
+// 'YYYY-MM-DD', a calendar day in Thai time (Asia/Bangkok). Malformed dates
+// are treated as absent.
+export type ISODate = string
 
 export type MyPathProps = {
   data: MyPathData
-  today?: ISODate // ไม่ส่ง = วันตามเวลาไทยจากนาฬิกาเครื่อง
-  onPlanChange: (plan: StudentPlan) => void // แผนทั้งก้อน
+  today?: ISODate // omitted = today in Thai time from the device clock
+  onPlanChange: (plan: StudentPlan) => void // always the whole plan
   onBuyCourse: (courseId: string) => void
   onStartCourse: (courseId: string) => void
-  view?: MyPathView // ไม่ส่ง = SDK เก็บเอง (ดู View state และ deep link)
+  // Omitted = the SDK keeps view state itself (docs/mypath-sdk-plan.md,
+  // View state and deep link).
+  view?: MyPathView
   onViewChange?: (view: MyPathView) => void
 }
 
@@ -16,15 +21,15 @@ export type MyPathProps = {
 export type MyPathView = { mode: 'month' | 'all'; month: string }
 
 export type MyPathData = {
-  catalog: SubjectGroup[] // ลำดับใน array = ลำดับที่แสดง
+  catalog: SubjectGroup[] // array order = display order
   plan: StudentPlan
-  events: ExamEvent[] // เฉพาะที่เกี่ยวกับนักเรียนคนนี้
-  owned: string[] // id ของคอร์สและ Mock ที่ซื้อแล้ว
+  events: ExamEvent[] // only those relevant to this student
+  owned: string[] // ids of purchased courses and Mocks
   progress: Record<string, number> // courseId → 0–100
-  // courseId → บาท จำนวนเต็ม
+  // courseId → whole THB
   prices: Record<string, { now: number; was?: number }>
-  packs: Record<string, PackInfo> // packId → แพ็ก
-  // courseId → รายละเอียด (ไม่มี = คอร์สไม่มีรายละเอียด)
+  packs: Record<string, PackInfo> // packId → pack
+  // courseId → detail (missing = a no-detail course)
   courseDetails: Record<string, CourseDetail>
 }
 
@@ -35,7 +40,7 @@ export type CatalogSubject = {
   name: string
   color: string
   courses: CourseCatalogItem[]
-} // courses เรียงตามลำดับเล่ม
+} // courses in volume order
 export type CourseCatalogItem = {
   id: string
   name: string
@@ -45,24 +50,24 @@ export type CourseCatalogItem = {
   cover?: string
 }
 
-// --- แผนเรียน (สิ่งที่นักเรียนแก้ได้ และสิ่งเดียวที่ SDK ส่งกลับ) ---
+// --- Student plan: what the student can edit, and all the SDK sends back ---
 export type StudentPlan = { calendar: StudyCalendar; courses: StudentCourse[] }
 export type StudyCalendar = {
   weekdayHours: number
   weekendHours: number
   specialDays: { date: ISODate; hours: number }[]
   breaks: { id: number; start: ISODate; end: ISODate; hours: number }[]
-  subjects: string[] // id ของวิชาที่เรียน
+  subjects: string[] // ids of Enabled subjects
 }
 export type StudentCourse = {
   courseId: string
   startDate?: ISODate
   followPrevious?: boolean
-  weeklyHours?: number // 1–10, ไม่มี = 5
+  weeklyHours?: number // 1–10, missing = 5
   followPreviousWeeklyHours?: boolean
 }
 
-// --- วันสอบ ---
+// --- exam dates ---
 export type ExamEvent = {
   id: string
   date: ISODate
@@ -70,7 +75,7 @@ export type ExamEvent = {
   kind: 'exam' | 'mock'
 }
 
-// --- รายละเอียดคอร์ส ---
+// --- course detail ---
 export type CourseDetail = {
   packId?: string
   volume?: Volume

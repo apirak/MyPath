@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// library mode: รูปฝังเป็น data URI เสมอ, CSS รวมเป็น dist/style.css
-// (docs/mypath-sdk-plan.md "Build และ publish")
+// Library mode: images are always inlined as data URIs and all CSS is bundled
+// into dist/style.css, so hosts need no asset pipeline
+// (docs/mypath-sdk-plan.md, Build section).
 export default defineConfig({
   plugins: [react()],
   build: {

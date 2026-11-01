@@ -1,0 +1,98 @@
+/* <HeaderButton>: pressable 3D button. The button is the layout box, __edge
+   is the static solid side, __front is the raised face that moves on press. */
+.mypath-root .mp-header-button {
+  --mp-hb-face: #fff;
+  --mp-hb-ink: #212529;
+  --mp-hb-border: #dee2e6;
+  --mp-hb-edge: #dee2e6;
+  position: relative;
+  display: inline-flex;
+  border: 0;
+  padding: 0;
+  min-height: 40px;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--mp-hb-ink);
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transform: translateY(2px);
+}
+
+.mypath-root .mp-header-button--primary {
+  --mp-hb-face: var(--mp-primary);
+  --mp-hb-ink: #fff;
+  --mp-hb-border: var(--mp-primary);
+  --mp-hb-edge: #03548b;
+}
+
+.mypath-root .mp-header-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.mypath-root .mp-header-button:focus-visible {
+  outline-offset: 2px;
+}
+
+.mypath-root .mp-header-button__edge {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--mp-hb-edge);
+}
+
+.mypath-root .mp-header-button__front {
+  position: relative;
+  align-self: stretch;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: inherit;
+  background: var(--mp-hb-face);
+  border: 2px solid var(--mp-hb-border);
+  border-bottom: 0;
+  padding: 8px 12px;
+  transform: translateY(-4px);
+  transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+  will-change: transform;
+}
+
+.mypath-root .mp-header-button--plain .mp-header-button__front {
+  border: 0;
+}
+
+.mypath-root .mp-header-button--secondary.mp-header-button--plain {
+  --mp-hb-edge: #ffffff80;
+}
+
+@media (hover: hover) {
+  .mypath-root .mp-header-button:hover .mp-header-button__front {
+    transform: translateY(-6px);
+    transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+  }
+}
+
+.mypath-root .mp-header-button:active .mp-header-button__front {
+  transform: translateY(-2px);
+  transition: transform 34ms ease;
+}
+
+.mypath-root .mp-header-button:disabled {
+  cursor: default;
+}
+
+.mypath-root .mp-header-button:disabled .mp-header-button__front {
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mypath-root .mp-header-button__front,
+  .mypath-root .mp-header-button:hover .mp-header-button__front {
+    transform: none;
+    transition: none;
+  }
+}

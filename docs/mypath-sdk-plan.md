@@ -69,7 +69,7 @@ packages/mypath/            ← SDK (ไม่รู้จักโค้ดใ�
   src/plan/                 ← buildPlan, progress (ฟังก์ชันล้วน)
   src/ui/                   ← Month, AllTimeline, CourseDetail, StudyCalendar, Progress, PathHeader, HeaderButton
   src/assets/               ← ไอคอน + รูปที่ SDK ใช้เอง
-  src/mypath.css            ← CSS ทั้งหมดของ SDK ครอบด้วย .mypath-root
+  src/mypath.css            ← index ที่ @import CSS ข้างแต่ละ component (ทุก selector ใต้ .mypath-root)
 src/host/                   ← Learn Anywhere จำลอง
   pages/                    ← Home, Courses, Profile, MyPathTab (แท็บ 3 = <MyPath data=… />)
   components/               ← BottomNav, HeaderButton
@@ -536,7 +536,7 @@ type MyPathProps = {
 
 - ใช้ **pnpm workspaces** (`packages: ['packages/*']` ใน `pnpm-workspace.yaml`) เพราะ repo ใช้ pnpm อยู่แล้ว ส่วน host ติดตั้งด้วย npm ได้ตามปกติ
 - `peerDependencies`: `react`, `react-dom` เท่านั้น ช่วง `^19.0.0` ทั้งคู่ (Learn Anywhere ใช้ React ล่าสุด) ถ้าวันหลังต้องรองรับ 18 การขยายช่วงลงเป็น minor
-- **ไอคอนเป็น SVG ของ SDK เอง ไม่ใช้ `lucide-react`:** copy path ของไอคอนที่ใช้ (ประมาณ 8–9 ตัว) จาก lucide มาเป็น component ใน `packages/mypath/src/ui/icons.tsx` รับ props `size` / `fill` / `className` แบบเดียวกับ lucide และเก็บข้อความ license ISC ของ lucide ไว้บนไฟล์. host ใช้ lucide ของตัวเองต่อได้ตามปกติ
+- **ไอคอนเป็น SVG ของ SDK เอง ไม่ใช้ `lucide-react`:** copy path ของไอคอนที่ใช้ (ประมาณ 8–9 ตัว) จาก lucide มาเป็น component ใน `packages/mypath/src/ui/components/icons.tsx` รับ props `size` / `fill` / `className` แบบเดียวกับ lucide และเก็บข้อความ license ISC ของ lucide ไว้บนไฟล์. host ใช้ lucide ของตัวเองต่อได้ตามปกติ
   **เหตุผล:** SDK ไม่มี dependency นอกจาก React ทั้งวิธี A และ B host ไม่ต้องติดตั้งอะไรเพิ่ม (ถ้า bundle lucide วิธี B ซึ่ง compile source ตรงๆ จะบังคับให้ host ติดตั้ง lucide เอง) และไม่ชนกันถ้า host ใช้ lucide คนละ major. ข้อเสียคือไอคอนใหม่ต้อง copy เอง ซึ่งรับได้เพราะใช้ไม่ถึงสิบตัว
 
 ### รูปและ CSS

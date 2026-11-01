@@ -1,13 +1,11 @@
 import HeaderButton from './HeaderButton'
 import { ArrowRight } from './icons'
-import cap from '../assets/graduate-cap.png'
+import cap from '../../assets/graduate-cap.png'
 
-// copy จาก src/prototype/mypath/PlanEmptyState.tsx —
-// ยังไม่ได้เลือกวิชาที่เรียน: ใช้แทนรายการ Month
-// ลูกศรลายดินสอ "วางแผนด้วยตนเอง" ชี้ขึ้นไปที่ปุ่มปฏิทินการเรียน (มุมขวาบนของ
-// PathHeader)
-// แบนเนอร์ตาม Figma "MyPath / Header" (69:19093) — ระบบช่วยวางแผนยังไม่มี
-// ปุ่มจึงยังไม่ทำอะไร
+// Replaces the Month list while there are no Enabled subjects. The pencil
+// arrow points up at the study calendar button (top right of PathHeader).
+// Banner per Figma "MyPath / Header" (69:19093); the planning assistant does
+// not exist yet, so its button does nothing.
 export default function PlanEmptyState() {
   return (
     <section className="mp-pes">

@@ -4,8 +4,8 @@ import { buildPlan, type Plan } from './plan/buildPlan'
 import { isISODate, thaiToday } from './plan/dates'
 import { withCourse } from './plan/timeline'
 
-// แผนที่คิดแล้วของ <MyPath> แต่ละตัว — ไม่มี state ระดับ module
-// จึงวางหลายตัวพร้อมกันได้โดยไม่ปนกัน
+// Computed plan per <MyPath> instance. No module-level state, so several
+// instances can be mounted at once without leaking into each other.
 const PlanContext = createContext<{
   plan: Plan
   data: MyPathData
@@ -13,8 +13,9 @@ const PlanContext = createContext<{
   onStartCourse: MyPathProps['onStartCourse']
 } | null>(null)
 
-// shortcut: ไม่ส่ง today = อ่านนาฬิกาตอน render เท่านั้น ยังไม่คิดวันใหม่ตอน
-// visibilitychange/เที่ยงคืน — เพิ่มเมื่อ host จริงไม่ส่ง today
+// shortcut: without a today prop the clock is read only on render, so Today
+// does not roll over at midnight or on visibilitychange; add that once a real
+// host omits today.
 export function MyPathProvider({
   data,
   today,
@@ -24,7 +25,7 @@ export function MyPathProvider({
 }: Pick<MyPathProps, 'data' | 'today' | 'onPlanChange' | 'onStartCourse'> & {
   children: ReactNode
 }) {
-  const day = isISODate(today) ? today : thaiToday() // today ผิดรูป = ไม่ได้ส่ง
+  const day = isISODate(today) ? today : thaiToday() // malformed = not sent
   const { catalog, plan: studentPlan, events } = data
   const plan = useMemo(
     () => buildPlan({ catalog, plan: studentPlan, events, today: day }),
@@ -43,11 +44,11 @@ export function usePlan() {
   return value
 }
 
-// ปุ่ม "เริ่มเรียน" ทุกจุด (หน้ารายละเอียด, แถบความคืบหน้า) —
-// คอร์สที่ยังเลื่อนตามวันนี้/เล่มก่อน (ไม่มีวันเริ่มต้น
-// หรือวันผิดรูปที่แผนไม่สนใจ)
-// ตรึงวันเริ่มที่คิดได้ตอนนี้ก่อน (docs/mypath-sdk-plan.md "เริ่มเรียน"
-// ตรึงวันเริ่ม)
+// Every "start learning" button (course detail, progress bar) goes through
+// here. A course whose start still floats with Today or the previous volume
+// (no valid start date) gets its current computed start pinned first, so it
+// stops moving once the student begins (docs/mypath-sdk-plan.md, section on
+// starting a course pinning the start date).
 export function useStartCourse() {
   const { plan, data, onPlanChange, onStartCourse } = usePlan()
   return (courseId: string) => {

@@ -1,10 +1,10 @@
-// Characterization: บันทึกข้อความความคืบหน้า (progressState) ทุก branch
-// ไว้เป็นค่าอ้างอิง — snapshot บันทึกไว้ตอนยังเป็น prototype (tag mockup-v1)
-// ตอนนี้คิดด้วย SDK
+// Characterization: pins the progressState message for every branch.
+// Snapshots were recorded from the prototype (tag mockup-v1); the SDK must
+// still match them.
 import { describe, expect, it } from 'vitest'
 import { progressState } from '../../packages/mypath/src/plan/progress'
 
-// คอร์ส 30 วัน: เป้าแรก (30%) = 2027-01-10, เป้าสอง (70%) = 2027-01-22
+// 30-day course: first target (30%) = 2027-01-10, second (70%) = 2027-01-22
 const course = { id: 'CHAR.1', start: '2027-01-01', end: '2027-01-31' }
 
 const cases: { name: string; value: number; today: string }[] = [
