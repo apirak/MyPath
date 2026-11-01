@@ -45,6 +45,18 @@ Lets a learner choose which subjects are enabled, set their usual available stud
 - Sliders are visually cloned from the course weekly-hours control; this panel allows 0 (“พัก”).
 - This is a frontend mock: changes persist only while the app runs.
 
+## SDK version (`/mypath`, ใบ 08 #11)
+
+port ไว้ที่ `packages/mypath/src/ui/StudyCalendar.tsx` เปิดจากปุ่ม "ปฏิทินการเรียน" ใน `PathHeader` ของ SDK (CSS ใน `mypath.css` class `mp-scp-*` ใต้ `.mypath-root` รวมสองไฟล์ของ prototype เป็นชุดเดียว เฉพาะ rule ที่ใช้จริง) หน้าตาเหมือน prototype ทั้ง desktop และ mobile ต่างกันตรงนี้:
+
+- **แผงเป็น state ภายในของ header** ไม่มี URL และไม่แตะ history. ปิดด้วย ✕ / คลิกฉากหลัง / **Esc** (animation 280ms) และสลับ Month/All แล้วแผงปิด (ข้อสรุป #4) · แผงเป็น modal: โฟกัสเข้าแผง Tab วนในแผง ปิดแล้วโฟกัสกลับปุ่ม (hook `useModal` ใช้ร่วมกับหน้ารายละเอียดคอร์ส)
+- **ทุกการแก้ส่งแผนทั้งก้อนผ่าน `onPlanChange`** (helper ล้วน `withStudyCalendar` ใน `plan/timeline.ts` แทน `setStudyCalendar`) หน้าจอเปลี่ยนเมื่อ host ส่งแผนกลับ. ช่วงปิดเทอมที่ซ้อนกัน, เริ่มหลังจบ หรือวันผิดรูป = ไม่ส่ง ช่องกลับเป็นค่าเดิม. `courses` ไม่ถูกแตะ จึงปิดวิชาแล้วเปิดกลับมาได้ค่าเดิม
+- **วิชามาจาก `data.catalog`** (กลุ่มและลำดับตาม host, เก็บเป็น id ใน `calendar.subjects`) · id วิชาที่ไม่มีใน catalog ไม่นับใน "เปิด N จาก M" แต่ยังอยู่ในแผนที่ส่งกลับ
+- ปฏิทินวันพิเศษยังเป็น ธ.ค. 2569 เดือนเดียว และช่วงปิดเทอมใหม่เริ่ม 10–17 ม.ค. 70 เหมือน prototype (ไม่ตาม `today`)
+- เทสต์: `tests/sdk/studyCalendar.test.tsx`
+
 ## Open questions
+
+- SDK: ปฏิทินวันพิเศษและค่าเริ่มต้นของช่วงปิดเทอมใหม่ยังผูกกับ ธ.ค. 2569 / ม.ค. 2570 ตาม prototype — ควรตาม `today` หรือเลื่อนเดือนได้หรือไม่ (ต้องตัดสินก่อนใช้จริงข้ามปีการศึกษา)
 
 - Holidays and special-day capacity do not reschedule course end dates; the plan remains weekly.
