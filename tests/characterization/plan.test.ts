@@ -5,7 +5,7 @@ import { MS, u, isoOf } from '../../packages/mypath/src/plan/dates'
 import { calendarBudgetForWeek, calendarHoursForDay } from '../../packages/mypath/src/plan/timeline'
 import { TODAY, mypathData } from '../../src/host/fixtures'
 
-const { subjects, axis } = buildPlan({ ...mypathData, today: TODAY })
+const { subjects, axis, totalHours, scheduledHoursByDay } = buildPlan({ ...mypathData, today: TODAY })
 const { calendar } = mypathData.plan
 
 describe('แผนเรียน: วิชาที่เรียน', () => {
@@ -27,6 +27,22 @@ describe('แผนเรียน: วิชาที่เรียน', () =>
 describe('แผนเรียน: แกน', () => {
   it('ช่วงแกนและเดือนบนแกน', () => {
     expect({ AXIS_START: axis.start, AXIS_END: axis.end, TOTAL_DAYS: axis.totalDays, axisLabel: axis.label, axisMonths: axis.months }).toMatchSnapshot()
+  })
+})
+
+// บันทึกตอนลบ prototype (#13) แทน oracle เดิมที่เทียบค่าเหล่านี้กับ prototype — ค่าเท่ากับ prototype ณ ตอนนั้น
+describe('แผนเรียน: ชั่วโมงตามแผน, เส้นเดือน, สีวิชา', () => {
+  it('ชั่วโมงตามแผนรวมรายสัปดาห์ (กราฟชั่วโมงเรียน/สัปดาห์ของ All)', () => {
+    const weeks: Record<string, number> = {}
+    for (const [iso, hours] of scheduledHoursByDay) {
+      const day = u(iso), monday = isoOf(day - ((new Date(day).getUTCDay() + 6) % 7) * MS)
+      weeks[monday] = +((weeks[monday] ?? 0) + hours).toFixed(4)
+    }
+    expect({ totalHours, weeks }).toMatchSnapshot()
+  })
+
+  it('เส้นเดือนบนแกนและสีของวิชา', () => {
+    expect({ monthLines: axis.monthLines, colors: subjects.map(s => `${s.name} ${s.color}`) }).toMatchSnapshot()
   })
 })
 
