@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Path SDK Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single reading column (~760px) with wide figures breaking out to ~980px; sections follow the reader's question order: what, how to plug in, what students feel, when. */
+:root{
+  --bg:#f6f7fb; --surface:#ffffff; --fg:#1c2233; --muted:#5d6579; --line:#d9dde8;
+  --in:#2f5fd0;      /* props flowing into the SDK (exam blue) */
+  --out:#0f8a6c;     /* callbacks flowing out to host */
+  --mock:#c8413b;    /* removed / not allowed */
+  --soft-in:#e7eefc; --soft-out:#e3f4ee; --soft-mock:#fbe9e8; --chip:#eef0f6;
+  --display:"Sarabun",system-ui,sans-serif;
+  --body:"Sarabun",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12151d; --surface:#1a1e29; --fg:#e6e9f2; --muted:#9aa2b6; --line:#2f3545;
+  --in:#7ea2ff; --out:#4fd1a8; --mock:#ff7f78;
+  --soft-in:#1f2a46; --soft-out:#173229; --soft-mock:#3a1f22; --chip:#252a38; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151d; --surface:#1a1e29; --fg:#e6e9f2; --muted:#9aa2b6; --line:#2f3545;
+  --in:#7ea2ff; --out:#4fd1a8; --mock:#ff7f78;
+  --soft-in:#1f2a46; --soft-out:#173229; --soft-mock:#3a1f22; --chip:#252a38; color-scheme:dark}
+
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+.wide{width:min(980px,calc(100vw - 32px));margin-left:50%;transform:translateX(-50%)}
+h1,h2,h3{font-family:var(--display);line-height:1.25;text-wrap:balance;margin:0}
+h1{font-size:2.3rem;font-weight:700}
+h2{font-size:1.6rem;font-weight:600}
+h3{font-size:1.1rem;font-weight:600}
+p{margin:0}
+section{display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:1.15rem;color:var(--fg)}
+.muted{color:var(--muted)}
+code{font-family:var(--mono);font-size:.88em;background:var(--chip);padding:1px 5px;border-radius:4px}
+pre{font-family:var(--mono);font-size:.84rem;line-height:1.55;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin:0;overflow-x:auto}
+pre code{background:none;padding:0}
+figure{margin:0;display:flex;flex-direction:column;gap:10px}
+figure .scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+figure svg{display:block;width:100%;height:auto;min-width:720px;color:var(--fg)}
+figcaption{font-size:.9rem;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+.tbl{overflow-x:auto}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--display);font-weight:600;font-size:.88rem;color:var(--muted)}
+.pill{display:inline-block;font-size:.75rem;font-family:var(--mono);padding:1px 8px;border-radius:99px;white-space:nowrap}
+.p-svg{background:var(--soft-in);color:var(--in)}
+.p-mer{background:var(--soft-out);color:var(--out)}
+.p-asc{background:var(--chip);color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.two>*{min-width:0}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.box ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.box.do{border-top:3px solid var(--out)}
+.box.dont{border-top:3px solid var(--mock)}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:36px 1fr;gap:12px;counter-increment:s}
+.steps li::before{content:counter(s);font-family:var(--display);font-weight:700;width:30px;height:30px;border-radius:50%;
+  background:var(--soft-in);color:var(--in);display:grid;place-items:center;font-size:.95rem}
+.steps li>div{min-width:0;display:flex;flex-direction:column;gap:4px}
+.ux{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.ux .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.ux .card h3{font-size:1rem}
+.cmp{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:.9rem}
+.cmp b{font-family:var(--mono);font-weight:500;font-size:.75rem;padding-top:3px}
+.cmp .was{color:var(--muted)}
+.cmp .now{color:var(--fg)}
+.who{font-size:.78rem;color:var(--muted);font-family:var(--mono)}
+.note{border-left:3px solid var(--mock);background:var(--soft-mock);padding:12px 16px;border-radius:0 8px 8px 0;font-size:.95rem}
+.mermaid{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;overflow-x:auto}
+@media (max-width:640px){.two,.ux{grid-template-columns:1fr}h1{font-size:1.8rem}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,theme:matchMedia("(prefers-color-scheme: dark)").matches?"dark":"default"});</script>
+</head>
+<body>
+
+<div class="wrap">
+
+<header style="display:flex;flex-direction:column;gap:14px">
+  <span class="eyebrow">แผนก่อน implement · issue #7 – #14 · 1 พ.ย. 2569</span>
+  <h1>My Path SDK: ทีม Learn Anywhere จะใช้งานยังไง และนักเรียนจะเห็นอะไรต่างไป</h1>
+  <p class="lede">My Path ที่ตอนนี้เป็น mockup ในแอปเดียว จะถูกแยกเป็น package <code>@learn/mypath</code> ที่ export component เดียวคือ <code>&lt;MyPath&gt;</code>. Learn Anywhere เป็นเจ้าของข้อมูลทั้งหมด ส่งข้อมูลเข้ามาเป็น props และรับการเปลี่ยนแปลงกลับผ่าน callback. หน้าตาเหมือน prototype ทุกจุด ยกเว้น 11 ข้อที่ตั้งใจเปลี่ยน ส่วนใหญ่เป็นเรื่องปุ่ม back และวันเริ่มคอร์ส</p>
+  <p class="muted" style="font-size:.9rem">ที่มา: <code>docs/mypath-sdk-plan.md</code>, <code>docs/mypath-integration.md</code>, ADR-0001 ถึง 0003 และ GitHub Issues ของ apirak/MyPath</p>
+</header>
+
+<section>
+  <span class="eyebrow">ก่อนอ่าน</span>
+  <h2>ภาพแต่ละแบบเหมาะกับอะไร</h2>
+  <p>ไม่มีแบบไหนดีที่สุดทุกเรื่อง หน้านี้เลือกตามสิ่งที่ภาพต้องบอก</p>
+  <div class="tbl"><table>
+    <tr><th>แบบ</th><th>ใช้กับ</th><th>เหตุผล</th></tr>
+    <tr><td><span class="pill p-svg">SVG</span></td><td>สัญญา host ↔ SDK, before/after, history ของปุ่ม back</td><td>คุมตำแหน่งได้แม่น วางของสองฝั่งให้เทียบกันได้ ใส่สีความหมาย (ขาเข้า/ขาออก) และเปลี่ยนตามธีมสว่าง/มืดได้</td></tr>
+    <tr><td><span class="pill p-mer">Mermaid</span></td><td>ลำดับเหตุการณ์ (sequence) และกราฟ ticket</td><td>เรื่องที่สำคัญคือ "อะไรเกิดก่อน" หรือ "อะไรรออะไร" ให้ Mermaid จัด layout เอง แก้ง่ายตอนแผนเปลี่ยน</td></tr>
+    <tr><td><span class="pill p-asc">ASCII</span></td><td>โครงโฟลเดอร์</td><td>dev อ่านใน terminal / PR อยู่แล้ว copy ไปวางใน docs ได้ทันที</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <span class="eyebrow">ภาพรวม</span>
+  <h2>อะไรย้ายไปอยู่ตรงไหน</h2>
+  <figure class="wide">
+    <div class="scroll">
+    <svg viewBox="0 0 940 330" role="img" aria-label="ก่อน: ทุกอย่างอยู่ในแอป Vite เดียว ผูกกับ router, CSS global และลิงก์ไป ONDEMAND_URL เอง. หลัง: host ถือ router API shop player ส่วน SDK มีแค่ UI การคำนวณ และ CSS ที่มี scope">
+      <defs>
+        <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+      </defs>
+      <!-- BEFORE -->
+      <text x="20" y="22" font-size="13" font-weight="600" fill="currentColor">ตอนนี้: prototype (tag mockup-v1)</text>
+      <rect x="20" y="36" width="380" height="280" rx="10" fill="none" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="36" y="60" font-size="12" fill="currentColor" opacity=".7">Vite app เดียว · BrowserRouter ครอบทั้งแอป</text>
+      <g font-size="12" fill="currentColor">
+        <rect x="36" y="74" width="348" height="34" rx="6" fill="var(--chip)"/><text x="48" y="96">pages/MyPath.tsx ใช้ &lt;Link to="/mypath"&gt; (ผูก router)</text>
+        <rect x="36" y="116" width="348" height="34" rx="6" fill="var(--chip)"/><text x="48" y="138">plan.ts + mock data + DAY_START = 2026-08-01</text>
+        <rect x="36" y="158" width="348" height="34" rx="6" fill="var(--chip)"/><text x="48" y="180">index.css ไฟล์เดียว: Tailwind + CSS ทุกหน้าปนกัน</text>
+        <rect x="36" y="200" width="348" height="34" rx="6" fill="var(--chip)"/><text x="48" y="222">ไอคอน lucide-react, รูปจาก /public/mypath</text>
+        <rect x="36" y="242" width="348" height="34" rx="6" fill="var(--soft-mock)"/><text x="48" y="264" fill="var(--mock)">ปุ่มซื้อ/เริ่มเรียน → เปิด ONDEMAND_URL ตรงๆ</text>
+      </g>
+      <text x="36" y="302" font-size="11" fill="currentColor" opacity=".6">ทีมอื่นเอาไปใช้ไม่ได้ถ้าไม่ copy ทั้งแอป</text>
+
+      <!-- arrow -->
+      <line x1="412" y1="176" x2="468" y2="176" stroke="currentColor" stroke-width="1.5" marker-end="url(#a1)"/>
+
+      <!-- AFTER -->
+      <text x="480" y="22" font-size="13" font-weight="600" fill="currentColor">หลัง: host + package</text>
+      <rect x="480" y="36" width="200" height="280" rx="10" fill="none" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="494" y="60" font-size="12" font-weight="600" fill="currentColor">Learn Anywhere (host)</text>
+      <g font-size="12" fill="currentColor">
+        <rect x="494" y="74" width="172" height="34" rx="6" fill="var(--chip)"/><text x="506" y="96">router + URL</text>
+        <rect x="494" y="116" width="172" height="34" rx="6" fill="var(--chip)"/><text x="506" y="138">API + backend</text>
+        <rect x="494" y="158" width="172" height="34" rx="6" fill="var(--chip)"/><text x="506" y="180">toMyPathData()</text>
+        <rect x="494" y="200" width="172" height="34" rx="6" fill="var(--chip)"/><text x="506" y="222">ร้านค้า / player</text>
+        <rect x="494" y="242" width="172" height="34" rx="6" fill="var(--chip)"/><text x="506" y="264">Tailwind, lucide</text>
+      </g>
+      <line x1="690" y1="150" x2="736" y2="150" stroke="var(--in)" stroke-width="1.6" marker-end="url(#a1)" color="var(--in)"/>
+      <text x="713" y="140" font-size="11" text-anchor="middle" fill="var(--in)">props</text>
+      <line x1="736" y1="200" x2="690" y2="200" stroke="var(--out)" stroke-width="1.6" marker-end="url(#a1)" color="var(--out)"/>
+      <text x="713" y="220" font-size="11" text-anchor="middle" fill="var(--out)">on…()</text>
+      <rect x="744" y="36" width="180" height="280" rx="10" fill="var(--soft-in)" stroke="var(--in)" stroke-opacity=".6"/>
+      <text x="758" y="60" font-size="12" font-weight="600" fill="var(--in)">@learn/mypath</text>
+      <g font-size="12" fill="currentColor">
+        <text x="758" y="94">&lt;MyPath&gt; ตัวเดียว</text>
+        <text x="758" y="122">buildPlan() ฟังก์ชันล้วน</text>
+        <text x="758" y="150">UI: Month, All, Course</text>
+        <text x="758" y="166">detail, ปฏิทิน, Progress</text>
+        <text x="758" y="194">mypath.css ใต้</text>
+        <text x="758" y="210">.mypath-root</text>
+        <text x="758" y="238">ไอคอน SVG + รูปฝังเอง</text>
+        <text x="758" y="266">peer: react ^19 เท่านั้น</text>
+      </g>
+      <text x="758" y="300" font-size="11" fill="var(--mock)">ไม่มี API · localStorage · analytics</text>
+    </svg>
+    </div>
+    <figcaption>ทุกอย่างที่ Learn Anywhere ตัวจริงมีอยู่แล้ว (router, API, ร้านค้า, Tailwind) ย้ายไปเป็นของ host. SDK เหลือแค่สิ่งที่เป็นของ My Path จริงๆ และไม่ยิงข้อมูลออกไปไหนเอง (PDPA, DP-001)</figcaption>
+  </figure>
+</section>
+
+<section>
+  <span class="eyebrow">Developer experience · 1</span>
+  <h2>สัญญาระหว่าง host กับ SDK</h2>
+  <p>ทีม Learn Anywhere ต้องเข้าใจภาพนี้ภาพเดียวก็พอ: ข้อมูลไหลเข้าทาง props (สีน้ำเงิน) การกระทำของนักเรียนไหลออกทาง callback (สีเขียว) ไม่มีทางอื่น</p>
+  <figure class="wide">
+    <div class="scroll">
+    <svg viewBox="0 0 940 440" role="img" aria-label="Host ส่ง data และ today เข้า MyPath. MyPath ส่ง onPlanChange ไปบันทึก แล้ว host ส่งแผนกลับเข้า data. onBuyCourse ไปร้านค้า onStartCourse ไป player. view และ onViewChange เชื่อมกับ URL แบบไม่บังคับ">
+      <defs>
+        <marker id="ai" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--in)"/></marker>
+        <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--out)"/></marker>
+        <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+      </defs>
+      <text x="20" y="20" font-size="13" font-weight="600" fill="currentColor">Learn Anywhere (host)</text>
+      <text x="920" y="20" font-size="13" font-weight="600" fill="var(--in)" text-anchor="end">@learn/mypath</text>
+
+      <g font-size="12.5" fill="currentColor">
+        <rect x="20" y="34" width="250" height="44" rx="8" fill="var(--chip)"/><text x="36" y="61">API ของ Learn Anywhere</text>
+        <rect x="20" y="108" width="250" height="44" rx="8" fill="var(--chip)" stroke="var(--in)"/><text x="36" y="135">toMyPathData() ← host เขียนเอง</text>
+        <rect x="20" y="182" width="250" height="44" rx="8" fill="var(--chip)" stroke-dasharray="4 3" stroke="currentColor" stroke-opacity=".5"/><text x="36" y="209">URL / router (ไม่บังคับ)</text>
+        <rect x="20" y="256" width="250" height="44" rx="8" fill="var(--chip)"/><text x="36" y="283">savePlan → backend</text>
+        <rect x="20" y="320" width="250" height="44" rx="8" fill="var(--chip)"/><text x="36" y="347">ร้านค้า (เล่มเดี่ยว / ทั้งแพ็ก)</text>
+        <rect x="20" y="384" width="250" height="44" rx="8" fill="var(--chip)"/><text x="36" y="411">player</text>
+      </g>
+      <line x1="145" y1="80" x2="145" y2="106" stroke="currentColor" stroke-width="1.3" marker-end="url(#ag)"/>
+      <!-- loop save -> back into adapter -->
+      <path d="M20,278 C-2,278 -2,130 18,130" fill="none" stroke="var(--in)" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ai)" transform="translate(6,0)"/>
+
+      <!-- boundary -->
+      <line x1="470" y1="34" x2="470" y2="428" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="2 5"/>
+      <text x="470" y="436" font-size="10.5" text-anchor="middle" fill="currentColor" opacity=".65">import ได้ทางเดียว host → '@learn/mypath' (มีเทสต์ scan)</text>
+
+      <!-- arrows -->
+      <line x1="272" y1="130" x2="636" y2="130" stroke="var(--in)" stroke-width="1.8" marker-end="url(#ai)"/>
+      <text x="454" y="120" font-size="12" text-anchor="middle" fill="var(--in)">data = { catalog, plan, events, owned, progress, prices, packs, courseDetails }</text>
+      <text x="454" y="148" font-size="11" text-anchor="middle" fill="var(--in)">today? 'YYYY-MM-DD' เวลาไทย (ไม่ส่ง = นาฬิกาเครื่อง)</text>
+
+      <line x1="272" y1="204" x2="636" y2="204" stroke="currentColor" stroke-opacity=".7" stroke-width="1.4" stroke-dasharray="5 4" marker-start="url(#ag)" marker-end="url(#ag)"/>
+      <text x="454" y="196" font-size="12" text-anchor="middle" fill="currentColor">view ⇄ onViewChange  { mode: 'month'|'all', month: 'YYYY-MM' }</text>
+
+      <line x1="636" y1="278" x2="272" y2="278" stroke="var(--out)" stroke-width="1.8" marker-end="url(#ao)"/>
+      <text x="454" y="270" font-size="12" text-anchor="middle" fill="var(--out)">onPlanChange(แผนทั้งก้อน)</text>
+      <text x="454" y="294" font-size="11" text-anchor="middle" fill="var(--out)">host บันทึกแล้วส่งกลับเข้า data.plan ไม่ส่งกลับ = จอกลับไปแผนเดิม</text>
+
+      <line x1="636" y1="342" x2="272" y2="342" stroke="var(--out)" stroke-width="1.8" marker-end="url(#ao)"/>
+      <text x="454" y="334" font-size="12" text-anchor="middle" fill="var(--out)">onBuyCourse(courseId)</text>
+
+      <line x1="636" y1="406" x2="272" y2="406" stroke="var(--out)" stroke-width="1.8" marker-end="url(#ao)"/>
+      <text x="454" y="398" font-size="12" text-anchor="middle" fill="var(--out)">onStartCourse(courseId)</text>
+
+      <!-- SDK box -->
+      <rect x="640" y="34" width="280" height="394" rx="12" fill="var(--soft-in)" stroke="var(--in)" stroke-opacity=".6"/>
+      <text x="658" y="62" font-size="14" font-weight="600" fill="currentColor">&lt;MyPath /&gt;</text>
+      <g font-size="12" fill="currentColor">
+        <text x="658" y="94" opacity=".7">SDK เก็บเองเป็น UI state</text>
+        <text x="658" y="116">• Month / All และเดือนที่ดู</text>
+        <text x="658" y="136">• หน้ารายละเอียดคอร์สที่เปิด</text>
+        <text x="658" y="156">• แผงปฏิทินการเรียน</text>
+        <text x="658" y="176">• แผนชั่วคราวระหว่างลากคอร์ส</text>
+        <text x="658" y="214" opacity=".7">คำนวณเอง</text>
+        <text x="658" y="236">• buildPlan(catalog, plan, today)</text>
+        <text x="658" y="256">• เป้า 30% / 70% (ธง / ถ้วย)</text>
+        <text x="658" y="276">• จัดรูปแบบ ฿3,900 และวันที่ไทย</text>
+      </g>
+      <rect x="656" y="318" width="248" height="94" rx="8" fill="var(--soft-mock)"/>
+      <g font-size="12" fill="var(--mock)">
+        <text x="670" y="342" font-weight="600">ไม่ทำเด็ดขาด</text>
+        <text x="670" y="362">✕ ยิง API   ✕ localStorage</text>
+        <text x="670" y="382">✕ analytics   ✕ แตะ browser history</text>
+        <text x="670" y="402">✕ import react-router / Tailwind</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption>ขอบเขตทางเดียว: host import SDK ได้ผ่านชื่อ package อย่างเดียว SDK import อะไรจาก host ไม่ได้เลย. เส้นประเรื่อง URL ไม่บังคับ host ที่ไม่ต้องการ deep link ไม่ต้องเขียนอะไรเพิ่ม</figcaption>
+  </figure>
+</section>
+
+<section>
+  <span class="eyebrow">Developer experience · 2</span>
+  <h2>สิ่งที่ทีม host ต้องทำ</h2>
+  <ol class="steps">
+    <li><div><h3>ติดตั้ง</h3><p>เลือกหนึ่งวิธี ตอนนี้แนะนำ A แต่ยังไม่เปิดใช้จนกว่าจะคุยกับทีม Learn Anywhere</p></div></li>
+    <li><div><h3>วาง <code>&lt;MyPath&gt;</code> ในแท็บที่ 3</h3><p>ให้กล่องที่สูงแน่นอน SDK เติมเต็มและ scroll ข้างในเอง ไม่รู้ว่ามี tab bar</p></div></li>
+    <li><div><h3>เขียน <code>toMyPathData()</code> จุดเดียว</h3><p>แปลง response ของ API เป็น <code>MyPathData</code>. ถ้า SDK เปลี่ยนรูปข้อมูล TypeScript จะเตือนที่ฟังก์ชันนี้ที่เดียว</p></div></li>
+    <li><div><h3>บันทึกเมื่อ <code>onPlanChange</code> แล้วส่งแผนกลับ</h3><p>บันทึกทับได้เลย ไม่ต้อง merge (last write wins) แนะนำอัปเดตจอก่อนรอ server</p></div></li>
+    <li><div><h3>ทำ endpoint ฝั่ง backend</h3><p>catalog, แผนของนักเรียน, วันสอบ, ความคืบหน้า และบันทึกแผน. ความรับผิดชอบ PDPA เรื่องจัดเก็บและความยินยอมผู้ปกครองอยู่ที่ host</p></div></li>
+  </ol>
+
+<pre><code>import { MyPath } from '@learn/mypath'
+import '@learn/mypath/style.css'          // วิธี A เท่านั้น
+
+&lt;div className="h-full"&gt;
+  &lt;MyPath
+    data={toMyPathData(res)}
+    onPlanChange={savePlan}
+    onBuyCourse={id =&gt; navigate(`/shop/${id}`)}
+    onStartCourse={id =&gt; navigate(`/learn/${id}`)}
+  /&gt;
+&lt;/div&gt;</code></pre>
+
+  <div class="tbl"><table>
+    <tr><th>วิธีติดตั้ง</th><th>เหมาะกับ</th><th>สิ่งที่ dev ต้องรู้</th></tr>
+    <tr><td><b>A.</b> tarball จาก GitHub Release</td><td>ใช้งานจริง (แนะนำ)</td><td>ได้ไฟล์ build แล้ว ปักเวอร์ชันชัด ขึ้นเวอร์ชันต้องแก้ URL เอง</td></tr>
+    <tr><td><b>B.</b> git submodule</td><td>ไม่อยากพึ่ง registry</td><td>ตั้ง alias + <code>dedupe: ['react','react-dom']</code>, CI ต้อง checkout submodule, ห้าม install ข้างใน vendor</td></tr>
+    <tr><td><b>C.</b> <code>file:</code> link</td><td>แก้สอง repo พร้อมกัน</td><td>บนเครื่อง dev เท่านั้น ลืม dedupe = <code>Invalid hook call</code></td></tr>
+  </table></div>
+
+  <div class="two">
+    <div class="box do"><h3>ไม่ต้องทำ</h3><ul>
+      <li>ติดตั้ง react-router, Tailwind หรือ lucide เพื่อ SDK</li>
+      <li>สร้าง <code>StudentCourse</code> ให้ครบทุกคอร์ส</li>
+      <li>เขียน reducer ซ้ำกับ SDK (ได้แผนทั้งก้อนกลับมา)</li>
+      <li>จัดการ loading/error ภายใน My Path</li>
+      <li>แปลงเวลาเอง ถ้าไม่ต้องการยึดเวลา server</li>
+    </ul></div>
+    <div class="box dont"><h3>ต้องระวัง</h3><ul>
+      <li>React และ React DOM <code>^19</code></li>
+      <li>CSP ต้องอนุญาต <code>img-src data:</code></li>
+      <li>ห้ามเขียน style ทับ <code>.mypath-root</code> / <code>mp-*</code></li>
+      <li>อย่าสลับระหว่างส่งกับไม่ส่ง <code>view</code> ขณะ component ยังอยู่</li>
+      <li>วันที่ทุกตัวเป็น <code>'YYYY-MM-DD'</code> เวลาไทย, วิชาอ้างด้วย id</li>
+    </ul></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Developer experience · 3</span>
+  <h2>ลำดับ callback ที่ host จะเห็น</h2>
+  <p>สองจังหวะที่ dev มักถาม: ลากคอร์สแล้วยิงกี่ครั้ง และกด "เริ่มเรียน" แล้วเกิดอะไร</p>
+<pre class="mermaid">
+sequenceDiagram
+    actor S as นักเรียน
+    participant M as MyPath (SDK)
+    participant H as Host
+    participant B as Backend
+    Note over S,M: ลากหัวคอร์สในหน้า All
+    S->>M: ลาก (หลายวัน)
+    M->>M: เก็บแผนชั่วคราว snap วันจันทร์
+    S->>M: ปล่อยเมาส์
+    M->>H: onPlanChange(แผนทั้งก้อน) ครั้งเดียว
+    H->>M: data.plan ใหม่ (อัปเดตจอทันที)
+    H->>B: savePlan
+    Note over S,M: กดเริ่มเรียน คอร์สที่ยังไม่มีวันเริ่ม
+    S->>M: กด เริ่มเรียน
+    M->>H: onPlanChange(ตรึง startDate = วันนี้)
+    M->>H: onStartCourse(courseId)
+    H->>S: เปิด player
+</pre>
+  <p class="muted" style="font-size:.9rem">slider, สวิตช์ และช่องวันที่ยิงทันทีทุกครั้งที่เปลี่ยน. ปฏิทินการเรียนยิงเฉพาะเมื่อค่าผ่านการตรวจแล้ว เช่น ช่วงปิดเทอมไม่ซ้อนกัน</p>
+</section>
+
+<section>
+  <span class="eyebrow">User experience · 1</span>
+  <h2>ปุ่ม back ทำงานต่างไป</h2>
+  <p>นี่คือความต่างที่นักเรียนจะรู้สึกมากที่สุด สถานการณ์: เข้า My Path ที่ ธ.ค. กด › 3 ครั้งไปดูเดือนสอบ มี.ค. แล้วสลับไป All</p>
+  <figure class="wide">
+    <div class="scroll">
+    <svg viewBox="0 0 940 250" role="img" aria-label="Prototype push ทุกครั้งที่เลื่อนเดือน ประวัติมี 6 รายการ ต้องกด back 5 ครั้งถึงออกจาก My Path. SDK replace ตอนเลื่อนเดือน และ push เฉพาะตอนสลับ Month All ประวัติมี 3 รายการ กด back 2 ครั้งก็ออก">
+      <g font-size="12" fill="currentColor">
+        <text x="20" y="34" font-weight="600">Prototype</text>
+        <text x="20" y="52" opacity=".65">push ทุกครั้ง</text>
+        <rect x="150" y="18" width="110" height="40" rx="6" fill="var(--chip)"/><text x="205" y="43" text-anchor="middle">Home</text>
+        <rect x="270" y="18" width="110" height="40" rx="6" fill="var(--soft-mock)"/><text x="325" y="43" text-anchor="middle">?month=12</text>
+        <rect x="390" y="18" width="110" height="40" rx="6" fill="var(--soft-mock)"/><text x="445" y="43" text-anchor="middle">?month=01</text>
+        <rect x="510" y="18" width="110" height="40" rx="6" fill="var(--soft-mock)"/><text x="565" y="43" text-anchor="middle">?month=02</text>
+        <rect x="630" y="18" width="110" height="40" rx="6" fill="var(--soft-mock)"/><text x="685" y="43" text-anchor="middle">?month=03</text>
+        <rect x="750" y="18" width="110" height="40" rx="6" fill="var(--chip)" stroke="currentColor" stroke-opacity=".5"/><text x="805" y="43" text-anchor="middle">/all</text>
+        <text x="150" y="84" fill="var(--mock)">back 5 ครั้งถึงออก · กด X ปิดคอร์สก็ push ?course= เพิ่มอีก</text>
+
+        <line x1="20" y1="112" x2="920" y2="112" stroke="currentColor" stroke-opacity=".15"/>
+
+        <text x="20" y="150" font-weight="600" fill="var(--in)">SDK + host</text>
+        <text x="20" y="168" opacity=".65">mode เปลี่ยน = push</text>
+        <text x="20" y="184" opacity=".65">mode เท่าเดิม = replace</text>
+        <rect x="150" y="134" width="110" height="40" rx="6" fill="var(--chip)"/><text x="205" y="159" text-anchor="middle">Home</text>
+        <rect x="270" y="134" width="230" height="40" rx="6" fill="var(--soft-in)"/><text x="385" y="159" text-anchor="middle">?month=12 → 03 (replace ×3)</text>
+        <rect x="510" y="134" width="110" height="40" rx="6" fill="var(--soft-in)" stroke="var(--in)"/><text x="565" y="159" text-anchor="middle">/all?month=03</text>
+        <text x="150" y="202" fill="var(--in)">back ครั้งแรก → กลับ Month มี.ค. · back ครั้งที่สอง → ออกจาก My Path</text>
+        <text x="150" y="224" opacity=".7">SDK ไม่แตะ history เลย หน้าคอร์สและแผงปฏิทินปิดด้วย X, คลิกพื้นหลัง หรือ Esc</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption>กติกา push/replace เป็นหน้าที่ของ host ใน 1 บรรทัด (<code>replace: next.mode === view.mode</code>). host จำลองใน repo นี้ทำเป็นตัวอย่าง</figcaption>
+  </figure>
+</section>
+
+<section>
+  <span class="eyebrow">User experience · 2</span>
+  <h2>ความต่างจาก prototype ที่ตั้งใจ</h2>
+  <p>นอกจากรายการนี้ หน้าจอต้องตรงกับ prototype ทุกแถวใน checklist ของ #13 (desktop 1440×900, mobile 375×812). ความต่างอื่นที่เจอ = ไม่ผ่าน</p>
+  <div class="ux">
+    <div class="card"><h3>คอร์สแรกที่ยังไม่มีวันเริ่ม เริ่มที่วันนี้</h3>
+      <div class="cmp"><b>เดิม</b><span class="was">เริ่ม 1 ส.ค. 69 เสมอ (DAY_START)</span><b>ใหม่</b><span class="now">เริ่มวันนี้ และเลื่อนตามวันนี้จนกว่าจะเลือกวันหรือกด "เริ่มเรียน"</span></div>
+      <span class="who">นักเรียนเห็นเมื่อเปิดวิชาใหม่</span></div>
+    <div class="card"><h3>"เริ่มเรียน" ตรึงวันเริ่ม</h3>
+      <div class="cmp"><b>เดิม</b><span class="was">กดแล้วเปิดเว็บ OnDemand</span><b>ใหม่</b><span class="now">บันทึกวันเริ่มลงแผน แล้ว host พาไป player ของ Learn Anywhere</span></div>
+      <span class="who">ธง/ถ้วยเป้า 30/70% เลยกำหนดได้จริง</span></div>
+    <div class="card"><h3>ปุ่มซื้อพาไปร้านค้าของ host</h3>
+      <div class="cmp"><b>เดิม</b><span class="was">ลิงก์ ONDEMAND_URL ตายตัว</span><b>ใหม่</b><span class="now">host ตัดสินเองว่าเปิดเล่มเดี่ยวหรือทั้งแพ็ก</span></div>
+      <span class="who">นักเรียนอยู่ในแอปต่อ</span></div>
+    <div class="card"><h3>เดือนนอกแผนถูกบีบเข้าขอบ</h3>
+      <div class="cmp"><b>เดิม</b><span class="was">กระโดดกลับเดือนของวันนี้</span><b>ใหม่</b><span class="now">ไปเดือนแรก/สุดท้ายของแผนที่ใกล้ที่สุด</span></div>
+      <span class="who">เช่น ย่นคอร์สตอนดูเดือนสุดท้าย หรือเปิดลิงก์เก่าจาก LINE</span></div>
+    <div class="card"><h3>สลับ Month/All แล้วหน้าภายในปิด</h3>
+      <div class="cmp"><b>เดิม</b><span class="was">พก ?course= ข้ามแท็บ</span><b>ใหม่</b><span class="now">หน้ารายละเอียดคอร์สและแผงปฏิทินปิดให้</span></div>
+      <span class="who">กด back แล้วไม่รู้สึกว่า back เสีย</span></div>
+    <div class="card"><h3>รายละเอียดเล็กที่แก้ให้ถูก</h3>
+      <div class="cmp"><b>ราคา</b><span class="now">ราคาเดิมขีดฆ่าจริง (prototype แสดง <code>&lt;s&gt;</code> เป็นตัวหนังสือ)</span><b>Esc</b><span class="now">ปิดแผงปฏิทินการเรียนได้</span><b>วันนี้</b><span class="now">ตามเวลาไทยเสมอ เปลี่ยนวันเองตอนเที่ยงคืน</span></div>
+      <span class="who">นักเรียนแทบไม่สังเกต</span></div>
+  </div>
+  <p class="muted" style="font-size:.9rem">ที่ไม่กระทบนักเรียน: แผงทดสอบความคืบหน้าย้ายไปอยู่ที่ host จำลอง และการทดสอบความคืบหน้าหลังเส้นตายเทียบเฉพาะการ์ด</p>
+</section>
+
+<section>
+  <span class="eyebrow">ลำดับงาน</span>
+  <h2>ticket ที่เหลือและสิ่งที่รอกัน</h2>
+  <p>grill ทั้ง 5 ใบปิดแล้ว ตัวเลือกด้าน API ล็อกหมดแล้ว งานที่เหลือเป็นงานลงมือ เริ่มที่ #7</p>
+<pre class="mermaid">
+flowchart LR
+    T2["#2 ตาข่ายกันพลาด"]:::done
+    T3["#3 สัญญาข้อมูล"]:::done
+    T4["#4 view และ deep link"]:::done
+    T5["#5 เกณฑ์ครบเท่า prototype"]:::done
+    T6["#6 build และ publish"]:::done
+    T7["#7 แยกบ้าน + host จำลอง"]:::next
+    T8["#8 Month + buildPlan"]
+    T9["#9 All timeline"]
+    T10["#10 Course detail + ซื้อ/เริ่ม"]
+    T11["#11 ปฏิทินการเรียน"]
+    T12["#12 ความคืบหน้า"]
+    T13["#13 ตรวจ parity + ลบ prototype"]:::human
+    T14["#14 Library build ยังไม่ publish"]
+    T2 --> T7
+    T3 --> T7
+    T7 --> T8
+    T8 --> T9 & T10 & T11 & T12
+    T4 --> T10
+    T9 & T10 & T11 & T12 --> T13
+    T5 --> T13
+    T13 --> T14
+    T6 --> T14
+    classDef done fill:#d8efe6,stroke:#0f8a6c,color:#0b4a3a
+    classDef next fill:#dbe5fb,stroke:#2f5fd0,color:#173a8a,stroke-width:2px
+    classDef human fill:#fbe3d6,stroke:#c46a2b,color:#6b3510
+</pre>
+  <p class="muted" style="font-size:.9rem">เขียว = ปิดแล้ว · น้ำเงิน = ถัดไป · ส้ม = เจ้าของ repo ต้องเซ็นผ่านเอง (เทียบ screenshot ทุกแถว). หลัง #8 เสร็จ #9 #11 #12 ทำพร้อมกันได้ #10 รอ #8 อย่างเดียวเพราะ #4 ปิดแล้ว</p>
+
+  <h3 style="margin-top:8px">โครง repo ระหว่างทำ (#7 – #13)</h3>
+<pre><code>src/prototype/      ← mockup เดิม แช่แข็ง ไม่แก้        → /prototype/mypath, /prototype/mypath/all
+src/host/           ← Learn Anywhere จำลอง             → /, /courses, /mypath/*, /profile
+  pages/MyPathTab.tsx    ← &lt;MyPath data=… /&gt; แบบเดียวกับแอปจริง
+  fixtures/*.json        ← ข้อมูล mock ที่ host ส่งเข้า SDK
+packages/mypath/    ← SDK
+  src/index.ts           ← ทางเข้าทางเดียว: &lt;MyPath&gt; + types
+  src/plan/              ← buildPlan, progress (copy จาก prototype ไม่เขียนใหม่)
+  src/ui/                ← Month, AllTimeline, CourseDetail, StudyCalendar, Progress
+  src/mypath.css         ← ทุก class อยู่ใต้ .mypath-root, prefix mp-</code></pre>
+  <p class="muted" style="font-size:.9rem">host จำลองใช้ SDK แบบเดียวกับแอปจริง ถ้า props ใช้ยาก เราจะรู้ก่อนทีม Learn Anywhere. prototype เปิดเทียบได้ตลอดจนผ่าน #13 แล้วจึงลบ (กู้คืนได้จาก tag <code>mockup-v1</code>)</p>
+</section>
+
+<section>
+  <span class="eyebrow">เวอร์ชัน</span>
+  <h2>ทีม host อัปเดตได้เมื่อไร</h2>
+  <div class="tbl"><table>
+    <tr><th>ช่วง</th><th>อัปเดตได้เลย</th><th>ต้องแก้ adapter ตาม CHANGELOG</th></tr>
+    <tr><td><code>0.x</code> (เริ่ม <code>0.1.0</code>)</td><td>patch เช่น 0.1.0 → 0.1.1</td><td>minor เช่น 0.1 → 0.2</td></tr>
+    <tr><td>ตั้งแต่ <code>1.0.0</code> (ใช้บน production ครั้งแรก)</td><td>minor, patch</td><td>major</td></tr>
+  </table></div>
+  <p>class CSS ไม่ใช่ API จึงเปลี่ยนได้ทุกเวอร์ชัน. ถ้า major ไหนเปลี่ยนรูป <code>StudentPlan</code> SDK ต้องอ่านแผนรูปเก่าที่ host บันทึกไว้ได้</p>
+</section>
+
+<section>
+  <span class="eyebrow">ต้องตัดสินก่อนแจกนอกทีม</span>
+  <h2>เรื่องที่ยังเปิดอยู่</h2>
+  <div class="note">repo <code>apirak/MyPath</code> เป็น public ใต้บัญชีส่วนตัว ทั้ง source และเอกสารแผน (รวมแผน redesign ของ Phase 2 ที่ยังไม่ออก) จึงเปิดให้ทุกคนเห็น ควรย้ายไป org ของบริษัทแบบ private ก่อนแจกทีม Learn Anywhere. ถ้าย้ายแล้ว วิธี A ต้องเปลี่ยนเป็น registry ที่ใช้ token</div>
+  <div class="box"><ul>
+    <li><b>ช่องทางแจก:</b> #14 ทำแค่ library build และทดสอบด้วย <code>pnpm pack</code> ในเครื่อง ยังไม่มี CI release, tag หรือ publish จนกว่าจะคุยกับทีม Learn Anywhere</li>
+    <li><b>เริ่มเรียนจากหน้าอื่น:</b> ถ้านักเรียนเริ่มเรียนจากหน้าอื่นของ Learn Anywhere วันเริ่มจะไม่ถูกตรึง host ต้องตั้ง <code>startDate</code> เองถ้าต้องการ</li>
+    <li><b>ปุ่ม back บน Android:</b> ถ้าพบว่าผู้ใช้ปัดออกจากหน้าคอร์สโดยไม่ตั้งใจบ่อย ค่อยเพิ่ม <code>onOverlayChange</code> (minor)</li>
+  </ul></div>
+</section>
+
+</div>
+</body>
+</html>
