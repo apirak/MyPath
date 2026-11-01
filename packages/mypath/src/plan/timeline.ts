@@ -1,6 +1,6 @@
 // ฟังก์ชันล้วนของหน้า All — copy สูตรจาก src/prototype/pages/MyPathAllTimeline.tsx (dragStart) และ src/prototype/mypath/plan.ts
 import type { ISODate, StudentCourse, StudentPlan, StudyCalendar } from '../types'
-import { MS, isoOf, u } from './dates'
+import { MS, isISODate, isoOf, u } from './dates'
 
 // แผนใหม่ที่คอร์สนั้นแก้ตาม patch (แทน setCourse* ของ prototype ที่แก้ของเดิม)
 // คอร์สที่ไม่มีในแผน: เพิ่มต่อท้าย — host ไม่ต้องส่งทุกคอร์ส (docs/mypath-integration.md "แผนเก็บเฉพาะค่าที่นักเรียนตั้ง")
@@ -9,7 +9,15 @@ export const withCourse = (plan: StudentPlan, courseId: string, patch: Partial<S
     ? { ...plan, courses: plan.courses.map(c => c.courseId === courseId ? { ...c, ...patch } : c) }
     : { ...plan, courses: [...plan.courses, { courseId, ...patch }] }
 
-export const withCourseStartDate = (plan: StudentPlan, courseId: string, startDate: ISODate) => withCourse(plan, courseId, { startDate })
+// แผนใหม่ที่ใช้ปฏิทินนี้ (แทน setStudyCalendar ของ prototype) — ไม่แตะ courses: ปิดวิชาแล้วเปิดกลับมาได้ค่าเดิม
+// ช่วงปิดเทอมผิด (วันผิดรูป, เริ่มหลังจบ, ซ้อนกัน) = undefined ไม่ส่งให้ host
+export const withStudyCalendar = (plan: StudentPlan, calendar: StudyCalendar): StudentPlan | undefined => {
+  const periods = [...calendar.breaks].sort((a, b) => a.start.localeCompare(b.start))
+  if (periods.some((period, index) => !isISODate(period.start) || !isISODate(period.end) || period.start > period.end || (index > 0 && periods[index - 1].end >= period.start))) return undefined
+  return { ...plan, calendar }
+}
+
+export const withCourseStartDate =(plan: StudentPlan, courseId: string, startDate: ISODate) => withCourse(plan, courseId, { startDate })
 
 // วันจันทร์ที่ใกล้ที่สุด (ขอบที่ 3.5 วัน) ให้ตรงกับแท่งชั่วโมงเรียน/สัปดาห์
 export const snapToMonday = (ms: number): ISODate => {
